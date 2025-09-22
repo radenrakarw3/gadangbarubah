@@ -4,7 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight } from 'lucide-react';
 import Logo from './Logo';
 import ImageSlideshow from './ImageSlideshow';
-import PhotoFrameMinang from './PhotoFrameMinang';
 import image1 from '@assets/DSC07140_1758564407964.jpg';
 import image2 from '@assets/DSC02436_1758564588903.jpg';
 import image3 from '@assets/DSC02371_1758564588950.jpg';
@@ -116,14 +115,16 @@ export default function WelcomePage() {
                   </p>
                 </div>
               </div>
-              <PhotoFrameMinang variant="royal-gold" density="rich" crest="gonjong">
-                <img 
-                  src={restaurantExterior} 
-                  alt="Eksterior mewah Gadang Barubah" 
-                  className="w-full h-full object-cover"
-                  data-testid="img-exterior"
-                />
-              </PhotoFrameMinang>
+              <div className="relative overflow-hidden rounded-xl shadow-2xl">
+                <div className="aspect-[4/3]">
+                  <img 
+                    src={restaurantExterior} 
+                    alt="Eksterior mewah Gadang Barubah" 
+                    className="w-full h-full object-cover"
+                    data-testid="img-exterior"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Story Section 2 - Interior/Night */}
@@ -143,15 +144,15 @@ export default function WelcomePage() {
                   </p>
                 </div>
               </div>
-              <div className="lg:order-1">
-                <PhotoFrameMinang variant="royal-gold" density="rich" crest="gonjong">
+              <div className="lg:order-1 relative overflow-hidden rounded-xl shadow-2xl">
+                <div className="aspect-[4/3]">
                   <img 
                     src={restaurantNight} 
                     alt="Suasana malam yang hangat di Gadang Barubah" 
                     className="w-full h-full object-cover"
                     data-testid="img-night"
                   />
-                </PhotoFrameMinang>
+                </div>
               </div>
             </div>
 
