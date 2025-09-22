@@ -50,7 +50,7 @@ export const botDetection = (req: Request, res: Response, next: NextFunction) =>
     /slackbot/i                  // Slack link preview
   ];
 
-  // MALICIOUS bot patterns (BLOCK these)
+  // MALICIOUS bot patterns (BLOCK only obvious automation tools)
   const maliciousBotPatterns = [
     /curl/i,
     /wget/i,
@@ -58,11 +58,8 @@ export const botDetection = (req: Request, res: Response, next: NextFunction) =>
     /^$/,                        // Empty user agent
     /phantomjs/i,
     /scrapy/i,
-    /nutch/i,
-    /robot/i,
-    /spider/i,
-    /crawler/i,
-    /bot/i                       // Generic bot (but legitimate ones already allowed above)
+    /nutch/i
+    // REMOVED: /robot/i, /spider/i, /crawler/i, /bot/i - too broad, might block legitimate traffic
   ];
 
   // First check if it's a legitimate search engine
@@ -77,7 +74,7 @@ export const botDetection = (req: Request, res: Response, next: NextFunction) =>
   const isMaliciousBot = maliciousBotPatterns.some(pattern => pattern.test(userAgent));
   
   if (isMaliciousBot) {
-    console.log(`🚫 Malicious bot blocked - User-Agent: ${userAgent}, IP: ${req.ip}`);
+    console.log(`🚫 Automation tool blocked - User-Agent: ${userAgent}, IP: ${req.ip}`);
     return res.status(403).json({
       success: false,
       message: "Access denied",
