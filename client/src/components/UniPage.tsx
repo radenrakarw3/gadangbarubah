@@ -89,6 +89,22 @@ export default function UniPage() {
             </p>
           </div>
           
+          {/* Mascot Section with Background */}
+          <div 
+            className="relative rounded-2xl overflow-hidden bg-cover bg-center shadow-2xl mb-16"
+            style={{ backgroundImage: `url(${restaurantBgImage})` }}
+          >
+            <div className="absolute inset-0 bg-black/40"></div>
+            <div className="relative z-10 p-8 sm:p-12 text-center">
+              <div className="max-w-2xl mx-auto">
+                <Mascot 
+                  isAnimating={false}
+                  message="Selamat datang di Gadang Barubah! Saya Uni, siap membantu Anda menemukan pengalaman kuliner terbaik."
+                />
+              </div>
+            </div>
+          </div>
+          
           {/* Services Grid */}
           <div className="grid md:grid-cols-2 gap-8 mb-16">
             {services.map((service) => {
@@ -124,22 +140,6 @@ export default function UniPage() {
                 </Card>
               );
             })}
-          </div>
-
-          {/* Mascot Section with Background */}
-          <div 
-            className="relative rounded-2xl overflow-hidden bg-cover bg-center shadow-2xl"
-            style={{ backgroundImage: `url(${restaurantBgImage})` }}
-          >
-            <div className="absolute inset-0 bg-black/40"></div>
-            <div className="relative z-10 p-8 sm:p-12 text-center">
-              <div className="max-w-2xl mx-auto">
-                <Mascot 
-                  isAnimating={false}
-                  message="Selamat datang di Gadang Barubah! Saya Uni, siap membantu Anda menemukan pengalaman kuliner terbaik."
-                />
-              </div>
-            </div>
           </div>
         </div>
       </main>
