@@ -4,6 +4,7 @@ interface SEOConfig {
   keywords?: string;
   path: string;
   ogType?: string;
+  noIndex?: boolean;
 }
 
 export const createSEOConfig = (config: SEOConfig) => {
@@ -22,6 +23,7 @@ export const createSEOConfig = (config: SEOConfig) => {
     ogSiteName: siteName,
     twitterTitle: config.title,
     twitterDescription: config.description,
+    noIndex: config.noIndex || false,
   };
 };
 
@@ -73,14 +75,16 @@ export const pageSEOConfigs = {
     title: "Login Member VIP Gadang Barubah - Akses Eksklusif Premium",
     description: "Login ke akun VIP member Gadang Barubah untuk menikmati benefit eksklusif, diskon khusus, dan layanan prioritas untuk pengalaman kuliner yang istimewa.",
     keywords: "login member gadang barubah, vip member, akun premium gadang barubah, member eksklusif, login vip restoran padang",
-    path: "/member/login"
+    path: "/member/login",
+    noIndex: true
   }),
   
   memberRegister: createSEOConfig({
     title: "Daftar VIP Member Gadang Barubah - Bergabung Program Eksklusif",
     description: "Daftar sebagai VIP member Gadang Barubah dan nikmati benefit eksklusif seperti diskon khusus, reservasi prioritas, dan menu spesial untuk member.",
     keywords: "daftar member gadang barubah, registrasi vip member, membership gadang barubah, daftar member premium, program vip restoran padang",
-    path: "/member/register"
+    path: "/member/register",
+    noIndex: true
   }),
   
   comingSoon: createSEOConfig({
@@ -94,7 +98,8 @@ export const pageSEOConfigs = {
     title: "Halaman Tidak Ditemukan - Gadang Barubah",
     description: "Halaman yang Anda cari tidak ditemukan. Kembali ke beranda untuk menjelajahi layanan dan hidangan premium Gadang Barubah.",
     keywords: "404, halaman tidak ditemukan, gadang barubah",
-    path: "/404"
+    path: "/404",
+    noIndex: true
   })
 };
 
@@ -117,12 +122,9 @@ export function getSEOConfigByPath(path: string) {
   return pageSEOConfigs.notFound;
 }
 
-export function generateSEOTags(seoConfig: ReturnType<typeof createSEOConfig>, currentPath?: string) {
-  // Normalize path for consistent comparison
-  const normalizedPath = currentPath ? currentPath.toLowerCase().replace(/\/$/, '') || '/' : '';
-  
-  // Set robots meta based on page type
-  const robotsContent = normalizedPath === '/404' || normalizedPath === '/member/login' || normalizedPath === '/member/register' 
+export function generateSEOTags(seoConfig: ReturnType<typeof createSEOConfig>) {
+  // Set robots meta based on SEO config noIndex flag
+  const robotsContent = seoConfig.noIndex
     ? 'noindex, nofollow' 
     : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
     

@@ -22,7 +22,7 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "blob:"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
-      connectSrc: ["'self'", "ws:", "wss:", "https://www.google-analytics.com", "https://analytics.google.com"],
+      connectSrc: ["'self'", "ws:", "wss:", "https://*.google-analytics.com", "https://*.analytics.google.com", "https://www.googletagmanager.com"],
       frameSrc: ["'none'"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
@@ -74,10 +74,20 @@ app.use((req, res, next) => {
   next();
 });
 
-// SEO Head injection middleware (before setupVite/serveStatic)
+// SEO Head injection middleware (only in production for real SEO benefits)
 app.get("*", async (req, res, next) => {
-  // Only handle non-API routes
-  if (req.path.startsWith("/api") || req.path.includes(".")) {
+  // Skip in development mode to avoid interfering with Vite HMR
+  if (app.get("env") === "development") {
+    return next();
+  }
+  
+  // Skip API routes, static assets, and Vite-specific routes
+  if (req.path.startsWith("/api") || 
+      req.path.includes(".") || 
+      req.path.startsWith("/src/") ||
+      req.path.startsWith("/@") ||
+      req.path.startsWith("/node_modules") ||
+      req.path.startsWith("/assets/")) {
     return next();
   }
 
@@ -99,7 +109,12 @@ app.get("*", async (req, res, next) => {
 
     // Get SEO config for this path
     const seoConfig = getSEOConfigByPath(req.path);
-    const seoTags = generateSEOTags(seoConfig, req.path);
+    const seoTags = generateSEOTags(seoConfig);
+    
+    // Set 404 status for unknown routes  
+    if (seoConfig.title.includes("Halaman Tidak Ditemukan")) {
+      res.status(404);
+    }
 
     // Replace SSR placeholders with actual SEO content
     template = template.replace(`<!--ssr-helmet-title-->`, seoTags.title);
