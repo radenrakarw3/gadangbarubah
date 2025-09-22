@@ -12,6 +12,7 @@ export const users = pgTable("users", {
 export const members = pgTable("members", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   namaLengkap: text("nama_lengkap").notNull(),
+  jenisKelamin: varchar("jenis_kelamin", { length: 3 }).notNull(), // 'Uda' or 'Uni'
   noWhatsApp: text("no_whatsapp").notNull().unique(),
   tanggalLahir: date("tanggal_lahir").notNull(),
   kodePos: varchar("kode_pos", { length: 10 }).notNull(),
@@ -27,6 +28,7 @@ export const insertMemberSchema = createInsertSchema(members).omit({
   id: true,
   pinHash: true, // Omit pinHash as we'll accept pin and hash it server-side
 }).extend({
+  jenisKelamin: z.enum(["Uda", "Uni"], { errorMap: () => ({ message: "Pilih jenis kelamin" }) }),
   pin: z.string().length(6, "PIN harus 6 digit"),
 });
 

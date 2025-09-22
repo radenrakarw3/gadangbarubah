@@ -3,10 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { ArrowLeft, UserPlus, User, Phone, Calendar, MapPin, Lock } from 'lucide-react';
+import { ArrowLeft, UserPlus, User, Phone, Calendar, MapPin, Lock, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import Logo from '@/components/Logo';
@@ -14,6 +15,7 @@ import { z } from 'zod';
 
 const registerSchema = z.object({
   namaLengkap: z.string().min(2, "Nama lengkap minimal 2 karakter"),
+  jenisKelamin: z.enum(["Uda", "Uni"], { errorMap: () => ({ message: "Pilih jenis kelamin" }) }),
   noWhatsApp: z.string().min(10, "Nomor WhatsApp minimal 10 digit"),
   tanggalLahir: z.string().min(1, "Tanggal lahir wajib diisi"),
   kodePos: z.string().length(5, "Kode pos harus 5 digit"),
@@ -34,6 +36,7 @@ export default function MemberRegister() {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       namaLengkap: '',
+      jenisKelamin: '' as 'Uda' | 'Uni' | '',
       noWhatsApp: '',
       tanggalLahir: '',
       kodePos: '',
@@ -129,6 +132,31 @@ export default function MemberRegister() {
                             className="text-base"
                           />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="jenisKelamin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-primary" />
+                          Jenis Kelamin
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger data-testid="select-gender">
+                              <SelectValue placeholder="Pilih jenis kelamin" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Uda">Uda (Cowok)</SelectItem>
+                            <SelectItem value="Uni">Uni (Cewek)</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}

@@ -15,10 +15,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    keyGenerator: (req) => {
-      // Rate limit per IP + WhatsApp number combination for better security
-      return `${req.ip}-${req.body?.noWhatsApp || 'unknown'}`;
-    },
   });
 
   // Member Registration
