@@ -3,13 +3,15 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import GadangBarubahPage from "@/components/GadangBarubahPage";
+import WelcomePage from "@/components/WelcomePage";
+import UniPage from "@/components/UniPage";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={GadangBarubahPage} />
+      <Route path="/" component={WelcomePage} />
+      <Route path="/uni" component={UniPage} />
       <Route component={NotFound} />
     </Switch>
   );
