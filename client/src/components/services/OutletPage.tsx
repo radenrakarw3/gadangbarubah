@@ -144,7 +144,7 @@ export default function OutletPage() {
 
   const locations = [
     {
-      name: "Gadang Barubah Main Gate",
+      name: "Gadang Barubah Pollux Mall Cikarang",
       address: "Main Gate, Mall Cikarang, Jl. Raya Cikarang - Cibarusah, Pasirsari, Cikarang Sel., Kabupaten Bekasi, Jawa Barat 17530 Pollux, Lantai GF",
       phone: "0895-0976-6739",
       hours: "10:00 - 22:00",
@@ -416,44 +416,6 @@ export default function OutletPage() {
             </Card>
           </div>
 
-          {/* Premium Experience */}
-          <Card className="border-border/30 shadow-lg bg-gradient-to-br from-background to-muted/5">
-            <CardContent className="p-10 text-center">
-              <h3 className="text-3xl font-serif font-medium text-foreground mb-6">
-                Pengalaman Premium
-              </h3>
-              <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto">
-                Setiap lokasi dirancang untuk memberikan pengalaman kuliner yang tak terlupakan dengan fasilitas terbaik dan pelayanan berkelas dunia.
-              </p>
-              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
-                <div className="space-y-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center mx-auto border border-primary/20">
-                    <MapPin className="h-6 w-6 text-primary" />
-                  </div>
-                  <p className="text-sm text-muted-foreground font-medium">Valet Parking</p>
-                </div>
-                <div className="space-y-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center mx-auto border border-primary/20">
-                    <Phone className="h-6 w-6 text-primary" />
-                  </div>
-                  <p className="text-sm text-muted-foreground font-medium">Concierge 24/7</p>
-                </div>
-                <div className="space-y-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center mx-auto border border-primary/20">
-                    <Store className="h-6 w-6 text-primary" />
-                  </div>
-                  <p className="text-sm text-muted-foreground font-medium">Private Dining</p>
-                </div>
-                <div className="space-y-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center mx-auto border border-primary/20">
-                    <Clock className="h-6 w-6 text-primary" />
-                  </div>
-                  <p className="text-sm text-muted-foreground font-medium">Priority Service</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </main>
     </div>
