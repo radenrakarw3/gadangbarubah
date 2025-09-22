@@ -75,12 +75,9 @@ export default function WelcomePage() {
           {/* Welcome Section */}
           <div className="text-center mb-12">
             <div className="mb-8">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light text-foreground mb-6 tracking-wide">
-                Selamat Datang di
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-medium text-primary mb-8 tracking-wide">
+                Selamat Datang di Gadang Barubah - Rumah Makan Padang
               </h1>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-medium text-primary mb-8 tracking-wide">
-                Gadang Barubah - Rumah Makan Padang
-              </h2>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             </div>
           </div>

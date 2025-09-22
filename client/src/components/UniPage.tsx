@@ -125,7 +125,11 @@ export default function UniPage() {
           </div>
           
           {/* Services Grid */}
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <div className="mb-16">
+            <h2 className="text-2xl sm:text-3xl font-serif font-medium text-foreground text-center mb-8">
+              Jelajahi Layanan Kami
+            </h2>
+            <div className="grid md:grid-cols-2 gap-8">
             {services.map((service) => {
               const IconComponent = service.icon;
               
@@ -159,6 +163,7 @@ export default function UniPage() {
                 </Card>
               );
             })}
+            </div>
           </div>
 
           {/* Rendang Kiloan Promo */}
