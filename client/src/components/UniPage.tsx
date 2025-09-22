@@ -157,27 +157,27 @@ export default function UniPage() {
             <Card className="overflow-hidden border-border/30 shadow-lg bg-gradient-to-br from-background to-muted/5 hover-elevate hover:shadow-xl transition-all duration-500">
               <CardContent className="p-0">
                 <div className="flex items-center">
-                  {/* Image Section - 1:1 ratio */}
-                  <div className="w-32 h-32 flex-shrink-0">
+                  {/* Image Section - 1:1 ratio with responsive sizing */}
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
                     <img 
                       src={rendangKiloanImage}
                       alt="Rendang Kiloan Gadang Barubah - packaging premium dengan rendang segar"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-bottom"
                       data-testid="img-rendang-kiloan"
                     />
                   </div>
                   
                   {/* Content Section */}
-                  <div className="flex-1 p-6">
+                  <div className="flex-1 p-4 sm:p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center mb-2">
-                          <ShoppingBag className="h-5 w-5 text-primary mr-2" />
-                          <h3 className="font-serif text-lg font-medium text-foreground">
+                        <div className="flex items-center mb-1 sm:mb-2">
+                          <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2" />
+                          <h3 className="font-serif text-base sm:text-lg font-medium text-foreground">
                             Rendang Kiloan
                           </h3>
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2 sm:mb-3">
                           Nikmati kelezatan rendang premium dalam kemasan praktis untuk keluarga
                         </p>
                         <div className="text-xs text-primary/70 font-medium">
@@ -187,7 +187,7 @@ export default function UniPage() {
                       
                       <Button 
                         size="sm"
-                        className="ml-4"
+                        className="ml-3 sm:ml-4 text-xs sm:text-sm"
                         asChild
                         data-testid="button-order-rendang"
                       >
