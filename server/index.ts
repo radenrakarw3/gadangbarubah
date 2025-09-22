@@ -31,15 +31,15 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false, // Disable for Vite compatibility
 }));
 
-// CUSTOMER-FRIENDLY SECURITY - Disabled blocking systems for better customer access
-app.use(securityLoggingMiddleware); // Monitor only (no blocking)
-app.use(costMonitoringMiddleware);  // Track expensive operations
+// ALL SECURITY DISABLED FOR MAXIMUM CUSTOMER ACCESS
+// app.use(securityLoggingMiddleware); // DISABLED - was causing log overhead
+// app.use(costMonitoringMiddleware);  // DISABLED - was tracking and potentially blocking
 // app.use(geoSecurity);            // DISABLED - was blocking legitimate customers
-app.use(botDetection);              // Keep for SEO - allows search engines, blocks obvious bots only
+// app.use(botDetection);           // DISABLED - might be too aggressive
 // app.use(strictRateLimit);        // DISABLED - was too restrictive (50 req/15min)
 // app.use(antiSpamSlowDown);       // DISABLED - was adding delays to legitimate users
 // app.use(requestValidator);       // DISABLED - was too aggressive on content validation
-app.use(honeypot);                  // Keep minimal form protection only
+// app.use(honeypot);               // DISABLED - even minimal protection can interfere
 
 app.use(express.json({ limit: '10mb' })); // Limit payload size
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
