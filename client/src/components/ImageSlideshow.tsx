@@ -23,7 +23,7 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
   }, [images.length, interval]);
 
   return (
-    <div className="relative overflow-hidden rounded-lg shadow-lg h-[400px] sm:h-[500px]">
+    <div className="relative overflow-hidden rounded-lg shadow-lg aspect-square w-full max-w-lg mx-auto">
       {images.map((image, index) => (
         <div
           key={index}
