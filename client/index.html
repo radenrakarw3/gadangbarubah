@@ -43,17 +43,36 @@
     {
       "@context": "https://schema.org",
       "@type": "Restaurant",
+      "@id": "https://gadangbarubahindonesia.id/#restaurant",
       "name": "Gadang Barubah",
-      "description": "Rumah makan Padang premium yang menghadirkan cita rasa autentik Minangkabau di Cikarang",
-      "image": "/og-image.jpg",
-      "logo": "/logo.webp",
+      "alternateName": "Gadang Barubah Restaurant",
+      "description": "Rumah makan Padang premium yang menghadirkan cita rasa autentik Minangkabau di Cikarang dengan menu tradisional seperti rendang, gulai, dan nasi padang berkualitas tinggi",
+      "image": [
+        "https://gadangbarubahindonesia.id/og-image.jpg",
+        "https://gadangbarubahindonesia.id/logo.webp"
+      ],
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://gadangbarubahindonesia.id/logo.webp",
+        "width": 512,
+        "height": 512
+      },
       "url": "https://gadangbarubahindonesia.id",
+      "sameAs": [
+        "https://www.instagram.com/gadangbarubah",
+        "https://www.facebook.com/gadangbarubah",
+        "https://maps.google.com/?cid=gadangbarubah-cikarang"
+      ],
+      "hasMap": "https://maps.google.com/?q=Pollux+Mall+Cikarang",
       "telephone": "+6289509766739",
+      "email": "info@gadangbarubahindonesia.id",
       "priceRange": "$$",
-      "servesCuisine": ["Indonesian", "Padang", "Minangkabau"],
+      "servesCuisine": ["Indonesian", "Padang", "Minangkabau", "Sumatran", "Halal"],
+      "currenciesAccepted": "IDR",
+      "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "Mobile Payment"],
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Pollux Mall Cikarang",
+        "streetAddress": "Pollux Mall Cikarang, Ground Floor Food Court",
         "addressLocality": "Cikarang",
         "addressRegion": "Jawa Barat",
         "postalCode": "17530",
@@ -73,23 +92,98 @@
         }
       ],
       "acceptsReservations": true,
+      "amenityFeature": [
+        {
+          "@type": "LocationFeatureSpecification",
+          "name": "Wi-Fi",
+          "value": true
+        },
+        {
+          "@type": "LocationFeatureSpecification", 
+          "name": "Air Conditioning",
+          "value": true
+        },
+        {
+          "@type": "LocationFeatureSpecification",
+          "name": "Halal Certified",
+          "value": true
+        },
+        {
+          "@type": "LocationFeatureSpecification",
+          "name": "Family Friendly",
+          "value": true
+        },
+        {
+          "@type": "LocationFeatureSpecification",
+          "name": "VIP Room Available",
+          "value": true
+        }
+      ],
+      "hasMenu": {
+        "@type": "Menu",
+        "name": "Menu Tradisional Padang",
+        "description": "Menu lengkap masakan Padang autentik dengan cita rasa khas Minangkabau",
+        "hasMenuSection": [
+          {
+            "@type": "MenuSection",
+            "name": "Nasi Padang",
+            "description": "Paket nasi dengan lauk pilihan khas Padang",
+            "hasMenuItem": [
+              {
+                "@type": "MenuItem",
+                "name": "Nasi Padang Komplit",
+                "description": "Nasi putih dengan rendang, gulai, sayur, dan lauk pelengkap"
+              }
+            ]
+          },
+          {
+            "@type": "MenuSection", 
+            "name": "Rendang",
+            "description": "Masakan daging sapi khas Minangkabau dengan bumbu rempah",
+            "hasMenuItem": [
+              {
+                "@type": "MenuItem",
+                "name": "Rendang Daging",
+                "description": "Rendang daging sapi dengan bumbu tradisional Minang"
+              }
+            ]
+          }
+        ]
+      },
       "offers": [
         {
           "@type": "Offer",
           "name": "Layanan Delivery",
-          "description": "Layanan antar makanan Padang premium ke rumah Anda"
+          "description": "Layanan antar makanan Padang premium ke rumah Anda dengan jangkauan area Cikarang",
+          "priceRange": "$$",
+          "availability": "https://schema.org/InStock"
         },
         {
           "@type": "Offer", 
           "name": "Event Catering",
-          "description": "Layanan katering untuk acara dan event spesial"
+          "description": "Layanan katering untuk acara pernikahan, corporate event, dan gathering dengan menu Padang authentic",
+          "priceRange": "$$$",
+          "availability": "https://schema.org/PreOrder"
         },
         {
           "@type": "Offer",
           "name": "VIP Membership",
-          "description": "Program membership dengan benefit eksklusif"
+          "description": "Program membership dengan benefit eksklusif berupa diskon, prioritas reservasi, dan menu khusus",
+          "price": "99000",
+          "priceCurrency": "IDR"
         }
-      ]
+      ],
+      "keywords": "rumah makan padang, nasi padang, rendang, gulai, masakan minang, restoran padang cikarang, makanan halal, delivery makanan padang, catering padang",
+      "founder": {
+        "@type": "Person",
+        "name": "Gadang Barubah"
+      },
+      "foundingDate": "2020",
+      "numberOfEmployees": {
+        "@type": "QuantitativeValue",
+        "minValue": 10,
+        "maxValue": 25
+      }
     }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
