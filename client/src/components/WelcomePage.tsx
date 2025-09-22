@@ -11,6 +11,8 @@ import image4 from '@assets/DSC07168_1758564588951.jpg';
 import image5 from '@assets/DSC07153_1758564588952.jpg';
 import image6 from '@assets/DSC07152_1758564588952.jpg';
 import image7 from '@assets/DSC07130_1758564588953.jpg';
+import restaurantExterior from '@assets/DSC07220_1758565473982.jpg';
+import restaurantNight from '@assets/DSC05600_1758565473997.jpg';
 
 export default function WelcomePage() {
   const [, navigate] = useLocation();
@@ -85,63 +87,97 @@ export default function WelcomePage() {
             <ImageSlideshow images={slideshowImages} interval={5000} />
           </div>
           
-          {/* About Us Section */}
-          <Card className="mb-10 border-border/50 shadow-sm">
-            <CardContent className="p-8 sm:p-12">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-serif font-medium text-foreground mb-2">Tentang Kami</h2>
-                <div className="w-16 h-px bg-primary mx-auto"></div>
-              </div>
-              
-              {/* Features Grid */}
-              <div className="grid md:grid-cols-3 gap-8 mb-10">
-                <div className="text-center">
-                  <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/10">
-                    <span className="text-2xl text-primary">🍽️</span>
-                  </div>
-                  <h3 className="font-serif text-lg font-medium mb-3">Kuliner Berkelas</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Menu autentik Minangkabau yang dipersembahkan dengan standar kuliner premium
+          {/* About Us Story Section */}
+          <div className="mb-10 space-y-16">
+            {/* Story Header */}
+            <div className="text-center">
+              <h2 className="text-4xl font-serif font-medium text-foreground mb-4">Kisah Gadang Barubah</h2>
+              <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
+              <p className="text-lg text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto">
+                Sebuah perjalanan yang dimulai dari mimpi untuk menghadirkan keagungan kuliner Minangkabau dalam balutan kemewahan modern
+              </p>
+            </div>
+
+            {/* Story Section 1 - Exterior */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <h3 className="text-2xl font-serif font-medium text-foreground">Arsitektur yang Menceritakan Kebesaran</h3>
+                <div className="space-y-4 text-muted-foreground leading-relaxed">
+                  <p>
+                    Berdiri megah dengan desain kontemporer yang memukau, Gadang Barubah hadir sebagai landmark kuliner yang tak terlupakan. 
+                    Setiap sudut bangunan dirancang untuk mencerminkan filosofi "Gadang" - kebesaran yang tak hanya terlihat dari kemegahan fisik, 
+                    namun juga dari kehangatan yang terpancar dari setiap detailnya.
                   </p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/10">
-                    <span className="text-2xl text-primary">🎖️</span>
-                  </div>
-                  <h3 className="font-serif text-lg font-medium mb-3">Pelayanan Prima</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Hospitalitas terbaik dengan perhatian detail yang menjadi ciri khas keunggulan kami
-                  </p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/10">
-                    <span className="text-2xl text-primary">✨</span>
-                  </div>
-                  <h3 className="font-serif text-lg font-medium mb-3">Pengalaman Istimewa</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Setiap kunjungan menjadi momen berkesan dengan suasana yang hangat dan eksklusif
+                  <p>
+                    Fasad modern yang berpadu dengan elemen tradisional menciptakan harmoni sempurna antara warisan masa lalu dan inovasi masa kini. 
+                    Di sinilah perjalanan kuliner Anda dimulai - dari langkah pertama memasuki kawasan yang dirancang khusus untuk memberikan 
+                    pengalaman yang luar biasa.
                   </p>
                 </div>
               </div>
-              
-              {/* Description */}
-              <div className="text-center max-w-3xl mx-auto space-y-6">
-                <p className="text-base text-muted-foreground leading-relaxed">
-                  Gadang Barubah hadir sebagai destinasi kuliner premium yang memadukan warisan tradisi 
-                  Minangkabau dengan keunggulan pelayanan modern. Kami berkomitmen memberikan pengalaman 
-                  bersantap yang tak terlupakan melalui cita rasa otentik dan atmosfer yang istimewa.
-                </p>
-                
-                <p className="text-base text-muted-foreground leading-relaxed">
-                  Dengan filosofi "Gadang" yang bermakna kebesaran, kami menghadirkan kemewahan dalam 
-                  setiap aspek - dari kualitas bahan terbaik hingga kehangatan pelayanan yang 
-                  mencerminkan nilai-nilai luhur budaya Minangkabau.
-                </p>
+              <div className="relative">
+                <div className="aspect-[4/3] overflow-hidden rounded-lg shadow-xl">
+                  <img 
+                    src={restaurantExterior} 
+                    alt="Eksterior mewah Gadang Barubah" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Story Section 2 - Interior/Night */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="lg:order-2 space-y-6">
+                <h3 className="text-2xl font-serif font-medium text-foreground">Atmosfer yang Memanjakan Jiwa</h3>
+                <div className="space-y-4 text-muted-foreground leading-relaxed">
+                  <p>
+                    Ketika malam tiba, Gadang Barubah bertransformasi menjadi oasis kuliner yang hangat dan mengundang. 
+                    Pencahayaan yang dipilih dengan cermat menciptakan suasana intimacy yang sempurna, 
+                    di mana setiap momen bersantap menjadi pengalaman yang berkesan.
+                  </p>
+                  <p>
+                    Interior yang didesain dengan perpaduan elemen tradisional dan modern mencerminkan kekayaan budaya Minangkabau 
+                    dalam balutan kemewahan kontemporer. Di sinilah cerita-cerita indah tercipta, di mana cita rasa bertemu dengan kehangatan, 
+                    dan setiap hidangan disajikan bukan hanya sebagai makanan, tetapi sebagai karya seni yang memanjakan seluruh indra.
+                  </p>
+                </div>
+              </div>
+              <div className="lg:order-1 relative">
+                <div className="aspect-[4/3] overflow-hidden rounded-lg shadow-xl">
+                  <img 
+                    src={restaurantNight} 
+                    alt="Suasana malam yang hangat di Gadang Barubah" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
+              </div>
+            </div>
+
+            {/* Story Conclusion */}
+            <Card className="border-border/50 shadow-sm bg-gradient-to-br from-background to-muted/20">
+              <CardContent className="p-8 sm:p-12 text-center">
+                <div className="max-w-4xl mx-auto space-y-6">
+                  <h3 className="text-3xl font-serif font-medium text-foreground mb-6">Lebih dari Sekadar Restoran</h3>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    Gadang Barubah adalah destinasi di mana tradisi kuliner Minangkabau yang kaya bertemu dengan standar pelayanan kelas dunia. 
+                    Setiap hidangan yang kami sajikan adalah hasil dari dedikasi para chef berpengalaman yang memahami esensi cita rasa otentik, 
+                    dipadu dengan inovasi modern yang memukau.
+                  </p>
+                  <p className="text-base text-muted-foreground leading-relaxed">
+                    Kami tidak hanya menyajikan makanan, tetapi menghadirkan pengalaman kuliner yang akan terukir dalam ingatan. 
+                    Dari kehangatan sambutan hingga kelezatan hidangan penutup, setiap momen di Gadang Barubah dirancang untuk menjadi 
+                    bagian dari cerita hidup yang tak terlupakan.
+                  </p>
+                  <div className="pt-4">
+                    <div className="inline-block w-16 h-px bg-primary"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
           
           {/* Continue Button */}
           <div className="text-center">
