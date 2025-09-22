@@ -7,6 +7,8 @@ import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft,
 import Logo from './Logo';
 import SEOHead from './SEOHead';
 import Mascot from './Mascot';
+import { BacklinksFooter } from './BacklinksFooter';
+import { StructuredData } from './StructuredData';
 import restaurantBgImage from '@assets/DSC03165_1758566711557.jpg';
 import rendangKiloanImage from '@assets/DSC02799_1758569186868.jpg';
 
@@ -237,19 +239,11 @@ export default function UniPage() {
         </div>
       </main>
       
-      {/* Footer */}
-      <footer className="border-t border-border/20 py-12 text-center">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="space-y-3">
-            <p className="text-base text-muted-foreground font-medium">
-              © 2025 Gadang Barubah
-            </p>
-            <p className="text-sm text-muted-foreground/70">
-              Keunggulan Kuliner yang Tak Tertandingi
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* SEO Structured Data */}
+      <StructuredData />
+      
+      {/* Footer dengan Backlinks untuk SEO */}
+      <BacklinksFooter />
     </div>
   );
 }

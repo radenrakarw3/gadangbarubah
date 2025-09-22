@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { OpenGraphTags } from './OpenGraphTags';
 import { pageSEOConfigs } from '@/lib/seo';
 
 interface SEOHeadProps {
@@ -124,6 +125,9 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           }
         })}
       </script>
+      
+      {/* Enhanced Open Graph Tags */}
+      <OpenGraphTags />
     </Helmet>
   );
 }
