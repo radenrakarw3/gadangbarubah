@@ -1,4 +1,4 @@
-import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
+import rateLimit from 'express-rate-limit';
 import slowDown from 'express-slow-down';
 import { Request, Response, NextFunction } from 'express';
 
@@ -167,17 +167,12 @@ export const requestValidator = (req: Request, res: Response, next: NextFunction
 // Enhanced security for member endpoints
 export const memberEndpointSecurity = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 3, // Very strict - only 3 attempts per 15 minutes
+  limit: 10, // Allow more attempts for better user experience
   message: {
     success: false,
     message: "Terlalu banyak percobaan akses member. Coba lagi dalam 15 menit.",
     code: "MEMBER_RATE_LIMIT"
   },
   standardHeaders: true,
-  legacyHeaders: false,
-  keyGenerator: (req) => {
-    // Rate limit by IP + endpoint combination (IPv6 compatible)
-    const ip = req.ip || req.connection.remoteAddress || 'unknown';
-    return `${ip}-${req.path}`;
-  }
+  legacyHeaders: false
 });
