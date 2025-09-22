@@ -1,15 +1,9 @@
-import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Handshake, TrendingUp, Shield, Users } from 'lucide-react';
-import Logo from '../Logo';
+import { Handshake, TrendingUp, Shield, Users } from 'lucide-react';
+import Header from '../Header';
 
 export default function PartnershipPage() {
-  const [, navigate] = useLocation();
-
-  const handleBack = () => {
-    navigate('/uni');
-  };
 
   const benefits = [
     {
@@ -51,37 +45,19 @@ export default function PartnershipPage() {
   ];
 
   return (
-    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-gradient-to-br from-background via-background/98 to-background/95 relative overflow-x-clip overflow-y-auto">
-      {/* Header */}
-      <header className="bg-card/50 backdrop-blur-sm border-b border-border/50 py-3 px-4" data-testid="header-section">
-        <div className="max-w-4xl mx-auto flex items-center space-x-4">
-          <Button
-            onClick={handleBack}
-            variant="ghost"
-            size="sm"
-            className="hover-elevate"
-            data-testid="button-back"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex-1 flex justify-center">
-            <div className="scale-50 origin-center">
-              <Logo />
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
+      <Header showBackButton={true} backPath="/uni" />
 
       <main className="px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center justify-center space-x-2">
-              <span className="text-4xl">🤝</span>
-              <span>Kemitraan</span>
+          <div className="text-center mb-12">
+            <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
+              Program Kemitraan Eksklusif
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Bergabung sebagai mitra bisnis Gadang Barubah
+            <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Bergabunglah dengan jaringan mitra terpilih dalam mengembangkan bisnis kuliner premium
             </p>
           </div>
 

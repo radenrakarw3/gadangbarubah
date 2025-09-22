@@ -1,8 +1,8 @@
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, Sparkles } from 'lucide-react';
-import Logo from './Logo';
+import { ChevronRight } from 'lucide-react';
+import Header from './Header';
 
 export default function WelcomePage() {
   const [, navigate] = useLocation();
@@ -12,151 +12,118 @@ export default function WelcomePage() {
   };
 
   return (
-    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-gradient-to-br from-background via-background/98 to-background/95 relative overflow-x-clip overflow-y-auto">
-      {/* Enhanced floating particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-2 h-2 bg-primary/40 rounded-full animate-ping animation-delay-1000"></div>
-        <div className="absolute top-32 right-16 w-1 h-1 bg-accent/50 rounded-full animate-pulse animation-delay-2000"></div>
-        <div className="absolute bottom-40 left-20 w-3 h-3 bg-primary/30 rounded-full animate-bounce animation-delay-500"></div>
-        <div className="absolute top-1/2 right-8 w-2 h-2 bg-accent/40 rounded-full animate-ping animation-delay-3000"></div>
-        <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-primary/50 rounded-full animate-pulse"></div>
-      </div>
-      
-      {/* Gradient overlays for depth */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background/20 via-transparent to-transparent"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent"></div>
+    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
+      <Header />
       
       {/* Main content */}
-      <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Header with Logo */}
-        <header className="flex-shrink-0 pt-8 pb-4" data-testid="header-section">
-          <Logo />
-        </header>
-        
-        {/* Main content area */}
-        <main className="flex-1 flex items-start justify-start md:items-center md:justify-center px-4 sm:px-6 lg:px-8 py-8">
-          <div className="max-w-5xl mx-auto text-center space-y-8 sm:space-y-10 md:space-y-12">
-            {/* Enhanced Welcome Title */}
-            <div className="space-y-6">
-              <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
-                <Sparkles className="h-5 w-5 text-primary animate-pulse" />
-                <span className="text-sm font-medium text-primary">Selamat Datang</span>
-              </div>
-              
-              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-foreground via-foreground to-primary/80 bg-clip-text text-transparent leading-tight">
-                Gadang Barubah
+      <main className="px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-4xl mx-auto">
+          {/* Welcome Section */}
+          <div className="text-center mb-16">
+            <div className="mb-8">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light text-foreground mb-6 tracking-wide">
+                Selamat Datang di
               </h1>
-              
-              <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-light max-w-2xl mx-auto">
-                Cita Rasa Autentik Minangkabau dengan Sentuhan Modern
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-medium text-primary mb-8 tracking-wide">
+                Gadang Barubah
+              </h2>
+              <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
+              <p className="text-lg sm:text-xl text-muted-foreground font-light leading-relaxed max-w-2xl mx-auto">
+                Cita Rasa Autentik Minangkabau dengan Sentuhan Kemewahan
               </p>
             </div>
-            
-            {/* Enhanced About Us Card */}
-            <Card className="max-w-4xl mx-auto shadow-2xl border-primary/10 bg-card/80 backdrop-blur-sm">
-              <CardContent className="p-8 md:p-12">
-                <div className="flex items-center justify-center mb-8">
-                  <div className="h-1 w-16 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full"></div>
-                </div>
-                
-                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8 flex items-center justify-center space-x-3">
-                  <span className="text-primary text-4xl">✨</span>
-                  <span>Tentang Kami</span>
-                  <span className="text-primary text-4xl">✨</span>
-                </h2>
-                
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-8">
-                  <div className="text-center space-y-3">
-                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-2xl">🏪</span>
-                    </div>
-                    <h3 className="font-semibold text-lg">Kualitas Terjamin</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Menu autentik dengan bahan berkualitas tinggi
-                    </p>
+          </div>
+          
+          {/* About Us Section */}
+          <Card className="mb-12 border-border/50 shadow-sm">
+            <CardContent className="p-8 sm:p-12">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-serif font-medium text-foreground mb-2">Tentang Kami</h2>
+                <div className="w-16 h-px bg-primary mx-auto"></div>
+              </div>
+              
+              {/* Features Grid */}
+              <div className="grid md:grid-cols-3 gap-8 mb-10">
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/10">
+                    <span className="text-2xl text-primary">🍽️</span>
                   </div>
-                  
-                  <div className="text-center space-y-3">
-                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-2xl">❤️</span>
-                    </div>
-                    <h3 className="font-semibold text-lg">Pelayanan Ramah</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Kehangatan tradisi Minangkabau di setiap pelayanan
-                    </p>
-                  </div>
-                  
-                  <div className="text-center space-y-3">
-                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-2xl">🍽️</span>
-                    </div>
-                    <h3 className="font-semibold text-lg">Porsi Memuaskan</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Porsi "Gadang" dengan harga bersahabat
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="prose prose-lg max-w-none text-center">
-                  <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                    Gadang Barubah menghadirkan destinasi kuliner yang memadukan 
-                    <span className="text-primary font-semibold"> cita rasa tradisional Minangkabau</span> 
-                    dengan inovasi modern untuk menciptakan pengalaman makan yang tak terlupakan.
-                  </p>
-                  
-                  <p className="text-base text-muted-foreground/80 leading-relaxed">
-                    Dari outlet hingga layanan catering, kami berkomitmen memberikan yang terbaik 
-                    untuk setiap momen spesial Anda. Bergabunglah dengan keluarga besar Gadang Barubah 
-                    dan rasakan keistimewaan kuliner Nusantara.
+                  <h3 className="font-serif text-lg font-medium mb-3">Kuliner Berkelas</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Menu autentik Minangkabau yang dipersembahkan dengan standar kuliner premium
                   </p>
                 </div>
-              </CardContent>
-            </Card>
-            
-            {/* Enhanced Continue Button */}
-            <div className="pt-4">
-              <div className="flex flex-col items-center space-y-4">
-                <Button
-                  onClick={handleContinue}
-                  size="lg"
-                  className="text-base sm:text-lg px-8 sm:px-12 py-4 md:py-6 lg:py-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden break-words"
-                  data-testid="button-continue"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                  <span className="relative z-10 font-semibold">Lanjut Cari Tau Gadang Barubah</span>
-                  <ChevronRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300 relative z-10" />
-                </Button>
                 
-                <p className="text-sm text-muted-foreground/80 animate-pulse">
-                  Temui Uni dan jelajahi layanan kami
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/10">
+                    <span className="text-2xl text-primary">🎖️</span>
+                  </div>
+                  <h3 className="font-serif text-lg font-medium mb-3">Pelayanan Prima</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Hospitalitas terbaik dengan perhatian detail yang menjadi ciri khas keunggulan kami
+                  </p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/10">
+                    <span className="text-2xl text-primary">✨</span>
+                  </div>
+                  <h3 className="font-serif text-lg font-medium mb-3">Pengalaman Istimewa</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Setiap kunjungan menjadi momen berkesan dengan suasana yang hangat dan eksklusif
+                  </p>
+                </div>
+              </div>
+              
+              {/* Description */}
+              <div className="text-center max-w-3xl mx-auto space-y-6">
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  Gadang Barubah hadir sebagai destinasi kuliner premium yang memadukan warisan tradisi 
+                  Minangkabau dengan keunggulan pelayanan modern. Kami berkomitmen memberikan pengalaman 
+                  bersantap yang tak terlupakan melalui cita rasa otentik dan atmosfer yang istimewa.
+                </p>
+                
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  Dengan filosofi "Gadang" yang bermakna kebesaran, kami menghadirkan kemewahan dalam 
+                  setiap aspek - dari kualitas bahan terbaik hingga kehangatan pelayanan yang 
+                  mencerminkan nilai-nilai luhur budaya Minangkabau.
                 </p>
               </div>
-            </div>
+            </CardContent>
+          </Card>
+          
+          {/* Continue Button */}
+          <div className="text-center">
+            <Button
+              onClick={handleContinue}
+              size="lg"
+              className="px-8 py-4 text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300 shadow-sm hover:shadow-md"
+              data-testid="button-continue"
+            >
+              Jelajahi Layanan Kami
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+            
+            <p className="text-sm text-muted-foreground/80 mt-4">
+              Temui Uni, asisten virtual kami yang siap membantu
+            </p>
           </div>
-        </main>
-        
-        {/* Enhanced Footer */}
-        <footer className="flex-shrink-0 py-6 sm:py-8 text-center pb-[env(safe-area-inset-bottom)]">
+        </div>
+      </main>
+      
+      {/* Footer */}
+      <footer className="border-t border-border/30 py-8 text-center">
+        <div className="max-w-4xl mx-auto px-4">
           <div className="space-y-2">
-            <div className="h-px w-32 bg-gradient-to-r from-transparent via-border to-transparent mx-auto mb-4"></div>
             <p className="text-sm text-muted-foreground font-medium">
               © 2025 Gadang Barubah
             </p>
-            <p className="text-xs text-muted-foreground/60">
-              Pengalaman Kuliner yang Tak Terlupakan
+            <p className="text-xs text-muted-foreground/80">
+              Keunggulan Kuliner yang Tak Tertandingi
             </p>
           </div>
-        </footer>
-      </div>
-      
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .animation-delay-500 { animation-delay: 0.5s; }
-          .animation-delay-1000 { animation-delay: 1s; }
-          .animation-delay-2000 { animation-delay: 2s; }
-          .animation-delay-3000 { animation-delay: 3s; }
-        `
-      }} />
+        </div>
+      </footer>
     </div>
   );
 }

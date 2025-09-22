@@ -1,59 +1,49 @@
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Store, Truck, Handshake, Crown, UtensilsCrossed, Sparkles } from 'lucide-react';
-import Logo from './Logo';
+import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight } from 'lucide-react';
+import Header from './Header';
 import Mascot from './Mascot';
 
 const services = [
   {
     id: 'outlet',
-    name: 'Outlet Gadang Barubah',
+    name: 'Outlet Eksklusif',
     icon: Store,
-    description: 'Kunjungi outlet kami dan nikmati pengalaman makan langsung dengan suasana yang nyaman, menu lengkap, dan pelayanan terbaik dari tim kami yang ramah.',
+    description: 'Kunjungi outlet premium kami untuk pengalaman bersantap langsung dengan suasana yang elegan dan menu terlengkap.',
     path: '/services/outlet',
-    color: 'from-red-500 to-red-600',
-    bgColor: 'bg-red-50 dark:bg-red-950/30',
     emoji: '🏪'
   },
   {
     id: 'delivery',
-    name: 'Pesan Antar',
+    name: 'Layanan Antar Premium',
     icon: Truck,
-    description: 'Pesan makanan favorit Anda dan kami antar langsung ke rumah dengan cepat, aman, dan tetap hangat. Delivery tersedia 24/7 di area coverage kami.',
+    description: 'Nikmati hidangan berkualitas tinggi dengan layanan antar yang cepat, aman, dan menjaga kualitas makanan.',
     path: '/services/delivery',
-    color: 'from-blue-500 to-blue-600',
-    bgColor: 'bg-blue-50 dark:bg-blue-950/30',
     emoji: '🚚'
   },
   {
     id: 'partnership',
-    name: 'Kemitraan',
+    name: 'Program Kemitraan',
     icon: Handshake,
-    description: 'Bergabung sebagai mitra bisnis dan kembangkan usaha kuliner bersama Gadang Barubah. Dapatkan dukungan penuh dari sistem dan brand yang terpercaya.',
+    description: 'Bergabunglah sebagai mitra bisnis eksklusif dengan dukungan penuh sistem dan brand terpercaya.',
     path: '/services/partnership',
-    color: 'from-green-500 to-green-600',
-    bgColor: 'bg-green-50 dark:bg-green-950/30',
     emoji: '🤝'
   },
   {
     id: 'membership',
-    name: 'Membership',
+    name: 'Member Eksklusif',
     icon: Crown,
-    description: 'Dapatkan benefit eksklusif dengan menjadi member Gadang Barubah. Nikmati diskon hingga 20%, promo khusus, dan poin reward setiap pembelian.',
+    description: 'Nikmati privilese istimewa dengan program keanggotaan yang memberikan benefit dan layanan premium.',
     path: '/services/membership',
-    color: 'from-purple-500 to-purple-600',
-    bgColor: 'bg-purple-50 dark:bg-purple-950/30',
     emoji: '👑'
   },
   {
     id: 'catering',
-    name: 'Catering & Event',
+    name: 'Catering & Acara',
     icon: UtensilsCrossed,
-    description: 'Layanan catering untuk acara spesial Anda mulai dari 50-1000 porsi. Kami siap melayani wedding, corporate event, dan acara besar lainnya.',
+    description: 'Layanan katering premium untuk acara istimewa dengan menu berkualitas tinggi dan pelayanan terbaik.',
     path: '/services/catering',
-    color: 'from-orange-500 to-orange-600',
-    bgColor: 'bg-orange-50 dark:bg-orange-950/30',
     emoji: '🍽️'
   }
 ];
@@ -61,156 +51,103 @@ const services = [
 export default function UniPage() {
   const [, navigate] = useLocation();
 
-  const handleBack = () => {
-    navigate('/');
-  };
-
   const handleServiceClick = (service: typeof services[0]) => {
     navigate(service.path);
     console.log(`Navigating to: ${service.name}`);
   };
 
   return (
-    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-gradient-to-br from-background via-background/98 to-background/95 relative overflow-x-clip overflow-y-auto">
-      {/* Enhanced floating particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-2 h-2 bg-primary/40 rounded-full animate-ping animation-delay-1000"></div>
-        <div className="absolute top-32 right-16 w-1 h-1 bg-accent/50 rounded-full animate-pulse animation-delay-2000"></div>
-        <div className="absolute bottom-40 left-20 w-3 h-3 bg-primary/30 rounded-full animate-bounce animation-delay-500"></div>
-        <div className="absolute top-1/2 right-8 w-2 h-2 bg-accent/40 rounded-full animate-ping animation-delay-3000"></div>
-        <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-primary/50 rounded-full animate-pulse"></div>
-        <div className="absolute top-3/4 left-1/4 w-1 h-1 bg-primary/40 rounded-full animate-bounce animation-delay-1500"></div>
-      </div>
-      
-      {/* Gradient overlays for depth */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background/20 via-transparent to-transparent"></div>
+    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
+      <Header showBackButton={true} backPath="/" />
       
       {/* Main content */}
-      <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Compact Mobile Header */}
-        <header className="flex-shrink-0 bg-card/50 backdrop-blur-sm border-b border-border/50 py-2 md:py-3 px-4" data-testid="header-section">
-          <div className="max-w-4xl mx-auto flex items-center space-x-3">
-            <Button
-              onClick={handleBack}
-              variant="ghost"
-              size="sm"
-              className="hover-elevate p-2 md:px-3 md:py-2"
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline ml-1">Kembali</span>
-            </Button>
-            
-            <div className="flex-1 flex justify-center">
-              <div className="scale-50 md:scale-60 origin-center transform -my-4 md:-my-3">
-                <Logo />
-              </div>
-            </div>
-            
-            <div className="w-16 md:w-20"></div> {/* Spacer for balance */}
+      <main className="px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-5xl mx-auto">
+          {/* Introduction */}
+          <div className="text-center mb-12">
+            <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
+              Layanan Premium Kami
+            </h1>
+            <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Uni siap membantu Anda menjelajahi berbagai layanan unggulan yang kami tawarkan
+            </p>
           </div>
-        </header>
-        
-        {/* Main content area */}
-        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-4 md:py-6">
-          <div className="max-w-4xl mx-auto">
-            {/* Title Section */}
-            <div className="text-center mb-6 md:mb-8">
-              <div className="inline-flex items-center space-x-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm mb-3 md:mb-4">
-                <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-                <span className="text-xs md:text-sm font-medium text-primary">Layanan Uni</span>
-              </div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-                Pilih Layanan Anda
-              </h1>
-              <p className="text-sm md:text-base text-muted-foreground">
-                Uni siap membantu Anda dengan berbagai layanan terbaik
+
+          {/* Mascot Section */}
+          <div className="flex justify-center mb-12">
+            <div className="max-w-md">
+              <Mascot 
+                isAnimating={false}
+                message="Selamat datang! Saya Uni, asisten pribadi Anda di Gadang Barubah. Silakan pilih layanan yang Anda inginkan, dan saya akan memandu Anda ke informasi lengkapnya."
+              />
+            </div>
+          </div>
+          
+          {/* Services Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((service) => {
+              const IconComponent = service.icon;
+              
+              return (
+                <Card 
+                  key={service.id} 
+                  className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20"
+                >
+                  <CardContent className="p-6">
+                    <div className="text-center mb-4">
+                      <div className="w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/10 group-hover:bg-primary/10 transition-colors">
+                        <IconComponent className="h-6 w-6 text-primary" />
+                      </div>
+                      <h3 className="font-serif text-lg font-medium text-foreground mb-2">
+                        {service.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                        {service.description}
+                      </p>
+                    </div>
+                    
+                    <Button
+                      onClick={() => handleServiceClick(service)}
+                      variant="outline"
+                      className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300"
+                      data-testid={`button-service-${service.id}`}
+                    >
+                      <span className="mr-2">{service.emoji}</span>
+                      Pelajari Selengkapnya
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Bottom Note */}
+          <div className="text-center mt-12">
+            <div className="bg-accent/30 rounded-lg p-6 border border-accent/20">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">Catatan:</strong> Tim customer service kami siap membantu Anda 24/7 
+                untuk memberikan informasi detail dan bantuan pemesanan melalui berbagai channel yang tersedia.
               </p>
             </div>
-
-            {/* Mascot Section - Now on top */}
-            <div className="flex flex-col items-center justify-center mb-6 md:mb-8">
-              <div className="w-full max-w-lg">
-                <Mascot 
-                  isAnimating={false}
-                  message="Halo! Saya Uni dari Gadang Barubah. Silakan pilih layanan yang Anda butuhkan. Saya akan membawa Anda ke halaman yang tepat!"
-                />
-              </div>
-            </div>
-            
-            {/* Service Buttons Section - Now below mascot */}
-            <div className="w-full">
-              <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-border/50 shadow-xl">
-                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2 text-center">
-                  Layanan Kami
-                </h2>
-                <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6 text-center">
-                  Klik untuk masuk ke halaman layanan
-                </p>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                  {services.map((service) => {
-                    const IconComponent = service.icon;
-                    
-                    return (
-                      <Card 
-                        key={service.id} 
-                        className="hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
-                      >
-                        <CardContent className="p-0">
-                          <Button
-                            onClick={() => handleServiceClick(service)}
-                            className="w-full h-auto py-3 md:py-4 px-4 justify-start text-left rounded-lg bg-gradient-to-r from-background to-background/50 hover:from-accent/20 hover:to-accent/10 transition-all duration-300"
-                            variant="ghost"
-                            data-testid={`button-service-${service.id}`}
-                          >
-                            <div className="flex items-center space-x-3 md:space-x-4 w-full">
-                              <div className={`p-2 md:p-3 rounded-xl flex-shrink-0 bg-gradient-to-r ${service.color} text-white shadow-md`}>
-                                <IconComponent className="h-4 w-4 md:h-5 md:w-5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-semibold text-sm md:text-base text-foreground break-words">
-                                  <span className="mr-2">{service.emoji}</span>
-                                  {service.name}
-                                </div>
-                              </div>
-                              <div className="flex-shrink-0">
-                                <ArrowLeft className="h-4 w-4 text-muted-foreground rotate-180" />
-                              </div>
-                            </div>
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
           </div>
-        </main>
-        
-        {/* Compact Footer */}
-        <footer className="flex-shrink-0 py-3 md:py-4 text-center border-t border-border/30 bg-card/30 backdrop-blur-sm pb-[env(safe-area-inset-bottom)]">
-          <div className="space-y-1">
-            <p className="text-xs md:text-sm text-muted-foreground font-medium">
+        </div>
+      </main>
+      
+      {/* Footer */}
+      <footer className="border-t border-border/30 py-8 text-center">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground font-medium">
               © 2025 Gadang Barubah
             </p>
-            <p className="text-xs text-muted-foreground/60">
-              Melayani Dengan Sepenuh Hati
+            <p className="text-xs text-muted-foreground/80">
+              Melayani dengan Standar Keunggulan Tertinggi
             </p>
           </div>
-        </footer>
-      </div>
-      
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .animation-delay-500 { animation-delay: 0.5s; }
-          .animation-delay-1000 { animation-delay: 1s; }
-          .animation-delay-1500 { animation-delay: 1.5s; }
-          .animation-delay-2000 { animation-delay: 2s; }
-          .animation-delay-3000 { animation-delay: 3s; }
-        `
-      }} />
+        </div>
+      </footer>
     </div>
   );
 }

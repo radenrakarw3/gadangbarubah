@@ -1,15 +1,9 @@
-import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, MapPin, Clock, Phone } from 'lucide-react';
-import Logo from '../Logo';
+import { MapPin, Clock, Phone } from 'lucide-react';
+import Header from '../Header';
 
 export default function OutletPage() {
-  const [, navigate] = useLocation();
-
-  const handleBack = () => {
-    navigate('/uni');
-  };
 
   const outlets = [
     {
@@ -36,48 +30,32 @@ export default function OutletPage() {
   ];
 
   return (
-    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-gradient-to-br from-background via-background/98 to-background/95 relative overflow-x-clip overflow-y-auto">
-      {/* Header */}
-      <header className="bg-card/50 backdrop-blur-sm border-b border-border/50 py-3 px-4" data-testid="header-section">
-        <div className="max-w-4xl mx-auto flex items-center space-x-4">
-          <Button
-            onClick={handleBack}
-            variant="ghost"
-            size="sm"
-            className="hover-elevate"
-            data-testid="button-back"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex-1 flex justify-center">
-            <div className="scale-50 origin-center">
-              <Logo />
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
+      <Header showBackButton={true} backPath="/uni" />
 
-      <main className="px-4 py-8">
+      <main className="px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-4xl mx-auto">
           {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center justify-center space-x-2">
-              <span className="text-4xl">🏪</span>
-              <span>Outlet Gadang Barubah</span>
+          <div className="text-center mb-12">
+            <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
+              Outlet Eksklusif Kami
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Kunjungi outlet kami untuk pengalaman makan langsung
+            <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Kunjungi lokasi premium kami untuk pengalaman bersantap yang tak terlupakan
             </p>
           </div>
 
           {/* Outlets Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {outlets.map((outlet, index) => (
-              <Card key={index} className="hover-elevate transition-all duration-300">
+              <Card key={index} className="hover:shadow-lg transition-all duration-300 border-border/50">
                 <CardContent className="p-6">
                   <div className="text-center mb-4">
-                    <div className="text-4xl mb-2">{outlet.image}</div>
-                    <h3 className="text-xl font-bold text-foreground">{outlet.name}</h3>
+                    <div className="w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/10">
+                      <span className="text-2xl">{outlet.image}</span>
+                    </div>
+                    <h3 className="text-xl font-serif font-medium text-foreground">{outlet.name}</h3>
                   </div>
                   
                   <div className="space-y-3">
@@ -97,7 +75,7 @@ export default function OutletPage() {
                     </div>
                   </div>
                   
-                  <Button className="w-full mt-4 hover-elevate" data-testid={`button-visit-${index}`}>
+                  <Button className="w-full mt-6" variant="outline" data-testid={`button-visit-${index}`}>
                     Kunjungi Outlet
                   </Button>
                 </CardContent>
@@ -106,27 +84,36 @@ export default function OutletPage() {
           </div>
 
           {/* Additional Info */}
-          <Card className="mt-8 bg-primary/10 border-primary/20">
-            <CardContent className="p-6 text-center">
-              <h3 className="text-xl font-bold text-foreground mb-4">
-                🍽️ Fasilitas di Outlet Kami
+          <Card className="bg-accent/20 border-accent/30">
+            <CardContent className="p-8 text-center">
+              <h3 className="text-2xl font-serif font-medium text-foreground mb-6">
+                Fasilitas Premium
               </h3>
-              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <div className="text-2xl">🅿️</div>
-                  <p className="text-sm text-muted-foreground">Parkir Gratis</p>
+              <div className="w-16 h-px bg-primary mx-auto mb-8"></div>
+              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto border border-primary/20">
+                    <span className="text-xl">🅿️</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground font-medium">Valet Parking</p>
                 </div>
-                <div className="space-y-2">
-                  <div className="text-2xl">📶</div>
-                  <p className="text-sm text-muted-foreground">WiFi Gratis</p>
+                <div className="space-y-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto border border-primary/20">
+                    <span className="text-xl">📶</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground font-medium">WiFi Premium</p>
                 </div>
-                <div className="space-y-2">
-                  <div className="text-2xl">❄️</div>
-                  <p className="text-sm text-muted-foreground">AC Sejuk</p>
+                <div className="space-y-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto border border-primary/20">
+                    <span className="text-xl">❄️</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground font-medium">AC Premium</p>
                 </div>
-                <div className="space-y-2">
-                  <div className="text-2xl">🛡️</div>
-                  <p className="text-sm text-muted-foreground">Protokol Kesehatan</p>
+                <div className="space-y-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto border border-primary/20">
+                    <span className="text-xl">🏆</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground font-medium">Certified Excellence</p>
                 </div>
               </div>
             </CardContent>
