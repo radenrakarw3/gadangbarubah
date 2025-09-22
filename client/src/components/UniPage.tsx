@@ -84,9 +84,7 @@ export default function UniPage() {
               Layanan Eksklusif
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
-              Jelajahi pengalaman kuliner premium yang kami hadirkan khusus untuk Anda
-            </p>
+            
           </div>
           
           {/* Mascot Section with Background */}
