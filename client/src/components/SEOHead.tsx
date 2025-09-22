@@ -21,6 +21,8 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
       <meta property="og:url" content={seoConfig.ogUrl} />
       <meta property="og:type" content={seoConfig.ogType} />
       <meta property="og:site_name" content={seoConfig.ogSiteName} />
+      <meta name="application-name" content="Gadang Barubah Indonesia" />
+      <meta name="publisher" content="gadangbarubahindonesia.id" />
       <meta property="og:image" content="https://gadangbarubahindonesia.id/og-image.jpg" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
@@ -64,6 +66,60 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
             "https://www.instagram.com/gadangbarubahindonesia",
             "https://wa.me/6289509766739"
           ]
+        })}
+      </script>
+      
+      {/* Organization Schema for Brand Recognition */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Gadang Barubah Indonesia",
+          "alternateName": ["Gadang Barubah", "gadangbarubahindonesia.id"],
+          "url": "https://gadangbarubahindonesia.id",
+          "logo": "https://gadangbarubahindonesia.id/og-image.jpg",
+          "description": "Rumah makan Padang premium dengan cabang di berbagai kota Indonesia",
+          "foundingDate": "2024",
+          "industry": "Restaurant & Food Service",
+          "numberOfEmployees": "10-50",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "ID",
+            "addressRegion": "Indonesia"
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+6289509766739",
+            "contactType": "customer service",
+            "availableLanguage": "Indonesian"
+          },
+          "sameAs": [
+            "https://www.instagram.com/gadangbarubahindonesia",
+            "https://wa.me/6289509766739"
+          ]
+        })}
+      </script>
+      
+      {/* WebSite Schema for Search Actions */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Gadang Barubah Indonesia",
+          "alternateName": "gadangbarubahindonesia.id",
+          "url": "https://gadangbarubahindonesia.id",
+          "description": "Website resmi Gadang Barubah - Rumah makan Padang premium Indonesia",
+          "inLanguage": "id-ID",
+          "copyrightYear": "2024",
+          "author": {
+            "@type": "Organization",
+            "name": "Gadang Barubah Indonesia"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://gadangbarubahindonesia.id/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
         })}
       </script>
     </Helmet>

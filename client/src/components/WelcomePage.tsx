@@ -117,7 +117,7 @@ export default function WelcomePage() {
                 <div className="aspect-[4/3]">
                   <img 
                     src={restaurantExterior} 
-                    alt="Eksterior mewah rumah makan Padang Gadang Barubah di Pollux Mall Cikarang" 
+                    alt="Eksterior mewah rumah makan Padang Gadang Barubah Indonesia (gadangbarubahindonesia.id)" 
                     className="w-full h-full object-cover"
                     data-testid="img-exterior"
                   />
@@ -131,7 +131,7 @@ export default function WelcomePage() {
                 <h3 className="text-2xl font-serif font-medium text-foreground">Bahasa Universal yang Menyatukan</h3>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    Kami percaya, kuliner adalah bahasa universal yang mampu menyatukan. Karena itu, Gadang Barubah berkomitmen 
+                    Kami percaya, kuliner adalah bahasa universal yang mampu menyatukan. Karena itu, Gadang Barubah (gadangbarubahindonesia.id) berkomitmen 
                     menghadirkan pengalaman bersantap yang hangat, ramah, dan berkesan, baik untuk keluarga, sahabat, maupun kolega.
                   </p>
                   <p>

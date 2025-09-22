@@ -29,7 +29,7 @@ export const pageSEOConfigs = {
   home: createSEOConfig({
     title: "Gadang Barubah - Rumah Makan Padang Premium Indonesia",
     description: "Gadang Barubah - Rumah makan Padang premium dengan cabang di berbagai kota. Nikmati nasi padang autentik, rendang terbaik, gulai khas Minang dengan cita rasa tradisional yang istimewa. Reservasi: 089509766739",
-    keywords: "gadang barubah, gadangbarubah, rumah makan padang terbaik, nasi padang enak, restoran padang premium, gadang barubah indonesia, alternatif payakumbuah, pengganti pagi sore, lebih baik dari bumus, selain padang merdeka, rumah makan padang premium, rendang enak, gulai padang terbaik, masakan minang autentik, gadangbarubahindonesia",
+    keywords: "gadang barubah, gadangbarubah, gadangbarubahindonesia.id, gadangbarubahindonesia, rumah makan padang terbaik, nasi padang enak, restoran padang premium, gadang barubah indonesia, alternatif payakumbuah, pengganti pagi sore, lebih baik dari bumus, selain padang merdeka, rumah makan padang premium, rendang enak, gulai padang terbaik, masakan minang autentik",
     path: "/",
     ogType: "restaurant"
   }),
