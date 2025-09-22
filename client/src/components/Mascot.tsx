@@ -47,24 +47,26 @@ export default function Mascot({ isAnimating = false, message }: MascotProps) {
   };
 
   return (
-    <div className="flex items-center justify-center gap-6 flex-wrap">
-      <div className="relative">
-        <img
-          src={mascotImage}
-          alt="Uni - Mascot Gadang Barubah"
-          className="w-full max-w-[16rem] sm:max-w-[18rem] md:max-w-[20rem] lg:max-w-[22rem] xl:max-w-[24rem] h-auto object-contain transition-transform duration-300"
-          style={getAnimationStyle()}
-          data-testid="mascot-uni"
-        />
-      </div>
-      
-      {message && (
-        <div className="bg-accent text-accent-foreground px-4 py-3 rounded-xl max-w-[min(20rem,90vw)] text-center font-medium relative break-words">
-          <div className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-r-8 border-transparent border-r-accent"></div>
-          {message}
+    <>
+      <div className="relative flex items-center justify-center">
+        <div className="relative">
+          <img
+            src={mascotImage}
+            alt="Uni - Mascot Gadang Barubah"
+            className="w-full max-w-[16rem] sm:max-w-[18rem] md:max-w-[20rem] lg:max-w-[22rem] xl:max-w-[24rem] h-auto object-contain transition-transform duration-300"
+            style={getAnimationStyle()}
+            data-testid="mascot-uni"
+          />
+          
+          {message && (
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 bg-accent text-accent-foreground px-4 py-3 rounded-xl max-w-[min(20rem,90vw)] text-center font-medium break-words z-10">
+              <div className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-r-8 border-transparent border-r-accent"></div>
+              {message}
+            </div>
+          )}
         </div>
-      )}
-      
+      </div>
+        
       <style dangerouslySetInnerHTML={{
         __html: `
           @keyframes idleBreathe {
@@ -98,6 +100,6 @@ export default function Mascot({ isAnimating = false, message }: MascotProps) {
           }
         `
       }} />
-    </div>
+    </>
   );
 }
