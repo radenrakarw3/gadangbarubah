@@ -1,9 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
 import helmet from "helmet";
+import fs from "fs";
+import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { strictRateLimit, antiSpamSlowDown, botDetection, geoSecurity, honeypot, requestValidator } from "./security";
 import { securityLoggingMiddleware, costMonitoringMiddleware } from "./monitoring";
+import { getSEOConfigByPath, generateSEOTags } from "../shared/seo";
 
 const app = express();
 
@@ -69,6 +72,49 @@ app.use((req, res, next) => {
   });
 
   next();
+});
+
+// SEO Head injection middleware (before setupVite/serveStatic)
+app.get("*", async (req, res, next) => {
+  // Only handle non-API routes
+  if (req.path.startsWith("/api") || req.path.includes(".")) {
+    return next();
+  }
+
+  try {
+    const clientTemplate = path.resolve(
+      import.meta.dirname,
+      "..",
+      "client",
+      "index.html",
+    );
+
+    // Read the HTML template
+    let template = await fs.promises.readFile(clientTemplate, "utf-8");
+    
+    // Check if this template has SSR placeholders
+    if (!template.includes("<!--ssr-helmet-")) {
+      return next(); // Let normal flow handle it
+    }
+
+    // Get SEO config for this path
+    const seoConfig = getSEOConfigByPath(req.path);
+    const seoTags = generateSEOTags(seoConfig);
+
+    // Replace SSR placeholders with actual SEO content
+    template = template.replace(`<!--ssr-helmet-title-->`, seoTags.title);
+    template = template.replace(`<!--ssr-helmet-meta-->`, seoTags.meta);
+    template = template.replace(`<!--ssr-helmet-link-->`, seoTags.link);
+    template = template.replace(`<!--ssr-helmet-script-->`, seoTags.script);
+    template = template.replace(`<!--ssr-outlet-->`, ""); // Empty for client rendering
+
+    // Set appropriate headers
+    res.status(200).set({ "Content-Type": "text/html" });
+    res.send(template);
+  } catch (error) {
+    log(`SEO middleware error: ${error}`);
+    next(); // Fall back to normal handling
+  }
 });
 
 (async () => {
