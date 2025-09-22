@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet-async';
-import { OpenGraphTags } from './OpenGraphTags';
 import { pageSEOConfigs } from '@/lib/seo';
 
 interface SEOHeadProps {
@@ -126,8 +125,22 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
         })}
       </script>
       
-      {/* Enhanced Open Graph Tags */}
-      <OpenGraphTags />
+      {/* Enhanced Social Media Meta Tags */}
+      <meta property="business:contact_data:street_address" content="Jl. Veteran No. 123" />
+      <meta property="business:contact_data:locality" content="Padang" />
+      <meta property="business:contact_data:region" content="Sumatera Barat" />
+      <meta property="business:contact_data:postal_code" content="25111" />
+      <meta property="business:contact_data:country_name" content="Indonesia" />
+      <meta property="business:contact_data:phone_number" content="+62812-3456-7890" />
+      
+      {/* Restaurant specific meta */}
+      <meta property="restaurant:cuisine" content="Indonesian, Minangkabau, Padang" />
+      <meta property="restaurant:price_range" content="$$" />
+      <meta property="restaurant:serves" content="Lunch, Dinner" />
+      
+      {/* Location meta */}
+      <meta property="place:location:latitude" content="-0.9492" />
+      <meta property="place:location:longitude" content="100.3543" />
     </Helmet>
   );
 }
