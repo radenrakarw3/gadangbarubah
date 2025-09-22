@@ -84,6 +84,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SEO Sitemap.xml endpoint
+  app.get("/sitemap.xml", (req, res) => {
+    const baseUrl = "https://gadangbarubahindonesia.id";
+    const currentDate = new Date().toISOString();
+    
+    const urls = [
+      {
+        loc: `${baseUrl}/`,
+        lastmod: currentDate,
+        changefreq: "weekly",
+        priority: "1.0"
+      },
+      {
+        loc: `${baseUrl}/uni`,
+        lastmod: currentDate,
+        changefreq: "weekly", 
+        priority: "0.9"
+      },
+      {
+        loc: `${baseUrl}/services/outlet`,
+        lastmod: currentDate,
+        changefreq: "monthly",
+        priority: "0.8"
+      },
+      {
+        loc: `${baseUrl}/services/delivery`,
+        lastmod: currentDate,
+        changefreq: "weekly",
+        priority: "0.8"
+      },
+      {
+        loc: `${baseUrl}/services/catering`,
+        lastmod: currentDate,
+        changefreq: "monthly",
+        priority: "0.7"
+      },
+      {
+        loc: `${baseUrl}/services/membership`,
+        lastmod: currentDate,
+        changefreq: "monthly",
+        priority: "0.7"
+      },
+      {
+        loc: `${baseUrl}/services/partnership`,
+        lastmod: currentDate,
+        changefreq: "monthly",
+        priority: "0.6"
+      },
+      {
+        loc: `${baseUrl}/member/login`,
+        lastmod: currentDate,
+        changefreq: "yearly",
+        priority: "0.5"
+      },
+      {
+        loc: `${baseUrl}/member/register`,
+        lastmod: currentDate,
+        changefreq: "yearly",
+        priority: "0.5"
+      }
+    ];
+
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+${urls.map(url => `  <url>
+    <loc>${url.loc}</loc>
+    <lastmod>${url.lastmod}</lastmod>
+    <changefreq>${url.changefreq}</changefreq>
+    <priority>${url.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+    res.set('Content-Type', 'application/xml');
+    res.send(sitemap);
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
