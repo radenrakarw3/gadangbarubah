@@ -3,48 +3,42 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft } from 'lucide-react';
 import Logo from './Logo';
-import Mascot from './Mascot';
 
 const services = [
   {
     id: 'outlet',
-    name: 'Outlet Eksklusif',
+    name: 'Dining Experience',
     icon: Store,
-    description: 'Kunjungi outlet premium kami untuk pengalaman bersantap langsung dengan suasana yang elegan dan menu terlengkap.',
-    path: '/services/outlet',
-    emoji: '🏪'
+    description: 'Rasakan pengalaman bersantap eksklusif di outlet premium kami dengan suasana mewah dan menu signature yang tak terlupakan.',
+    path: '/services/outlet'
   },
   {
     id: 'delivery',
-    name: 'Layanan Antar Premium',
+    name: 'Premium Delivery',
     icon: Truck,
-    description: 'Nikmati hidangan berkualitas tinggi dengan layanan antar yang cepat, aman, dan menjaga kualitas makanan.',
-    path: '/services/delivery',
-    emoji: '🚚'
+    description: 'Nikmati kelezatan hidangan berkualitas restoran langsung di rumah Anda dengan layanan antar yang menjaga cita rasa.',
+    path: '/services/delivery'
   },
   {
     id: 'partnership',
-    name: 'Program Kemitraan',
+    name: 'Business Partnership',
     icon: Handshake,
-    description: 'Bergabunglah sebagai mitra bisnis eksklusif dengan dukungan penuh sistem dan brand terpercaya.',
-    path: '/services/partnership',
-    emoji: '🤝'
+    description: 'Bergabunglah dalam ekosistem kuliner premium kami dengan program kemitraan yang memberikan keuntungan berkelanjutan.',
+    path: '/services/partnership'
   },
   {
     id: 'membership',
-    name: 'Member Eksklusif',
+    name: 'VIP Membership',
     icon: Crown,
-    description: 'Nikmati privilese istimewa dengan program keanggotaan yang memberikan benefit dan layanan premium.',
-    path: '/services/membership',
-    emoji: '👑'
+    description: 'Dapatkan akses eksklusif ke benefit istimewa, reservasi prioritas, dan pengalaman kuliner yang dipersonalisasi.',
+    path: '/services/membership'
   },
   {
     id: 'catering',
-    name: 'Catering & Acara',
+    name: 'Event Catering',
     icon: UtensilsCrossed,
-    description: 'Layanan katering premium untuk acara istimewa dengan menu berkualitas tinggi dan pelayanan terbaik.',
-    path: '/services/catering',
-    emoji: '🍽️'
+    description: 'Wujudkan acara istimewa Anda dengan layanan katering premium yang menciptakan momen tak terlupakan.',
+    path: '/services/catering'
   }
 ];
 
@@ -53,7 +47,6 @@ export default function UniPage() {
 
   const handleServiceClick = (service: typeof services[0]) => {
     navigate(service.path);
-    console.log(`Navigating to: ${service.name}`);
   };
 
   return (
@@ -84,86 +77,97 @@ export default function UniPage() {
       <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-5xl mx-auto">
           {/* Introduction */}
-          <div className="text-center mb-10">
-            <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
-              Layanan Premium Kami
+          <div className="text-center mb-16">
+            <h1 className="text-4xl sm:text-5xl font-serif font-light text-foreground mb-6">
+              Layanan Eksklusif
             </h1>
-            <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Uni siap membantu Anda menjelajahi berbagai layanan unggulan yang kami tawarkan
+            <div className="w-32 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
+              Jelajahi pengalaman kuliner premium yang kami hadirkan khusus untuk Anda
             </p>
-          </div>
-
-          {/* Mascot Section */}
-          <div className="flex justify-center mb-10">
-            <div className="max-w-md">
-              <Mascot 
-                isAnimating={false}
-                message="Selamat datang! Saya Uni, asisten pribadi Anda di Gadang Barubah. Silakan pilih layanan yang Anda inginkan, dan saya akan memandu Anda ke informasi lengkapnya."
-              />
-            </div>
           </div>
           
           {/* Services Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
             {services.map((service) => {
               const IconComponent = service.icon;
               
               return (
                 <Card 
                   key={service.id} 
-                  className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20"
+                  className="group cursor-pointer hover:shadow-xl transition-all duration-500 border-border/30 hover:border-primary/30 bg-gradient-to-br from-background to-muted/10 hover-elevate"
+                  onClick={() => handleServiceClick(service)}
                 >
-                  <CardContent className="p-6">
-                    <div className="text-center mb-4">
-                      <div className="w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/10 group-hover:bg-primary/10 transition-colors">
-                        <IconComponent className="h-6 w-6 text-primary" />
+                  <CardContent className="p-8">
+                    <div className="flex items-start space-x-6">
+                      <div className="flex-shrink-0">
+                        <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center border border-primary/20 group-hover:from-primary/20 group-hover:to-primary/10 transition-all duration-300">
+                          <IconComponent className="h-8 w-8 text-primary" />
+                        </div>
                       </div>
-                      <h3 className="font-serif text-lg font-medium text-foreground mb-2">
-                        {service.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                        {service.description}
-                      </p>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-serif text-xl font-medium text-foreground mb-3 group-hover:text-primary transition-colors duration-300">
+                          {service.name}
+                        </h3>
+                        <p className="text-base text-muted-foreground leading-relaxed mb-6">
+                          {service.description}
+                        </p>
+                        <div className="flex items-center text-primary font-medium text-sm group-hover:translate-x-2 transition-transform duration-300">
+                          <span>Lihat Detail</span>
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </div>
+                      </div>
                     </div>
-                    
-                    <Button
-                      onClick={() => handleServiceClick(service)}
-                      variant="outline"
-                      className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300"
-                      data-testid={`button-service-${service.id}`}
-                    >
-                      <span className="mr-2">{service.emoji}</span>
-                      Pelajari Selengkapnya
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
                   </CardContent>
                 </Card>
               );
             })}
           </div>
 
-          {/* Bottom Note */}
-          <div className="text-center mt-12">
-            <div className="bg-accent/30 rounded-lg p-6 border border-accent/20">
-              <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Catatan:</strong> Tim customer service kami siap membantu Anda 24/7 
-                untuk memberikan informasi detail dan bantuan pemesanan melalui berbagai channel yang tersedia.
-              </p>
-            </div>
+          {/* Concierge Section */}
+          <div className="text-center">
+            <Card className="border-border/30 shadow-lg bg-gradient-to-br from-background to-muted/5">
+              <CardContent className="p-10">
+                <div className="max-w-2xl mx-auto">
+                  <h3 className="font-serif text-2xl font-medium text-foreground mb-4">
+                    Konsultasi Personal
+                  </h3>
+                  <div className="w-16 h-px bg-primary mx-auto mb-6"></div>
+                  <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+                    Tim concierge kami siap memberikan rekomendasi personal dan membantu mewujudkan 
+                    pengalaman kuliner yang sempurna sesuai preferensi Anda.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button 
+                      size="lg" 
+                      className="px-8 py-4 bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-300"
+                    >
+                      Hubungi Concierge
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      className="px-8 py-4 border-primary/30 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                    >
+                      Lihat Kontak
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>
       
       {/* Footer */}
-      <footer className="border-t border-border/30 py-8 text-center">
+      <footer className="border-t border-border/20 py-12 text-center">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground font-medium">
+          <div className="space-y-3">
+            <p className="text-base text-muted-foreground font-medium">
               © 2025 Gadang Barubah
             </p>
-            <p className="text-xs text-muted-foreground/80">
-              Melayani dengan Standar Keunggulan Tertinggi
+            <p className="text-sm text-muted-foreground/70">
+              Keunggulan Kuliner yang Tak Tertandingi
             </p>
           </div>
         </div>
