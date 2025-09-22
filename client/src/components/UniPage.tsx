@@ -118,7 +118,7 @@ export default function UniPage() {
               <div className="max-w-2xl mx-auto">
                 <Mascot 
                   isAnimating={false}
-                  message="Selamat datang di Gadang Barubah - rumah makan Padang terbaik di Cikarang! Saya Uni, siap membantu Anda menemukan pengalaman kuliner nasi padang dan masakan Minang premium yang tak tertandingi."
+                  message="Selamat datang di Gadang Barubah - rumah makan Padang premium Indonesia! Saya Uni, siap membantu Anda menemukan pengalaman kuliner nasi padang dan masakan Minang premium yang tak tertandingi."
                 />
               </div>
             </div>

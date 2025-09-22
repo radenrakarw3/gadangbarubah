@@ -43,7 +43,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           "@type": "Restaurant",
           "name": "Gadang Barubah",
           "alternateName": ["Gadang Barubah Restaurant", "Rumah Makan Padang Gadang Barubah"],
-          "description": "Rumah makan Padang premium terbaik di Cikarang dengan nasi padang autentik, rendang terbaik, dan masakan Minang tradisional. Pilihan utama untuk kuliner Padang di area Pollux Mall.",
+          "description": "Rumah makan Padang premium dengan cabang di berbagai kota Indonesia. Nasi padang autentik, rendang terbaik, dan masakan Minang tradisional dengan cita rasa yang tak tertandingi.",
           "image": "https://gadangbarubahindonesia.id/og-image.jpg",
           "url": "https://gadangbarubahindonesia.id",
           "telephone": "+6289509766739",
@@ -51,23 +51,15 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           "servesCuisine": ["Indonesian", "Padang", "Minangkabau", "Asian"],
           "address": {
             "@type": "PostalAddress",
-            "streetAddress": "Pollux Mall Cikarang",
-            "addressLocality": "Cikarang",
-            "addressRegion": "Jawa Barat",
-            "postalCode": "17530",
+            "addressRegion": "Indonesia",
             "addressCountry": "ID"
-          },
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": -6.2564,
-            "longitude": 107.1568
           },
           "openingHours": "Mo-Su 10:00-22:00",
           "hasMenu": "https://gadangbarubahindonesia.id/menu",
           "acceptsReservations": true,
           "paymentAccepted": ["Cash", "Credit Card", "Debit Card"],
           "currenciesAccepted": "IDR",
-          "keywords": "rumah makan padang, nasi padang, restoran padang cikarang, rendang, gulai, masakan minang, gadang barubah, pollux mall",
+          "keywords": "rumah makan padang, nasi padang, restoran padang premium, rendang, gulai, masakan minang, gadang barubah, cabang indonesia",
           "sameAs": [
             "https://www.instagram.com/gadangbarubahindonesia",
             "https://wa.me/6289509766739"

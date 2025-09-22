@@ -27,31 +27,31 @@ export const createSEOConfig = (config: SEOConfig) => {
 
 export const pageSEOConfigs = {
   home: createSEOConfig({
-    title: "Gadang Barubah - Rumah Makan Padang Premium di Cikarang",
-    description: "Gadang Barubah - Rumah makan Padang premium di Pollux Mall Cikarang. Nikmati nasi padang autentik, rendang terbaik, gulai khas Minang dengan cita rasa tradisional yang istimewa. Reservasi: 089509766739",
-    keywords: "gadang barubah, gadangbarubah, gadang barubah cikarang, rumah makan padang terbaik cikarang, nasi padang enak cikarang, restoran padang pollux mall, gadang barubah indonesia, alternatif payakumbuah, pengganti pagi sore, lebih baik dari bumus, selain padang merdeka, rumah makan padang premium, rendang enak cikarang, gulai padang terbaik, masakan minang autentik, gadangbarubahindonesia",
+    title: "Gadang Barubah - Rumah Makan Padang Premium Indonesia",
+    description: "Gadang Barubah - Rumah makan Padang premium dengan cabang di berbagai kota. Nikmati nasi padang autentik, rendang terbaik, gulai khas Minang dengan cita rasa tradisional yang istimewa. Reservasi: 089509766739",
+    keywords: "gadang barubah, gadangbarubah, rumah makan padang terbaik, nasi padang enak, restoran padang premium, gadang barubah indonesia, alternatif payakumbuah, pengganti pagi sore, lebih baik dari bumus, selain padang merdeka, rumah makan padang premium, rendang enak, gulai padang terbaik, masakan minang autentik, gadangbarubahindonesia",
     path: "/",
     ogType: "restaurant"
   }),
   
   services: createSEOConfig({
     title: "Layanan Premium Gadang Barubah - Outlet, Delivery, Catering & VIP Membership",
-    description: "Jelajahi layanan lengkap Gadang Barubah: lokasi outlet premium, delivery nasi padang, catering event, dan VIP membership. Pengalaman kuliner Minang premium di Cikarang.",
-    keywords: "layanan gadang barubah, delivery nasi padang cikarang, catering padang cikarang, vip membership padang, outlet padang premium, gadang barubah services, layanan restoran padang terbaik, alternatif delivery padang cikarang",
+    description: "Jelajahi layanan lengkap Gadang Barubah: lokasi outlet premium, delivery nasi padang, catering event, dan VIP membership. Pengalaman kuliner Minang premium di seluruh Indonesia.",
+    keywords: "layanan gadang barubah, delivery nasi padang, catering padang, vip membership padang, outlet padang premium, gadang barubah services, layanan restoran padang terbaik, alternatif delivery padang",
     path: "/uni"
   }),
   
   outlet: createSEOConfig({
     title: "Lokasi Outlet Gadang Barubah - Restoran Padang Premium di Pollux Mall",
-    description: "Kunjungi outlet premium Gadang Barubah di Pollux Mall Cikarang. Nikmati suasana mewah, VIP room eksklusif, dan pengalaman kuliner Padang autentik yang tak terlupakan.",
-    keywords: "outlet gadang barubah, restoran padang pollux mall, outlet padang cikarang, lokasi gadang barubah, vip room padang cikarang, rumah makan mewah cikarang, tempat makan padang terbaik, alternatif restoran padang cikarang",
+    description: "Kunjungi outlet premium Gadang Barubah di berbagai lokasi. Nikmati suasana mewah, VIP room eksklusif, dan pengalaman kuliner Padang autentik yang tak terlupakan.",
+    keywords: "outlet gadang barubah, restoran padang premium, outlet padang, lokasi gadang barubah, vip room padang, rumah makan mewah, tempat makan padang terbaik, alternatif restoran padang",
     path: "/services/outlet"
   }),
   
   delivery: createSEOConfig({
     title: "Delivery Nasi Padang Premium Gadang Barubah - Antar ke Rumah",
     description: "Pesan delivery nasi padang premium Gadang Barubah langsung ke rumah. Rendang, gulai, dan lauk Minang autentik dengan kualitas restoran. Order mudah via WhatsApp: 089509766739",
-    keywords: "delivery nasi padang cikarang, pesan gadang barubah online, antar nasi padang cikarang, delivery rendang cikarang, gofood gadang barubah, grabfood nasi padang, delivery makanan padang, order nasi padang cikarang, alternatif delivery padang",
+    keywords: "delivery nasi padang, pesan gadang barubah online, antar nasi padang, delivery rendang, gofood gadang barubah, grabfood nasi padang, delivery makanan padang, order nasi padang, alternatif delivery padang",
     path: "/services/delivery"
   }),
   
@@ -65,7 +65,7 @@ export const pageSEOConfigs = {
   catering: createSEOConfig({
     title: "Catering Event Gadang Barubah - Layanan Katering Padang Premium",
     description: "Wujudkan acara istimewa dengan catering premium Gadang Barubah. Hidangan Padang autentik untuk pernikahan, corporate event, dan gathering keluarga dengan cita rasa tradisional yang autentik.",
-    keywords: "catering padang cikarang, catering event cikarang, katering nasi padang terbaik, catering pernikahan minang, catering gadang barubah, jasa katering padang premium, catering rendang gulai, katering makanan padang enak",
+    keywords: "catering padang, catering event, katering nasi padang terbaik, catering pernikahan minang, catering gadang barubah, jasa katering padang premium, catering rendang gulai, katering makanan padang enak",
     path: "/services/catering"
   }),
   
@@ -85,8 +85,8 @@ export const pageSEOConfigs = {
   
   membership: createSEOConfig({
     title: "VIP Membership Gadang Barubah - Program Eksklusif #1 untuk Pecinta Kuliner Padang",
-    description: "Bergabunglah dengan VIP Membership Gadang Barubah - program member terbaik di Cikarang. Nikmati benefit eksklusif, reservasi prioritas, diskon spesial, dan pengalaman kuliner premium yang tak tertandingi.",
-    keywords: "vip membership gadang barubah, member premium padang cikarang, benefit eksklusif restoran padang, program member vip terbaik, membership kuliner padang premium, diskon nasi padang member",
+    description: "Bergabunglah dengan VIP Membership Gadang Barubah - program member terbaik untuk pecinta kuliner Padang. Nikmati benefit eksklusif, reservasi prioritas, diskon spesial, dan pengalaman kuliner premium yang tak tertandingi.",
+    keywords: "vip membership gadang barubah, member premium padang, benefit eksklusif restoran padang, program member vip terbaik, membership kuliner padang premium, diskon nasi padang member",
     path: "/services/membership"
   }),
   
