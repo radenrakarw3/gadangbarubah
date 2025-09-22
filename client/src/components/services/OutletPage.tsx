@@ -34,8 +34,9 @@ export default function OutletPage() {
   return (
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
       {/* Top section with back button and logo */}
-      <div className="px-4 pt-8 pb-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+      <div className="relative px-4 pt-8 pb-4">
+        {/* Back button positioned absolutely */}
+        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
           <Button
             onClick={() => navigate('/uni')}
             variant="ghost"
@@ -46,12 +47,13 @@ export default function OutletPage() {
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline ml-1 text-sm">Kembali</span>
           </Button>
-          
-          <div className="flex-1 flex justify-center">
+        </div>
+        
+        {/* Logo always centered */}
+        <div className="w-full flex justify-center">
+          <div className="absolute left-1/2 transform -translate-x-1/2">
             <Logo />
           </div>
-          
-          <div className="w-20"></div>
         </div>
       </div>
       
