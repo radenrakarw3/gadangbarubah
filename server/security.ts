@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import slowDown from 'express-slow-down';
 import { Request, Response, NextFunction } from 'express';
 
@@ -34,24 +34,23 @@ export const antiSpamSlowDown = slowDown({
 export const botDetection = (req: Request, res: Response, next: NextFunction) => {
   const userAgent = req.get('User-Agent') || '';
   
-  // Common bot patterns - be very strict
+  // Common bot patterns - allow legitimate browsers
   const botPatterns = [
-    /bot/i,
-    /crawler/i,
-    /spider/i,
-    /scraper/i,
+    /googlebot/i,
+    /bingbot/i,
+    /slurp/i,
+    /duckduckbot/i,
+    /baiduspider/i,
+    /yandexbot/i,
+    /facebookexternalhit/i,
+    /twitterbot/i,
     /curl/i,
     /wget/i,
-    /python/i,
-    /requests/i,
-    /http/i,
+    /python.*requests/i,
     /^$/,  // Empty user agent
-    /phantom/i,
-    /selenium/i,
-    /headless/i,
-    /automated/i,
-    /test/i,
-    /monitor/i
+    /phantomjs/i,
+    /scrapy/i,
+    /nutch/i
   ];
 
   const isBot = botPatterns.some(pattern => pattern.test(userAgent));
