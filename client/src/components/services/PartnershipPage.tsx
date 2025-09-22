@@ -19,7 +19,7 @@ export default function PartnershipPage() {
     {
       icon: Shield,
       title: "Brand Terpercaya",
-      description: "Bergabung dengan brand yang sudah dikenal luas di Sumatera Barat"
+      description: "Bergabung dengan brand rumah makan Padang yang sudah dikenal luas sebagai destinasi kuliner nasi padang terbaik"
     },
     {
       icon: Users,
@@ -100,11 +100,11 @@ export default function PartnershipPage() {
           {/* Title */}
           <div className="text-center mb-10">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
-              Program Kemitraan Eksklusif
+              Kemitraan Rumah Makan Padang Premium
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Bergabunglah dengan jaringan mitra terpilih dalam mengembangkan bisnis kuliner premium
+              Bergabunglah dengan jaringan mitra terpilih dalam mengembangkan bisnis kuliner nasi padang dan masakan Minang di Cikarang
             </p>
           </div>
 

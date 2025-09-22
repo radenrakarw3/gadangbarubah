@@ -27,37 +27,37 @@ export default function WelcomePage() {
   const slideshowImages = [
     {
       src: image1,
-      alt: "Sajian autentik Minangkabau di Gadang Barubah",
-      caption: "Cita Rasa Autentik yang Tak Terlupakan"
+      alt: "Nasi padang dan rendang autentik Minangkabau di Gadang Barubah",
+      caption: "Cita Rasa Nasi Padang Autentik yang Tak Terlupakan"
     },
     {
       src: image2,
-      alt: "Presentasi makanan premium dengan minuman segar",
+      alt: "Presentasi masakan Padang premium dengan minuman segar",
       caption: "Presentasi Berkelas dengan Cita Rasa Istimewa"
     },
     {
       src: image3,
-      alt: "Pelayanan prima dari staf Gadang Barubah",
+      alt: "Pelayanan prima dari staf rumah makan Padang Gadang Barubah",
       caption: "Pelayanan Tulus dari Hati"
     },
     {
       src: image4,
-      alt: "Pengalaman bersantap bersama keluarga",
+      alt: "Pengalaman bersantap nasi padang bersama keluarga",
       caption: "Momen Berkualitas Bersama Orang Terkasih"
     },
     {
       src: image5,
-      alt: "Hidangan tradisional dengan sentuhan modern",
-      caption: "Tradisi Kuliner yang Diwariskan Turun Temurun"
+      alt: "Hidangan tradisional Padang dengan sentuhan modern",
+      caption: "Tradisi Kuliner Minang yang Diwariskan Turun Temurun"
     },
     {
       src: image6,
-      alt: "Detail makanan dengan plating yang sempurna",
-      caption: "Keahlian Kuliner yang Sempurna"
+      alt: "Detail masakan Padang dengan plating yang sempurna",
+      caption: "Keahlian Kuliner Padang yang Sempurna"
     },
     {
       src: image7,
-      alt: "Proses memasak dengan keahlian tinggi",
+      alt: "Proses memasak rendang dan gulai dengan keahlian tinggi",
       caption: "Passion dan Dedikasi dalam Setiap Sajian"
     }
   ];
@@ -101,7 +101,7 @@ export default function WelcomePage() {
                 Selamat Datang di
               </h1>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-medium text-primary mb-8 tracking-wide">
-                Gadang Barubah
+                Gadang Barubah - Rumah Makan Padang
               </h2>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             </div>
@@ -119,7 +119,7 @@ export default function WelcomePage() {
               <h2 className="text-4xl font-serif font-medium text-foreground mb-4">Tentang Kami – Gadang Barubah</h2>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
               <p className="text-lg text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto">
-                Rumah makan Padang yang menghadirkan cita rasa otentik Minangkabau dalam balutan suasana modern di Pollux Mall Cikarang
+                Rumah makan Padang terbaik yang menghadirkan nasi padang autentik dan masakan Minang tradisional dalam balutan suasana modern di Pollux Mall Cikarang
               </p>
             </div>
 
@@ -130,11 +130,11 @@ export default function WelcomePage() {
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
                     Nama "Gadang Barubah" melambangkan semangat besar untuk terus berinovasi, tanpa meninggalkan akar tradisi yang kaya. 
-                    Di sini, setiap sajian bukan sekadar makanan, melainkan sebuah perjalanan rasa yang menghadirkan resep turun-temurun khas Minang.
+                    Di sini, setiap sajian nasi padang dan masakan Minang bukan sekadar makanan, melainkan sebuah perjalanan rasa yang menghadirkan resep turun-temurun khas Padang.
                   </p>
                   <p>
-                    Dari rendang yang mendunia, gulai penuh rempah, hingga aneka lauk pauk segar—disajikan dengan sentuhan kekinian yang 
-                    menggugah selera. Harmoni tradisi dan inovasi hadir dalam setiap hidangan, membawa cita rasa autentik yang tak lekang oleh waktu.
+                    Dari rendang daging yang mendunia, gulai kambing penuh rempah, hingga aneka lauk pauk segar khas Padang—disajikan dengan sentuhan kekinian yang 
+                    menggugah selera. Harmoni tradisi dan inovasi hadir dalam setiap hidangan nasi padang, membawa cita rasa autentik masakan Minang yang tak lekang oleh waktu.
                   </p>
                 </div>
               </div>
@@ -142,7 +142,7 @@ export default function WelcomePage() {
                 <div className="aspect-[4/3]">
                   <img 
                     src={restaurantExterior} 
-                    alt="Eksterior mewah Gadang Barubah" 
+                    alt="Eksterior mewah rumah makan Padang Gadang Barubah di Pollux Mall Cikarang" 
                     className="w-full h-full object-cover"
                     data-testid="img-exterior"
                   />
@@ -160,9 +160,9 @@ export default function WelcomePage() {
                     menghadirkan pengalaman bersantap yang hangat, ramah, dan berkesan, baik untuk keluarga, sahabat, maupun kolega.
                   </p>
                   <p>
-                    Biarkan aroma rempah dan cita rasa autentik membawa Anda seolah berkunjung langsung ke ranah Minang, sekaligus 
-                    merasakan kenyamanan ruang modern yang kami hadirkan di tengah kota. Setiap momen menjadi istimewa dalam suasana 
-                    yang dirancang khusus untuk menciptakan kebersamaan.
+                    Biarkan aroma rempah rendang dan gulai serta cita rasa autentik nasi padang membawa Anda seolah berkunjung langsung ke ranah Minang, sekaligus 
+                    merasakan kenyamanan ruang modern yang kami hadirkan di tengah Cikarang. Setiap momen makan bersama menjadi istimewa dalam suasana 
+                    rumah makan Padang yang dirancang khusus untuk menciptakan kebersamaan.
                   </p>
                 </div>
               </div>

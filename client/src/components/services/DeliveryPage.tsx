@@ -11,10 +11,10 @@ export default function DeliveryPage() {
   const seoConfig = pageSEOConfigs.delivery;
 
   const deliveryAreas = [
-    { area: "Padang Kota", time: "30-45 menit", fee: "Gratis" },
-    { area: "Padang Selatan", time: "45-60 menit", fee: "Rp 5.000" },
-    { area: "Padang Utara", time: "45-60 menit", fee: "Rp 5.000" },
-    { area: "Bukittinggi", time: "60-90 menit", fee: "Rp 10.000" }
+    { area: "Cikarang Pusat", time: "30-45 menit", fee: "Gratis" },
+    { area: "Cikarang Utara", time: "45-60 menit", fee: "Rp 5.000" },
+    { area: "Cikarang Selatan", time: "45-60 menit", fee: "Rp 5.000" },
+    { area: "Bekasi Timur", time: "60-90 menit", fee: "Rp 10.000" }
   ];
 
   return (
@@ -68,11 +68,11 @@ export default function DeliveryPage() {
           {/* Title */}
           <div className="text-center mb-10">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
-              Layanan Antar Premium
+              Delivery Nasi Padang Autentik ke Cikarang
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Nikmati kelezatan hidangan berkualitas tinggi langsung di rumah Anda
+              Nikmati kelezatan nasi padang, rendang, dan gulai berkualitas rumah makan langsung di rumah Anda dengan layanan antar terpercaya
             </p>
           </div>
 

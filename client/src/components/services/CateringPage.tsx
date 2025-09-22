@@ -95,11 +95,11 @@ export default function CateringPage() {
           {/* Title */}
           <div className="text-center mb-10">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
-              Catering & Acara Eksklusif
+              Catering Nasi Padang & Acara Eksklusif
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Sajikan pengalaman kuliner istimewa untuk setiap momen berharga Anda
+              Sajikan pengalaman kuliner nasi padang autentik dan masakan Minang istimewa untuk setiap momen berharga Anda di Cikarang
             </p>
           </div>
 

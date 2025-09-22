@@ -17,10 +17,10 @@ export default function MembershipPage() {
       color: "border-gray-300 bg-gray-50 dark:bg-gray-900/30",
       icon: "🥈",
       benefits: [
-        "Diskon 5% setiap pembelian",
+        "Diskon 5% setiap pembelian nasi padang",
         "Poin reward setiap transaksi",
-        "Info promo via WhatsApp",
-        "Birthday surprise"
+        "Info promo masakan Minang via WhatsApp",
+        "Birthday surprise dengan hidangan spesial"
       ]
     },
     {
@@ -114,11 +114,11 @@ export default function MembershipPage() {
           {/* Title */}
           <div className="text-center mb-10">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
-              Program Member Eksklusif
+              VIP Membership Pecinta Nasi Padang
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Rasakan privilese istimewa dengan berbagai keuntungan eksklusif untuk member terpilih
+              Bergabunglah dengan komunitas eksklusif pecinta masakan Minang dan nikmati benefit istimewa untuk pengalaman kuliner nasi padang terbaik di Cikarang
             </p>
           </div>
 

@@ -36,7 +36,7 @@ export default function OutletPage() {
     {
       src: interiorMain,
       title: "Interior Premium",
-      description: "Suasana interior dengan konsep warna hangat dan buffet area yang elegan"
+      description: "Suasana interior rumah makan Padang dengan konsep warna hangat dan buffet area nasi padang yang elegan"
     },
     {
       src: vipRoom,
@@ -51,7 +51,7 @@ export default function OutletPage() {
     {
       src: waiterService,
       title: "Pelayanan Prima",
-      description: "Staff profesional memberikan pelayanan berkualitas dengan menu signature kami"
+      description: "Staff profesional memberikan pelayanan berkualitas dengan menu signature masakan Minang kami"
     },
     {
       src: menuDisplay,
@@ -61,7 +61,7 @@ export default function OutletPage() {
     {
       src: familyDining,
       title: "Family Dining",
-      description: "Pengalaman makan bersama dengan berbagai pilihan hidangan khas Minang"
+      description: "Pengalaman makan bersama dengan berbagai pilihan nasi padang dan hidangan khas Minang autentik"
     },
     {
       src: elegantDining,
@@ -209,11 +209,11 @@ export default function OutletPage() {
           {/* Title */}
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-serif font-light text-foreground mb-6">
-              Outlet Location
+              Outlet Rumah Makan Padang Premium Cikarang
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
-              Temukan pengalaman bersantap eksklusif di lokasi premium kami dengan suasana mewah dan menu signature yang tak terlupakan
+              Temukan pengalaman bersantap nasi padang eksklusif di Pollux Mall Cikarang dengan suasana mewah dan menu masakan Minang signature yang tak terlupakan
             </p>
           </div>
 

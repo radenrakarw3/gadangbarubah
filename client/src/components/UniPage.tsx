@@ -15,35 +15,35 @@ const services = [
     id: 'outlet',
     name: 'Outlet Location',
     icon: Store,
-    description: 'Kunjungi lokasi outlet premium kami dengan suasana mewah, VIP room eksklusif, dan pengalaman kuliner yang tak terlupakan.',
+    description: 'Kunjungi rumah makan Padang premium kami di Pollux Mall Cikarang dengan suasana mewah, VIP room eksklusif, dan pengalaman kuliner nasi padang yang tak terlupakan.',
     path: '/services/outlet'
   },
   {
     id: 'delivery',
     name: 'Premium Delivery',
     icon: Truck,
-    description: 'Nikmati kelezatan hidangan berkualitas restoran langsung di rumah Anda dengan layanan antar yang menjaga cita rasa.',
+    description: 'Nikmati kelezatan nasi padang, rendang, dan gulai berkualitas restoran langsung di rumah Anda dengan layanan antar yang menjaga cita rasa autentik.',
     path: '/services/delivery'
   },
   {
     id: 'partnership',
     name: 'Business Partnership',
     icon: Handshake,
-    description: 'Bergabunglah dalam ekosistem kuliner premium kami dengan program kemitraan yang memberikan keuntungan berkelanjutan.',
+    description: 'Bergabunglah dalam ekosistem kuliner Padang premium kami dengan program kemitraan rumah makan yang memberikan keuntungan berkelanjutan.',
     path: '/services/partnership'
   },
   {
     id: 'membership',
     name: 'VIP Membership',
     icon: Crown,
-    description: 'Dapatkan akses eksklusif ke benefit istimewa, reservasi prioritas, dan pengalaman kuliner yang dipersonalisasi.',
+    description: 'Dapatkan akses eksklusif ke benefit istimewa, reservasi prioritas untuk nasi padang, dan pengalaman kuliner Minang yang dipersonalisasi.',
     path: '/services/membership'
   },
   {
     id: 'catering',
     name: 'Event Catering',
     icon: UtensilsCrossed,
-    description: 'Wujudkan acara istimewa Anda dengan layanan katering premium yang menciptakan momen tak terlupakan.',
+    description: 'Wujudkan acara istimewa Anda dengan layanan katering nasi padang dan masakan Minang premium yang menciptakan momen tak terlupakan.',
     path: '/services/catering'
   }
 ];
@@ -124,7 +124,7 @@ export default function UniPage() {
           {/* Introduction */}
           <div className="text-center mb-16">
             <h1 className="text-4xl sm:text-5xl font-serif font-light text-foreground mb-6">
-              Layanan Eksklusif
+              Layanan Eksklusif Rumah Makan Padang
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             
@@ -140,7 +140,7 @@ export default function UniPage() {
               <div className="max-w-2xl mx-auto">
                 <Mascot 
                   isAnimating={false}
-                  message="Selamat datang di Gadang Barubah! Saya Uni, siap membantu Anda menemukan pengalaman kuliner terbaik."
+                  message="Selamat datang di rumah makan Padang Gadang Barubah! Saya Uni, siap membantu Anda menemukan pengalaman kuliner nasi padang dan masakan Minang terbaik."
                 />
               </div>
             </div>
