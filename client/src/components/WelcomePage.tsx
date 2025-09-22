@@ -13,11 +13,9 @@ export default function WelcomePage() {
 
   return (
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
-      {/* Logo at top - always centered */}
-      <div className="w-full flex justify-center pt-8 pb-4">
-        <div className="absolute left-1/2 transform -translate-x-1/2">
-          <Logo />
-        </div>
+      {/* Logo at top */}
+      <div className="text-center pt-8 pb-4">
+        <Logo />
       </div>
       
       {/* Main content */}

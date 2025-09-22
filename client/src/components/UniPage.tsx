@@ -59,9 +59,8 @@ export default function UniPage() {
   return (
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
       {/* Top section with back button and logo */}
-      <div className="relative px-4 pt-8 pb-4">
-        {/* Back button positioned absolutely */}
-        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+      <div className="px-4 pt-8 pb-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Button
             onClick={() => navigate('/')}
             variant="ghost"
@@ -72,13 +71,12 @@ export default function UniPage() {
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline ml-1 text-sm">Kembali</span>
           </Button>
-        </div>
-        
-        {/* Logo always centered */}
-        <div className="w-full flex justify-center">
-          <div className="absolute left-1/2 transform -translate-x-1/2">
+          
+          <div className="flex-1 flex justify-center">
             <Logo />
           </div>
+          
+          <div className="w-20"></div>
         </div>
       </div>
       
