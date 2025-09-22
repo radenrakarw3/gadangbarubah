@@ -2,7 +2,7 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight } from 'lucide-react';
-import Header from './Header';
+import Logo from './Logo';
 
 export default function WelcomePage() {
   const [, navigate] = useLocation();
@@ -13,10 +13,13 @@ export default function WelcomePage() {
 
   return (
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
-      <Header />
+      {/* Logo at top */}
+      <div className="text-center pt-8 pb-4">
+        <Logo />
+      </div>
       
       {/* Main content */}
-      <main className="px-4 sm:px-6 lg:px-8 py-8 pt-20">
+      <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Welcome Section */}
           <div className="text-center mb-12">

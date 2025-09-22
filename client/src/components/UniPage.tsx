@@ -1,8 +1,8 @@
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight } from 'lucide-react';
-import Header from './Header';
+import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft } from 'lucide-react';
+import Logo from './Logo';
 import Mascot from './Mascot';
 
 const services = [
@@ -58,10 +58,30 @@ export default function UniPage() {
 
   return (
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
-      <Header showBackButton={true} backPath="/" />
+      {/* Top section with back button and logo */}
+      <div className="px-4 pt-8 pb-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <Button
+            onClick={() => navigate('/')}
+            variant="ghost"
+            size="sm"
+            className="hover:bg-accent/10 text-muted-foreground hover:text-foreground"
+            data-testid="button-back"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline ml-1 text-sm">Kembali</span>
+          </Button>
+          
+          <div className="flex-1 flex justify-center">
+            <Logo />
+          </div>
+          
+          <div className="w-20"></div>
+        </div>
+      </div>
       
       {/* Main content */}
-      <main className="px-4 sm:px-6 lg:px-8 py-8 pt-20">
+      <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-5xl mx-auto">
           {/* Introduction */}
           <div className="text-center mb-10">
