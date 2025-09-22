@@ -21,7 +21,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "blob:", "https://www.google-analytics.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://replit.com", "https://static.cloudflareinsights.com"],
       connectSrc: ["'self'", "ws:", "wss:", "https://*.google-analytics.com", "https://*.analytics.google.com", "https://www.googletagmanager.com"],
       frameSrc: ["'none'"],
       objectSrc: ["'none'"],
@@ -87,7 +87,11 @@ app.get("*", async (req, res, next) => {
       req.path.startsWith("/src/") ||
       req.path.startsWith("/@") ||
       req.path.startsWith("/node_modules") ||
-      req.path.startsWith("/assets/")) {
+      req.path.startsWith("/assets/") ||
+      req.path.endsWith(".tsx") ||
+      req.path.endsWith(".ts") ||
+      req.path.endsWith(".js") ||
+      req.path.endsWith(".jsx")) {
     return next();
   }
 
