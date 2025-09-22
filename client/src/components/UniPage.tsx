@@ -1,4 +1,5 @@
 import { useLocation } from 'wouter';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft, ShoppingBag } from 'lucide-react';
@@ -47,6 +48,11 @@ const services = [
 
 export default function UniPage() {
   const [, navigate] = useLocation();
+  
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleServiceClick = (service: typeof services[0]) => {
     // Services that redirect to WhatsApp
