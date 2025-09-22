@@ -13,22 +13,31 @@ const app = express();
 // Enable trust proxy for accurate IP detection (important for rate limiting)
 app.set('trust proxy', 1);
 
-// Enhanced security headers
+// ULTRA PERMISSIVE HEADERS - NO BLOCKING WHATSOEVER
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "blob:", "https://www.google-analytics.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://replit.com", "https://static.cloudflareinsights.com"],
-      connectSrc: ["'self'", "ws:", "wss:", "https://*.google-analytics.com", "https://*.analytics.google.com", "https://www.googletagmanager.com"],
-      frameSrc: ["'none'"],
-      objectSrc: ["'none'"],
+      defaultSrc: ["*", "'unsafe-inline'", "'unsafe-eval'", "data:", "blob:"],
+      styleSrc: ["*", "'unsafe-inline'", "data:", "blob:"],
+      fontSrc: ["*", "data:", "blob:"],
+      imgSrc: ["*", "data:", "blob:"],
+      scriptSrc: ["*", "'unsafe-inline'", "'unsafe-eval'", "data:", "blob:"],
+      connectSrc: ["*", "data:", "blob:", "ws:", "wss:"],
+      frameSrc: ["*"],
+      objectSrc: ["*"],
+      mediaSrc: ["*", "data:", "blob:"],
+      workerSrc: ["*", "data:", "blob:"],
+      childSrc: ["*", "data:", "blob:"],
+      formAction: ["*"],
+      frameAncestors: ["*"],
+      baseUri: ["*"],
       upgradeInsecureRequests: [],
     },
   },
-  crossOriginEmbedderPolicy: false, // Disable for Vite compatibility
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: false,
+  hsts: false,
+  referrerPolicy: false,
 }));
 
 // ALL SECURITY DISABLED FOR MAXIMUM CUSTOMER ACCESS
