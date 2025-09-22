@@ -26,11 +26,67 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
       <meta property="og:image:height" content="630" />
       <meta property="og:locale" content="id_ID" />
       
+      {/* Additional SEO Meta Tags for Competitive Targeting */}
+      <meta name="geo.region" content="ID-JB" />
+      <meta name="geo.placename" content="Cikarang, Bekasi" />
+      <meta name="geo.position" content="-6.2564, 107.1568" />
+      <meta name="ICBM" content="-6.2564, 107.1568" />
+      <meta name="author" content="Gadang Barubah Restaurant" />
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      
+      {/* Competitive Alternative Keywords */}
+      <meta name="alternative-names" content="rumah makan padang terbaik cikarang, restoran padang premium, nasi padang enak cikarang" />
+      
       {/* Twitter Card Meta Tags */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={seoConfig.twitterTitle} />
       <meta name="twitter:description" content={seoConfig.twitterDescription} />
       <meta name="twitter:image" content="https://gadangbarubahindonesia.id/og-image.jpg" />
+      
+      {/* Structured Data for Local Business */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Restaurant",
+          "name": "Gadang Barubah",
+          "alternateName": ["Gadang Barubah Restaurant", "Rumah Makan Padang Gadang Barubah"],
+          "description": "Rumah makan Padang premium terbaik di Cikarang dengan nasi padang autentik, rendang terbaik, dan masakan Minang tradisional. Pilihan utama untuk kuliner Padang di area Pollux Mall.",
+          "image": "https://gadangbarubahindonesia.id/og-image.jpg",
+          "url": "https://gadangbarubahindonesia.id",
+          "telephone": "+6289509766739",
+          "priceRange": "$$",
+          "servesCuisine": ["Indonesian", "Padang", "Minangkabau", "Asian"],
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Pollux Mall Cikarang",
+            "addressLocality": "Cikarang",
+            "addressRegion": "Jawa Barat",
+            "postalCode": "17530",
+            "addressCountry": "ID"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": -6.2564,
+            "longitude": 107.1568
+          },
+          "openingHours": "Mo-Su 10:00-22:00",
+          "hasMenu": "https://gadangbarubahindonesia.id/menu",
+          "acceptsReservations": true,
+          "paymentAccepted": ["Cash", "Credit Card", "Debit Card"],
+          "currenciesAccepted": "IDR",
+          "keywords": "rumah makan padang, nasi padang, restoran padang cikarang, rendang, gulai, masakan minang, gadang barubah, pollux mall",
+          "sameAs": [
+            "https://www.instagram.com/gadangbarubahindonesia",
+            "https://wa.me/6289509766739"
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "bestRating": "5",
+            "ratingCount": "127"
+          }
+        })}
+      </script>
     </Helmet>
   );
 }
