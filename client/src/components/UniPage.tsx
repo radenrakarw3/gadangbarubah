@@ -2,6 +2,7 @@ import { useLocation } from 'wouter';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { trackContactMethod, trackServiceView } from '@/lib/analytics';
 import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft, ShoppingBag } from 'lucide-react';
 import Logo from './Logo';
 import SEOHead from './SEOHead';
@@ -61,10 +62,24 @@ export default function UniPage() {
     const whatsAppNumber = '6289509766739'; // format untuk WhatsApp API (62 untuk Indonesia + nomor tanpa 0)
     
     if (whatsAppServices.includes(service.id)) {
+      // Track WhatsApp contact method usage
+      trackContactMethod('whatsapp', 'services_hub', {
+        service_type: service.id as any,
+        restaurant_action: service.id === 'delivery' ? 'delivery' : 'whatsapp',
+        outlet_name: 'Gadang Barubah',
+        event_label: `whatsapp_${service.id}`
+      });
+      
       const message = encodeURIComponent(`Halo, saya tertarik dengan layanan ${service.name} dari Gadang Barubah. Mohon informasi lebih lanjut.`);
       const whatsAppUrl = `https://api.whatsapp.com/send?phone=${whatsAppNumber}&text=${message}`;
       window.open(whatsAppUrl, '_blank');
     } else {
+      // Track service page navigation
+      trackServiceView(service.id === 'membership' ? 'vip_membership' : 'outlet', {
+        event_label: `navigate_${service.id}`,
+        custom_parameter_1: 'services_hub_navigation'
+      });
+      
       // Navigate to individual pages for other services
       navigate(service.path);
     }

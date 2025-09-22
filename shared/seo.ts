@@ -156,23 +156,40 @@ export function generateSEOTags(seoConfig: ReturnType<typeof createSEOConfig>) {
       <meta name="twitter:description" content="${seoConfig.twitterDescription}" />
       <meta name="twitter:image" content="https://gadangbarubahindonesia.id/og-image.jpg" />
     `,
-    link: `<link rel="canonical" href="${seoConfig.canonical}" />`,
+    link: `
+      <link rel="canonical" href="${seoConfig.canonical}" />
+      <link rel="preconnect" href="https://www.googletagmanager.com">
+      <link rel="preconnect" href="https://www.google-analytics.com">
+      <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+      <link rel="dns-prefetch" href="https://www.google-analytics.com">
+    `,
     script: `
-      <!-- Google tag (gtag.js) -->
+      <!-- Google Analytics 4 with Consent Mode v2 -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJJXWLV11T"></script>
       <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-KJJXWLV11T');
+        
+        // Consent Mode v2 defaults - GDPR compliant (deny analytics until consent)
+        gtag('consent', 'default', {
+          'ad_storage': 'denied',
+          'ad_user_data': 'denied', 
+          'ad_personalization': 'denied',
+          'analytics_storage': 'denied',
+          'functionality_storage': 'granted',
+          'personalization_storage': 'denied',
+          'security_storage': 'granted'
+        });
+        
+        // Configure GA4 with performance optimizations for restaurant SEO
+        gtag('config', 'G-KJJXWLV11T', {
+          'send_page_view': false,
+          'transport_type': 'beacon',
+          'allow_google_signals': false,
+          'cookie_flags': 'SameSite=Strict;Secure'
+        });
       </script>
-      
-      <!-- Google Tag Manager -->
-      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-TV5FRZ8P');</script>
     `
   };
 }

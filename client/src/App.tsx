@@ -1,9 +1,11 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
+import { initializeAnalytics, trackPageView } from "@/lib/analytics";
+import { useEffect } from "react";
 import WelcomePage from "@/components/WelcomePage";
 import UniPage from "@/components/UniPage";
 import OutletPage from "@/components/services/OutletPage";
@@ -16,6 +18,16 @@ import ComingSoon from "@/pages/ComingSoon";
 import NotFound from "@/pages/not-found";
 
 function Router() {
+  const [location] = useLocation();
+  
+  // Track page views for SPA navigation
+  useEffect(() => {
+    trackPageView({
+      path: location,
+      title: document.title
+    });
+  }, [location]);
+  
   return (
     <Switch>
       <Route path="/" component={WelcomePage} />
@@ -34,20 +46,15 @@ function Router() {
 }
 
 function App() {
+  // Initialize analytics once on app load
+  useEffect(() => {
+    initializeAnalytics();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <HelmetProvider>
-          {/* Google Tag Manager (noscript) */}
-          <noscript>
-            <iframe 
-              src="https://www.googletagmanager.com/ns.html?id=GTM-TV5FRZ8P"
-              height="0" 
-              width="0" 
-              style={{ display: 'none', visibility: 'hidden' }}
-              title="Google Tag Manager"
-            />
-          </noscript>
           <Toaster />
           <Router />
         </HelmetProvider>

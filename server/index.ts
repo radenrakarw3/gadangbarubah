@@ -20,7 +20,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "blob:"],
+      imgSrc: ["'self'", "data:", "blob:", "https://www.google-analytics.com"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
       connectSrc: ["'self'", "ws:", "wss:", "https://*.google-analytics.com", "https://*.analytics.google.com", "https://www.googletagmanager.com"],
       frameSrc: ["'none'"],
