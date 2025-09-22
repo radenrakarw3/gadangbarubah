@@ -10,6 +10,8 @@ import DeliveryPage from "@/components/services/DeliveryPage";
 import PartnershipPage from "@/components/services/PartnershipPage";
 import MembershipPage from "@/components/services/MembershipPage";
 import CateringPage from "@/components/services/CateringPage";
+import MemberLogin from "@/pages/MemberLogin";
+import MemberRegister from "@/pages/MemberRegister";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -22,6 +24,8 @@ function Router() {
       <Route path="/services/partnership" component={PartnershipPage} />
       <Route path="/services/membership" component={MembershipPage} />
       <Route path="/services/catering" component={CateringPage} />
+      <Route path="/member/login" component={MemberLogin} />
+      <Route path="/member/register" component={MemberRegister} />
       <Route component={NotFound} />
     </Switch>
   );

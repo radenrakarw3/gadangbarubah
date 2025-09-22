@@ -1,7 +1,7 @@
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, User } from 'lucide-react';
 import Logo from './Logo';
 import ImageSlideshow from './ImageSlideshow';
 import image1 from '@assets/DSC07140_1758564407964.jpg';
@@ -177,7 +177,7 @@ export default function WelcomePage() {
           </div>
           
           {/* Continue Button */}
-          <div className="text-center">
+          <div className="text-center space-y-4">
             <Button
               onClick={handleContinue}
               size="lg"
@@ -188,7 +188,21 @@ export default function WelcomePage() {
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
             
-            <p className="text-sm text-muted-foreground/80 mt-4">
+            {/* Login Member Button */}
+            <div className="flex justify-center">
+              <Button
+                onClick={() => navigate('/member/login')}
+                variant="outline"
+                size="sm"
+                className="text-sm font-medium border-primary/30 text-primary hover:bg-primary/5"
+                data-testid="button-member-login"
+              >
+                <User className="mr-2 h-4 w-4" />
+                Login Member
+              </Button>
+            </div>
+            
+            <p className="text-sm text-muted-foreground/80">
               Temui Uni, asisten virtual kami yang siap membantu
             </p>
           </div>
