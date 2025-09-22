@@ -14,7 +14,7 @@ import image6 from '@assets/DSC07152_1758564588952.jpg';
 import image7 from '@assets/DSC07130_1758564588953.jpg';
 import restaurantExterior from '@assets/DSC07220_1758565473982.jpg';
 import restaurantNight from '@assets/DSC05600_1758565473997.jpg';
-import uniMascotImage from '@assets/ChatGPT Image Sep 22, 2025, 11_37_20 PM_1758584495417.png';
+import { AnimatedUni } from './AnimatedUni';
 
 export default function WelcomePage() {
   const [, navigate] = useLocation();
@@ -177,17 +177,8 @@ export default function WelcomePage() {
             </Card>
           </div>
           
-          {/* Uni Mascot */}
-          <div className="text-center mb-8">
-            <div className="relative inline-block">
-              <img 
-                src={uniMascotImage}
-                alt="Uni - Mascot resmi Gadang Barubah Restaurant dengan pakaian tradisional Minangkabau"
-                className="w-64 sm:w-80 h-auto mx-auto rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
-                data-testid="img-uni-mascot"
-              />
-            </div>
-          </div>
+          {/* Animated Uni Mascot with Speech Bubble */}
+          <AnimatedUni />
 
           {/* Continue Button */}
           <div className="text-center space-y-4">
