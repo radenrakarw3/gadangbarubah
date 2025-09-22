@@ -12,7 +12,7 @@ export default function WelcomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/98 to-background/95 relative overflow-hidden">
+    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-gradient-to-br from-background via-background/98 to-background/95 relative overflow-x-clip overflow-y-auto">
       {/* Enhanced floating particles */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-2 h-2 bg-primary/40 rounded-full animate-ping animation-delay-1000"></div>
@@ -34,8 +34,8 @@ export default function WelcomePage() {
         </header>
         
         {/* Main content area */}
-        <main className="flex-1 flex items-center justify-center px-4 py-8">
-          <div className="max-w-5xl mx-auto text-center space-y-12">
+        <main className="flex-1 flex items-start justify-start md:items-center md:justify-center px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-5xl mx-auto text-center space-y-8 sm:space-y-10 md:space-y-12">
             {/* Enhanced Welcome Title */}
             <div className="space-y-6">
               <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
@@ -43,11 +43,11 @@ export default function WelcomePage() {
                 <span className="text-sm font-medium text-primary">Selamat Datang</span>
               </div>
               
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-foreground via-foreground to-primary/80 bg-clip-text text-transparent leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-foreground via-foreground to-primary/80 bg-clip-text text-transparent leading-tight">
                 Gadang Barubah
               </h1>
               
-              <p className="text-xl md:text-2xl text-muted-foreground font-light max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-light max-w-2xl mx-auto">
                 Cita Rasa Autentik Minangkabau dengan Sentuhan Modern
               </p>
             </div>
@@ -65,7 +65,7 @@ export default function WelcomePage() {
                   <span className="text-primary text-4xl">✨</span>
                 </h2>
                 
-                <div className="grid md:grid-cols-3 gap-8 mb-8">
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-8">
                   <div className="text-center space-y-3">
                     <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
                       <span className="text-2xl">🏪</span>
@@ -119,7 +119,7 @@ export default function WelcomePage() {
                 <Button
                   onClick={handleContinue}
                   size="lg"
-                  className="text-lg px-12 py-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
+                  className="text-base sm:text-lg px-8 sm:px-12 py-4 md:py-6 lg:py-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden break-words"
                   data-testid="button-continue"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
@@ -136,7 +136,7 @@ export default function WelcomePage() {
         </main>
         
         {/* Enhanced Footer */}
-        <footer className="flex-shrink-0 py-8 text-center">
+        <footer className="flex-shrink-0 py-6 sm:py-8 text-center pb-[env(safe-area-inset-bottom)]">
           <div className="space-y-2">
             <div className="h-px w-32 bg-gradient-to-r from-transparent via-border to-transparent mx-auto mb-4"></div>
             <p className="text-sm text-muted-foreground font-medium">

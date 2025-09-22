@@ -52,14 +52,14 @@ export default function Mascot({ isAnimating = false, message }: MascotProps) {
         <img
           src={mascotImage}
           alt="Uni - Mascot Gadang Barubah"
-          className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 object-contain transition-transform duration-300"
+          className="w-full max-w-[16rem] sm:max-w-[18rem] md:max-w-[20rem] lg:max-w-[22rem] xl:max-w-[24rem] h-auto object-contain transition-transform duration-300"
           style={getAnimationStyle()}
           data-testid="mascot-uni"
         />
       </div>
       
       {message && (
-        <div className="bg-accent text-accent-foreground px-4 py-2 rounded-lg max-w-xs text-center font-medium relative">
+        <div className="bg-accent text-accent-foreground px-4 py-3 rounded-xl max-w-[min(20rem,90vw)] text-center font-medium relative break-words">
           <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-accent"></div>
           {message}
         </div>

@@ -72,7 +72,7 @@ export default function UniPage() {
   const selectedServiceData = services.find(s => s.id === selectedService) || services[0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/98 to-background/95 relative overflow-hidden">
+    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-gradient-to-br from-background via-background/98 to-background/95 relative overflow-x-clip overflow-y-auto">
       {/* Enhanced floating particles */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-2 h-2 bg-primary/40 rounded-full animate-ping animation-delay-1000"></div>
@@ -112,7 +112,7 @@ export default function UniPage() {
         </header>
         
         {/* Main content area */}
-        <main className="flex-1 px-4 py-6">
+        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6">
           <div className="max-w-7xl mx-auto">
             {/* Title Section */}
             <div className="text-center mb-8">
@@ -128,9 +128,9 @@ export default function UniPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8">
               {/* Mascot Section */}
-              <div className="xl:col-span-3 flex flex-col items-center justify-center order-2 xl:order-1">
+              <div className="lg:col-span-3 flex flex-col items-center justify-center order-2 lg:order-1">
                 <div className="w-full max-w-2xl">
                   <Mascot 
                     isAnimating={selectedService !== null}
@@ -152,7 +152,7 @@ export default function UniPage() {
                             </h3>
                           </div>
                         </div>
-                        <p className="text-muted-foreground leading-relaxed">
+                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed break-words">
                           {selectedServiceData.description}
                         </p>
                       </CardContent>
@@ -162,13 +162,13 @@ export default function UniPage() {
               </div>
               
               {/* Service Buttons Section */}
-              <div className="xl:col-span-2 space-y-6 order-1 xl:order-2">
-                <div className="sticky top-6">
+              <div className="lg:col-span-2 space-y-6 order-1 lg:order-2">
+                <div className="lg:sticky lg:top-6">
                   <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-xl">
-                    <h2 className="text-2xl font-bold text-foreground mb-2 text-center xl:text-left">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2 text-center lg:text-left">
                       Layanan Kami
                     </h2>
-                    <p className="text-muted-foreground mb-6 text-center xl:text-left">
+                    <p className="text-sm sm:text-base text-muted-foreground mb-6 text-center lg:text-left">
                       Klik untuk mengetahui lebih detail
                     </p>
                     
@@ -206,7 +206,7 @@ export default function UniPage() {
                                     <IconComponent className="h-5 w-5" />
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <div className={`font-semibold text-sm lg:text-base transition-colors duration-300 ${
+                                    <div className={`font-semibold text-sm lg:text-base transition-colors duration-300 break-words ${
                                       isSelected ? 'text-white' : 'text-foreground'
                                     }`}>
                                       <span className="mr-2">{service.emoji}</span>
@@ -233,7 +233,7 @@ export default function UniPage() {
         </main>
         
         {/* Enhanced Footer */}
-        <footer className="flex-shrink-0 py-6 text-center border-t border-border/30 bg-card/30 backdrop-blur-sm">
+        <footer className="flex-shrink-0 py-4 sm:py-6 text-center border-t border-border/30 bg-card/30 backdrop-blur-sm pb-[env(safe-area-inset-bottom)]">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground font-medium">
               © 2025 Gadang Barubah
