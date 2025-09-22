@@ -126,6 +126,7 @@ export default function MembershipPage() {
                     </ul>
                     
                     <Button 
+                      onClick={() => navigate('/member/login')}
                       className={`w-full hover-elevate ${index === 1 ? 'bg-primary hover:bg-primary/90' : ''}`}
                       variant={index === 1 ? 'default' : 'outline'}
                       data-testid={`button-join-${index}`}
@@ -205,7 +206,12 @@ export default function MembershipPage() {
                 </div>
                 
                 <div className="flex flex-col items-center justify-center space-y-3">
-                  <Button size="lg" className="w-full hover-elevate" data-testid="button-join-now">
+                  <Button 
+                    onClick={() => navigate('/member/login')}
+                    size="lg" 
+                    className="w-full hover-elevate" 
+                    data-testid="button-join-now"
+                  >
                     <Crown className="mr-2 h-4 w-4" />
                     Daftar Sekarang
                   </Button>
