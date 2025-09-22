@@ -116,14 +116,31 @@ export default function WelcomePage() {
                 </div>
               </div>
               <div className="relative">
-                <div className="aspect-[4/3] overflow-hidden rounded-lg shadow-xl">
-                  <img 
-                    src={restaurantExterior} 
-                    alt="Eksterior mewah Gadang Barubah" 
-                    className="w-full h-full object-cover"
-                  />
+                {/* Minangkabau Frame */}
+                <div className="relative p-4 bg-gradient-to-br from-yellow-100/20 to-red-100/20 rounded-2xl border-2 border-yellow-200/30">
+                  {/* Traditional Corner Ornaments */}
+                  <div className="absolute -top-2 -left-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-red-500 rounded-full opacity-80"></div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-red-500 rounded-full opacity-80"></div>
+                  <div className="absolute -bottom-2 -left-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-red-500 rounded-full opacity-80"></div>
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-red-500 rounded-full opacity-80"></div>
+                  
+                  {/* Geometric Pattern Border */}
+                  <div className="absolute inset-2 border border-yellow-300/50 rounded-lg">
+                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-yellow-500 rotate-45 opacity-70"></div>
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-4 h-4 bg-yellow-500 rotate-45 opacity-70"></div>
+                    <div className="absolute left-0 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-red-500 rotate-45 opacity-70"></div>
+                    <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-red-500 rotate-45 opacity-70"></div>
+                  </div>
+                  
+                  <div className="aspect-[4/3] overflow-hidden rounded-lg shadow-xl relative z-10">
+                    <img 
+                      src={restaurantExterior} 
+                      alt="Eksterior mewah Gadang Barubah" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-                <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
+                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-br from-yellow-200/20 to-red-200/20 rounded-full blur-2xl"></div>
               </div>
             </div>
 
@@ -145,14 +162,36 @@ export default function WelcomePage() {
                 </div>
               </div>
               <div className="lg:order-1 relative">
-                <div className="aspect-[4/3] overflow-hidden rounded-lg shadow-xl">
-                  <img 
-                    src={restaurantNight} 
-                    alt="Suasana malam yang hangat di Gadang Barubah" 
-                    className="w-full h-full object-cover"
-                  />
+                {/* Minangkabau Frame - Night Version */}
+                <div className="relative p-4 bg-gradient-to-br from-red-100/20 to-yellow-100/20 rounded-2xl border-2 border-red-200/30">
+                  {/* Traditional Corner Ornaments - Night Theme */}
+                  <div className="absolute -top-2 -left-2 w-8 h-8 bg-gradient-to-br from-red-500 to-yellow-400 rounded-full opacity-80"></div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-red-500 to-yellow-400 rounded-full opacity-80"></div>
+                  <div className="absolute -bottom-2 -left-2 w-8 h-8 bg-gradient-to-br from-red-500 to-yellow-400 rounded-full opacity-80"></div>
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-br from-red-500 to-yellow-400 rounded-full opacity-80"></div>
+                  
+                  {/* Traditional Songket-inspired Pattern */}
+                  <div className="absolute inset-2 border-2 border-red-300/40 rounded-lg">
+                    {/* Center diamonds */}
+                    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-yellow-400 rotate-45 opacity-60"></div>
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-yellow-400 rotate-45 opacity-60"></div>
+                    <div className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-red-400 rotate-45 opacity-60"></div>
+                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-red-400 rotate-45 opacity-60"></div>
+                    
+                    {/* Corner triangular patterns */}
+                    <div className="absolute top-1 left-1 w-0 h-0 border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-yellow-400/50"></div>
+                    <div className="absolute top-1 right-1 w-0 h-0 border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-red-400/50"></div>
+                  </div>
+                  
+                  <div className="aspect-[4/3] overflow-hidden rounded-lg shadow-xl relative z-10">
+                    <img 
+                      src={restaurantNight} 
+                      alt="Suasana malam yang hangat di Gadang Barubah" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-red-200/20 to-yellow-200/20 rounded-full blur-3xl"></div>
               </div>
             </div>
 
