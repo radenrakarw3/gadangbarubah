@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft } from 'lucide-react';
 import Logo from './Logo';
+import Mascot from './Mascot';
+import restaurantBgImage from '@assets/DSC03165_1758566711557.jpg';
 
 const services = [
   {
@@ -124,37 +126,20 @@ export default function UniPage() {
             })}
           </div>
 
-          {/* Concierge Section */}
-          <div className="text-center">
-            <Card className="border-border/30 shadow-lg bg-gradient-to-br from-background to-muted/5">
-              <CardContent className="p-10">
-                <div className="max-w-2xl mx-auto">
-                  <h3 className="font-serif text-2xl font-medium text-foreground mb-4">
-                    Konsultasi Personal
-                  </h3>
-                  <div className="w-16 h-px bg-primary mx-auto mb-6"></div>
-                  <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                    Tim concierge kami siap memberikan rekomendasi personal dan membantu mewujudkan 
-                    pengalaman kuliner yang sempurna sesuai preferensi Anda.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button 
-                      size="lg" 
-                      className="px-8 py-4 bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-300"
-                    >
-                      Hubungi Concierge
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="lg" 
-                      className="px-8 py-4 border-primary/30 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
-                    >
-                      Lihat Kontak
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Mascot Section with Background */}
+          <div 
+            className="relative rounded-2xl overflow-hidden bg-cover bg-center shadow-2xl"
+            style={{ backgroundImage: `url(${restaurantBgImage})` }}
+          >
+            <div className="absolute inset-0 bg-black/40"></div>
+            <div className="relative z-10 p-8 sm:p-12 text-center">
+              <div className="max-w-2xl mx-auto">
+                <Mascot 
+                  isAnimating={false}
+                  message="Selamat datang di Gadang Barubah! Saya Uni, siap membantu Anda menemukan pengalaman kuliner terbaik."
+                />
+              </div>
+            </div>
           </div>
         </div>
       </main>
