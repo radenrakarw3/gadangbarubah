@@ -72,7 +72,7 @@ export function BacklinksFooter() {
               </a>
               
               <a 
-                href="https://www.google.com/maps/place/Gadang+Barubah+Restaurant" 
+                href="https://maps.app.goo.gl/JcR1hDXTawCkjGu7A" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-cream/80 hover:text-gold transition-colors group"
@@ -89,7 +89,7 @@ export function BacklinksFooter() {
             <h3 className="text-xl font-bold text-gold mb-4">Pesan Online</h3>
             <div className="space-y-3">
               <a 
-                href="https://gofood.link/a/gadangbarubah" 
+                href="https://gofood.co.id/en/jakarta/restaurant/gadang-barubah-0879bb59-cabc-41e7-9d69-d80029a0a48c" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-cream/80 hover:text-gold transition-colors group"
@@ -128,7 +128,9 @@ export function BacklinksFooter() {
             <h3 className="text-xl font-bold text-gold mb-4">Menu Kami</h3>
             <div className="space-y-3">
               <a 
-                href="#menu-signature" 
+                href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20menu%20signature%20Minang" 
+                target="_blank" 
+                rel="noopener noreferrer"
                 className="block text-cream/80 hover:text-gold transition-colors hover:underline"
                 data-testid="link-menu-signature"
               >
@@ -136,7 +138,9 @@ export function BacklinksFooter() {
               </a>
               
               <a 
-                href="#menu-nasi-padang" 
+                href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20nasi%20padang%20tradisional" 
+                target="_blank" 
+                rel="noopener noreferrer"
                 className="block text-cream/80 hover:text-gold transition-colors hover:underline"
                 data-testid="link-menu-nasi-padang"
               >
@@ -144,7 +148,9 @@ export function BacklinksFooter() {
               </a>
               
               <a 
-                href="#menu-dessert" 
+                href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20dessert%20dan%20klepon" 
+                target="_blank" 
+                rel="noopener noreferrer"
                 className="block text-cream/80 hover:text-gold transition-colors hover:underline"
                 data-testid="link-menu-dessert"
               >
@@ -152,7 +158,9 @@ export function BacklinksFooter() {
               </a>
               
               <a 
-                href="#catering" 
+                href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20layanan%20catering" 
+                target="_blank" 
+                rel="noopener noreferrer"
                 className="block text-cream/80 hover:text-gold transition-colors hover:underline"
                 data-testid="link-catering"
               >
@@ -170,19 +178,19 @@ export function BacklinksFooter() {
           
           {/* SEO Internal Links */}
           <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <a href="#tentang-kami" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-about">
+            <a href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20restoran" target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-about">
               Tentang Gadang Barubah
             </a>
             <span className="text-cream/40">|</span>
-            <a href="#menu-lengkap" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-full-menu">
+            <a href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20melihat%20menu%20lengkap" target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-full-menu">
               Menu Lengkap
             </a>
             <span className="text-cream/40">|</span>
-            <a href="#reservasi" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-reservation">
+            <a href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20reservasi%20meja" target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-reservation">
               Reservasi Meja
             </a>
             <span className="text-cream/40">|</span>
-            <a href="#kontak" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-contact">
+            <a href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya" target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-contact">
               Hubungi Kami
             </a>
           </div>
