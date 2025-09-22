@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageCircle, ArrowDown } from 'lucide-react';
+import { MessageCircle, ArrowDown, X, MapPin, Truck, Handshake, Crown, UtensilsCrossed, Sparkles, Star, Zap } from 'lucide-react';
 import uniMascotImage from '@assets/ChatGPT Image Sep 22, 2025, 11_37_20 PM_1758584495417.png';
 
 export function AnimatedUni() {
@@ -14,43 +14,68 @@ export function AnimatedUni() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Handle keyboard events for accessibility
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showSpeechBubble) {
+        setShowSpeechBubble(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showSpeechBubble]);
+
   return (
     <div className="relative text-center mb-8">
       {/* Speech Bubble */}
       {showSpeechBubble && (
-        <div className="absolute -top-32 left-1/2 transform -translate-x-1/2 z-10 animate-bounce-in">
-          <div className="relative bg-white dark:bg-gray-800 border-2 border-gold/30 rounded-2xl p-4 shadow-lg max-w-xs">
-            <div className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
-              <MessageCircle className="w-4 h-4 text-gold" />
-              Halo! Saya Uni 👋
+        <div 
+          className="absolute -top-32 sm:-top-36 left-1/2 transform -translate-x-1/2 z-10 animate-bounce-in"
+          data-testid="speech-bubble-container"
+        >
+          <div className="relative bg-white dark:bg-gray-800 border-2 border-[hsl(var(--minang-gold-primary))] border-opacity-30 rounded-2xl p-4 shadow-lg max-w-xs">
+            {/* Close Button */}
+            <button 
+              onClick={() => setShowSpeechBubble(false)}
+              className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Tutup pesan Uni"
+              data-testid="button-close-speech-bubble"
+            >
+              <X className="w-3 h-3 text-gray-500" />
+            </button>
+            
+            <div className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2" data-testid="text-uni-greeting">
+              <MessageCircle className="w-4 h-4 text-[hsl(var(--minang-gold-primary))]" />
+              Halo! Saya Uni
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed mb-3">
-              Di <span className="font-semibold text-gold">"Jelajahi Layanan Kami"</span> kamu bisa menemukan:
+            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed mb-3" data-testid="text-service-intro">
+              Di <span className="font-semibold text-[hsl(var(--minang-gold-primary))]">"Jelajahi Layanan Kami"</span> kamu bisa menemukan:
             </p>
             <ul className="text-xs text-gray-600 dark:text-gray-300 space-y-1 mb-3">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-gold rounded-full"></span>
-                📍 Lokasi Outlet Premium
+              <li className="flex items-center gap-2" data-testid="service-item-outlet">
+                <MapPin className="w-3 h-3 text-[hsl(var(--minang-gold-primary))]" />
+                Lokasi Outlet Premium
               </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-gold rounded-full"></span>
-                🚚 Delivery ke Rumah
+              <li className="flex items-center gap-2" data-testid="service-item-delivery">
+                <Truck className="w-3 h-3 text-[hsl(var(--minang-gold-primary))]" />
+                Delivery ke Rumah
               </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-gold rounded-full"></span>
-                🤝 Partnership Bisnis
+              <li className="flex items-center gap-2" data-testid="service-item-partnership">
+                <Handshake className="w-3 h-3 text-[hsl(var(--minang-gold-primary))]" />
+                Partnership Bisnis
               </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-gold rounded-full"></span>
-                👑 VIP Membership
+              <li className="flex items-center gap-2" data-testid="service-item-membership">
+                <Crown className="w-3 h-3 text-[hsl(var(--minang-gold-primary))]" />
+                VIP Membership
               </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-gold rounded-full"></span>
-                🍽️ Catering Event
+              <li className="flex items-center gap-2" data-testid="service-item-catering">
+                <UtensilsCrossed className="w-3 h-3 text-[hsl(var(--minang-gold-primary))]" />
+                Catering Event
               </li>
             </ul>
-            <div className="flex items-center justify-center gap-1 text-gold text-xs font-medium">
-              <ArrowDown className="w-3 h-3 animate-bounce" />
+            <div className="flex items-center justify-center gap-1 text-[hsl(var(--minang-gold-primary))] text-xs font-medium" data-testid="text-call-to-action">
+              <ArrowDown className="w-3 h-3 animate-bounce motion-reduce:animate-none" />
               Klik tombol di bawah yuk!
             </div>
             
@@ -62,25 +87,29 @@ export function AnimatedUni() {
       
       {/* Animated Uni Mascot */}
       <div className="relative inline-block">
-        <img 
-          src={uniMascotImage}
-          alt="Uni - Mascot resmi Gadang Barubah Restaurant dengan pakaian tradisional Minangkabau"
-          className="w-64 sm:w-80 h-auto mx-auto rounded-lg shadow-lg 
-                     animate-float hover:animate-wave transition-all duration-300
-                     hover:scale-105 cursor-pointer"
-          data-testid="img-uni-mascot"
-          onClick={() => setShowSpeechBubble(!showSpeechBubble)}
-        />
+        {/* Outer wrapper for float animation */}
+        <div className="animate-float motion-reduce:animate-none">
+          {/* Inner wrapper for hover effects */}
+          <div className="hover:animate-wave motion-reduce:hover:animate-none transition-all duration-300 hover:scale-105 cursor-pointer">
+            <img 
+              src={uniMascotImage}
+              alt="Uni - Mascot resmi Gadang Barubah Restaurant dengan pakaian tradisional Minangkabau"
+              className="w-64 sm:w-80 h-auto mx-auto rounded-lg shadow-lg"
+              data-testid="img-uni-mascot"
+              onClick={() => setShowSpeechBubble(!showSpeechBubble)}
+            />
+          </div>
+        </div>
         
         {/* Floating sparkles */}
-        <div className="absolute top-4 right-4 animate-ping">
-          <span className="text-gold text-lg">✨</span>
+        <div className="absolute top-4 right-4 animate-ping motion-reduce:animate-none hidden sm:block">
+          <Sparkles className="w-5 h-5 text-[hsl(var(--minang-gold-primary))]" />
         </div>
-        <div className="absolute top-8 left-6 animate-pulse delay-500">
-          <span className="text-gold text-sm">⭐</span>
+        <div className="absolute top-8 left-6 animate-pulse delay-500 motion-reduce:animate-none hidden sm:block">
+          <Star className="w-4 h-4 text-[hsl(var(--minang-gold-primary))]" />
         </div>
-        <div className="absolute bottom-8 right-8 animate-bounce delay-1000">
-          <span className="text-gold text-base">💫</span>
+        <div className="absolute bottom-8 right-8 animate-bounce delay-1000 motion-reduce:animate-none hidden sm:block">
+          <Zap className="w-5 h-5 text-[hsl(var(--minang-gold-primary))]" />
         </div>
       </div>
     </div>

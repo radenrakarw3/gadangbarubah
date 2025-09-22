@@ -345,4 +345,16 @@
       transform: scale(1);
     }
   }
+
+  /* Accessibility: Respect user motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float,
+    .animate-wave,
+    .animate-bounce-in,
+    .animate-ping,
+    .animate-pulse,
+    .animate-bounce {
+      animation: none;
+    }
+  }
 }
