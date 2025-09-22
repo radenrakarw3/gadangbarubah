@@ -145,7 +145,7 @@ export default function WelcomePage() {
                 <div className="aspect-[4/3]">
                   <img 
                     src={restaurantNight} 
-                    alt="Suasana malam yang hangat di Gadang Barubah" 
+                    alt="Suasana malam hangat di rumah makan Padang Gadang Barubah dengan pencahayaan ambient" 
                     className="w-full h-full object-cover"
                     data-testid="img-night"
                   />

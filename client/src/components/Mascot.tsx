@@ -52,7 +52,7 @@ export default function Mascot({ isAnimating = false, message }: MascotProps) {
         <div className="relative">
           <img
             src={mascotImage}
-            alt="Uni - Mascot Gadang Barubah"
+            alt="Uni - Mascot ramah Gadang Barubah rumah makan Padang yang siap membantu"
             className="w-full max-w-[16rem] sm:max-w-[18rem] md:max-w-[20rem] lg:max-w-[22rem] xl:max-w-[24rem] h-auto object-contain transition-transform duration-300"
             style={getAnimationStyle()}
             data-testid="mascot-uni"
