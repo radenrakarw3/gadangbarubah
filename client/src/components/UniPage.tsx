@@ -48,7 +48,18 @@ export default function UniPage() {
   const [, navigate] = useLocation();
 
   const handleServiceClick = (service: typeof services[0]) => {
-    navigate(service.path);
+    // Services that redirect to WhatsApp
+    const whatsAppServices = ['delivery', 'partnership', 'catering'];
+    const whatsAppNumber = '6289509766739'; // format untuk WhatsApp API (62 untuk Indonesia + nomor tanpa 0)
+    
+    if (whatsAppServices.includes(service.id)) {
+      const message = encodeURIComponent(`Halo, saya tertarik dengan layanan ${service.name} dari Gadang Barubah. Mohon informasi lebih lanjut.`);
+      const whatsAppUrl = `https://api.whatsapp.com/send?phone=${whatsAppNumber}&text=${message}`;
+      window.open(whatsAppUrl, '_blank');
+    } else {
+      // Navigate to individual pages for other services
+      navigate(service.path);
+    }
   };
 
   return (
