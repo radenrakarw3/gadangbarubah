@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Clock, Phone, ArrowLeft, Store, ChevronLeft, ChevronRight, Crown } from 'lucide-react';
 import Logo from '../Logo';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Import restaurant photos
 import exteriorImage from '@assets/DSC07220_1758567803910.jpg';
@@ -21,6 +21,8 @@ import buffetArea from '@assets/DSC03388_1758567885565.jpg';
 export default function OutletPage() {
   const [, navigate] = useLocation();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoSliding, setIsAutoSliding] = useState(true);
+  const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const atmosphereImages = [
     {
@@ -80,41 +82,76 @@ export default function OutletPage() {
     }
   ];
 
+  const pauseAndResume = () => {
+    setIsAutoSliding(false);
+    // Clear existing timeout
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current);
+    }
+    // Set new timeout to resume
+    resumeTimeoutRef.current = setTimeout(() => setIsAutoSliding(true), 10000);
+  };
+
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % atmosphereImages.length);
+    pauseAndResume();
   };
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + atmosphereImages.length) % atmosphereImages.length);
+    pauseAndResume();
   };
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+    pauseAndResume();
+  };
+
+  // Auto-slide every 5 seconds when enabled
+  useEffect(() => {
+    if (!isAutoSliding) return;
+    
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % atmosphereImages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [atmosphereImages.length, isAutoSliding]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (resumeTimeoutRef.current) {
+        clearTimeout(resumeTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Preload next and previous images
+  useEffect(() => {
+    const preloadImages = () => {
+      const nextIndex = (currentSlide + 1) % atmosphereImages.length;
+      const prevIndex = (currentSlide - 1 + atmosphereImages.length) % atmosphereImages.length;
+      
+      [nextIndex, prevIndex].forEach(index => {
+        const img = new Image();
+        img.src = atmosphereImages[index].src;
+      });
+    };
+    
+    preloadImages();
+  }, [currentSlide, atmosphereImages]);
 
   const locations = [
     {
-      name: "Gadang Barubah Flagship",
-      address: "Jl. Raya Padang No. 123, Padang",
-      phone: "0751-123456",
-      hours: "08:00 - 22:00",
+      name: "Gadang Barubah Main Gate",
+      address: "Main Gate, Mall Cikarang, Jl. Raya Cikarang - Cibarusah, Pasirsari, Cikarang Sel., Kabupaten Bekasi, Jawa Barat 17530 Pollux, Lantai GF",
+      phone: "0895-0976-6739",
+      hours: "10:00 - 22:00",
       icon: Store,
-      type: "Flagship Restaurant",
-      description: "Pengalaman dining premium dengan menu signature lengkap dan private dining room."
-    },
-    {
-      name: "Gadang Barubah Plaza",
-      address: "Mall Plaza Andalas Lt. 2, Padang",
-      phone: "0751-654321", 
-      hours: "10:00 - 21:00",
-      icon: Store,
-      type: "Contemporary Dining",
-      description: "Suasana modern dengan konsep open kitchen dan live cooking experience."
-    },
-    {
-      name: "Gadang Barubah Express",
-      address: "Jl. Sudirman No. 456, Bukittinggi",
-      phone: "0752-987654",
-      hours: "24 Jam",
-      icon: Clock,
-      type: "Quick Fine Dining",
-      description: "Layanan 24 jam dengan kualitas premium untuk kenyamanan Anda kapan saja."
+      type: "Premium Restaurant",
+      description: "Outlet flagship kami di Mall Cikarang dengan konsep premium dining dan VIP room eksklusif.",
+      googleMaps: "https://maps.app.goo.gl/jP1JMKQZBU9AXSLz5"
     }
   ];
 
@@ -155,8 +192,8 @@ export default function OutletPage() {
             </p>
           </div>
 
-          {/* Locations Grid */}
-          <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {/* Location Info */}
+          <div className="max-w-2xl mx-auto mb-12">
             {locations.map((location, index) => {
               const LocationIcon = location.icon;
               return (
@@ -199,13 +236,28 @@ export default function OutletPage() {
                           </div>
                         </div>
                         
-                        <Button 
-                          className="bg-primary hover:bg-primary/90 transition-all duration-300 px-6"
-                          onClick={() => console.log(`Reservasi ${location.name}`)}
-                          data-testid={`button-visit-${index}`}
-                        >
-                          Buat Reservasi
-                        </Button>
+                        <div className="flex flex-wrap gap-3">
+                          <Button 
+                            className="bg-primary hover:bg-primary/90 transition-all duration-300 px-6"
+                            onClick={() => {
+                              const message = encodeURIComponent('Halo, saya tertarik untuk buat reservasi di Gadang Barubah. Mohon informasi lebih lanjut.');
+                              const whatsAppUrl = `https://api.whatsapp.com/send?phone=6289509766739&text=${message}`;
+                              window.open(whatsAppUrl, '_blank', 'noopener,noreferrer');
+                            }}
+                            data-testid={`button-reservation-${index}`}
+                          >
+                            Buat Reservasi
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            className="border-primary/30 hover:border-primary/50 px-6"
+                            onClick={() => window.open(location.googleMaps, '_blank', 'noopener,noreferrer')}
+                            data-testid={`button-maps-${index}`}
+                          >
+                            <MapPin className="h-4 w-4 mr-2" />
+                            Google Maps
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -227,13 +279,15 @@ export default function OutletPage() {
             </div>
             
             <div className="relative max-w-4xl mx-auto">
-              <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl">
                 <img
                   src={atmosphereImages[currentSlide].src}
                   alt={atmosphereImages[currentSlide].title}
                   className="w-full h-full object-cover transition-all duration-500"
+                  loading="eager"
+                  decoding="async"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-8">
                   <h3 className="text-white text-2xl font-serif font-medium mb-2">
                     {atmosphereImages[currentSlide].title}
@@ -249,8 +303,9 @@ export default function OutletPage() {
                 variant="outline"
                 size="icon"
                 onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white border-white/20 shadow-lg"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white border-white/20 shadow-lg z-10"
                 data-testid="button-prev-slide"
+                aria-label="Foto sebelumnya"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -258,8 +313,9 @@ export default function OutletPage() {
                 variant="outline"
                 size="icon"
                 onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white border-white/20 shadow-lg"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white border-white/20 shadow-lg z-10"
                 data-testid="button-next-slide"
+                aria-label="Foto selanjutnya"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -269,13 +325,15 @@ export default function OutletPage() {
                 {atmosphereImages.map((_, index) => (
                   <button
                     key={index}
-                    onClick={() => setCurrentSlide(index)}
+                    onClick={() => goToSlide(index)}
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       index === currentSlide 
                         ? 'bg-primary w-8' 
                         : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
                     }`}
                     data-testid={`indicator-${index}`}
+                    aria-label={`Pergi ke foto ${index + 1}`}
+                    aria-current={index === currentSlide ? 'true' : 'false'}
                   />
                 ))}
               </div>
@@ -337,7 +395,7 @@ export default function OutletPage() {
                       onClick={() => {
                         const message = encodeURIComponent('Halo, saya tertarik untuk reservasi VIP Room di Gadang Barubah. Mohon informasi lebih lanjut.');
                         const whatsAppUrl = `https://api.whatsapp.com/send?phone=6289509766739&text=${message}`;
-                        window.open(whatsAppUrl, '_blank');
+                        window.open(whatsAppUrl, '_blank', 'noopener,noreferrer');
                       }}
                       data-testid="button-vip-reservation"
                     >
