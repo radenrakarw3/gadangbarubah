@@ -48,7 +48,7 @@ export default function Mascot({ isAnimating = false, message }: MascotProps) {
 
   return (
     <>
-      <div className="relative flex items-center justify-center">
+      <div className="relative flex flex-col sm:flex-row items-center justify-center gap-4">
         <div className="relative">
           <img
             src={mascotImage}
@@ -57,14 +57,17 @@ export default function Mascot({ isAnimating = false, message }: MascotProps) {
             style={getAnimationStyle()}
             data-testid="mascot-uni"
           />
-          
-          {message && (
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 bg-accent text-accent-foreground px-4 py-3 rounded-xl max-w-[min(20rem,90vw)] text-center font-medium break-words z-10">
-              <div className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-r-8 border-transparent border-r-accent"></div>
-              {message}
-            </div>
-          )}
         </div>
+        
+        {message && (
+          <div className="bg-accent text-accent-foreground px-4 py-3 rounded-xl max-w-[min(20rem,90vw)] text-center font-medium break-words relative">
+            {/* Mobile: Arrow pointing up */}
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-accent sm:hidden"></div>
+            {/* Desktop: Arrow pointing left */}
+            <div className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-r-8 border-transparent border-r-accent hidden sm:block"></div>
+            {message}
+          </div>
+        )}
       </div>
         
       <style dangerouslySetInnerHTML={{
