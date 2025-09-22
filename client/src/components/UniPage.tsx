@@ -1,10 +1,11 @@
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft, ShoppingBag } from 'lucide-react';
 import Logo from './Logo';
 import Mascot from './Mascot';
 import restaurantBgImage from '@assets/DSC03165_1758566711557.jpg';
+import rendangKiloanImage from '@assets/DSC02799_1758569186868.jpg';
 
 const services = [
   {
@@ -149,6 +150,60 @@ export default function UniPage() {
                 </Card>
               );
             })}
+          </div>
+
+          {/* Rendang Kiloan Promo */}
+          <div className="max-w-2xl mx-auto mb-16">
+            <Card className="overflow-hidden border-border/30 shadow-lg bg-gradient-to-br from-background to-muted/5 hover-elevate hover:shadow-xl transition-all duration-500">
+              <CardContent className="p-0">
+                <div className="flex items-center">
+                  {/* Image Section - 1:1 ratio */}
+                  <div className="w-32 h-32 flex-shrink-0">
+                    <img 
+                      src={rendangKiloanImage}
+                      alt="Rendang Kiloan Gadang Barubah - packaging premium dengan rendang segar"
+                      className="w-full h-full object-cover"
+                      data-testid="img-rendang-kiloan"
+                    />
+                  </div>
+                  
+                  {/* Content Section */}
+                  <div className="flex-1 p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-2">
+                          <ShoppingBag className="h-5 w-5 text-primary mr-2" />
+                          <h3 className="font-serif text-lg font-medium text-foreground">
+                            Rendang Kiloan
+                          </h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                          Nikmati kelezatan rendang premium dalam kemasan praktis untuk keluarga
+                        </p>
+                        <div className="text-xs text-primary/70 font-medium">
+                          ✨ Rasa otentik • Kemasan premium • Tahan lama
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        size="sm"
+                        className="ml-4"
+                        asChild
+                        data-testid="button-order-rendang"
+                      >
+                        <a
+                          href={`https://api.whatsapp.com/send?phone=6289509766739&text=${encodeURIComponent('Halo, saya tertarik untuk memesan Rendang Kiloan Gadang Barubah. Mohon informasi harga dan ketersediaan.')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Order
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>
