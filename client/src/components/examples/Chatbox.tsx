@@ -15,8 +15,8 @@ export default function ChatboxExample() {
   return (
     <div className="relative h-screen bg-background">
       <div className="p-8 text-center">
-        <h2 className="text-xl font-semibold mb-4">Chatbox Component Example</h2>
-        <p className="text-muted-foreground">Try chatting with Uni!</p>
+        <h2 className="text-xl font-semibold mb-4">Chatbox dengan Tombol Pilihan</h2>
+        <p className="text-muted-foreground">Pilih opsi untuk berinteraksi dengan Uni!</p>
       </div>
       <Chatbox 
         isVisible={isVisible}

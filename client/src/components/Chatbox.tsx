@@ -1,14 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Send, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
 interface Message {
   id: string;
   text: string;
   isFromUni: boolean;
   timestamp: Date;
+}
+
+interface ChatOption {
+  id: string;
+  text: string;
+  response: string;
 }
 
 interface ChatboxProps {
@@ -21,21 +26,26 @@ export default function Chatbox({ isVisible = true, onToggle, onUniMessage }: Ch
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Selamat datang di Gadang Barubah! Saya Uni, siap membantu Anda hari ini. Ada yang bisa saya bantu?',
+      text: 'Selamat datang di Gadang Barubah! Saya Uni, siap membantu Anda hari ini. Silakan pilih topik yang ingin Anda ketahui:',
       isFromUni: true,
       timestamp: new Date()
     }
   ]);
-  const [inputText, setInputText] = useState('');
+  const [currentOptions, setCurrentOptions] = useState<ChatOption[]>([
+    { id: '1', text: 'Tentang Gadang Barubah', response: 'Gadang Barubah adalah tempat yang menyediakan pengalaman terbaik untuk Anda. Kami berkomitmen memberikan pelayanan yang memuaskan!' },
+    { id: '2', text: 'Produk & Layanan', response: 'Kami menawarkan berbagai produk dan layanan berkualitas tinggi. Setiap produk kami dibuat dengan penuh perhatian untuk kepuasan Anda.' },
+    { id: '3', text: 'Cara Pemesanan', response: 'Pemesanan sangat mudah! Anda bisa menghubungi kami atau datang langsung. Tim kami siap membantu proses pemesanan Anda.' },
+    { id: '4', text: 'Kontak Kami', response: 'Anda bisa menghubungi kami kapan saja. Kami selalu siap melayani dan menjawab pertanyaan Anda dengan ramah!' }
+  ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [showOptions, setShowOptions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const uniResponses = [
-    "Terima kasih sudah mengunjungi Gadang Barubah! Kami senang bisa bertemu dengan Anda.",
-    "Wah, pertanyaan yang menarik! Saya akan membantu Anda dengan senang hati.",
-    "Gadang Barubah menyediakan produk terbaik untuk Anda. Ada yang ingin Anda ketahui?",
-    "Saya di sini untuk membantu! Jangan ragu untuk bertanya apa saja.",
-    "Pengalaman yang luar biasa menanti Anda di Gadang Barubah!"
+  const followUpOptions = [
+    { id: 'more1', text: 'Ceritakan lebih detail', response: 'Tentu! Gadang Barubah telah melayani pelanggan dengan dedikasi tinggi. Kami bangga menjadi bagian dari komunitas ini.' },
+    { id: 'more2', text: 'Ada pertanyaan lain', response: 'Saya senang membantu! Silakan pilih topik lain yang ingin Anda ketahui.' },
+    { id: 'thanks', text: 'Terima kasih Uni!', response: 'Sama-sama! Saya senang bisa membantu. Jangan ragu untuk bertanya lagi kapan saja!' },
+    { id: 'restart', text: 'Mulai dari awal', response: 'Baik! Mari kita mulai lagi. Silakan pilih topik yang ingin Anda ketahui:' }
   ];
 
   useEffect(() => {
@@ -46,40 +56,47 @@ export default function Chatbox({ isVisible = true, onToggle, onUniMessage }: Ch
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSendMessage = () => {
-    if (!inputText.trim()) return;
-
-    const newMessage: Message = {
+  const handleOptionClick = (option: ChatOption) => {
+    // Add user's choice as message
+    const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputText,
+      text: option.text,
       isFromUni: false,
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, newMessage]);
-    setInputText('');
+    setMessages(prev => [...prev, userMessage]);
+    setShowOptions(false);
     
     // Simulate Uni typing and responding
     setIsTyping(true);
     setTimeout(() => {
-      const randomResponse = uniResponses[Math.floor(Math.random() * uniResponses.length)];
       const uniMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: randomResponse,
+        text: option.response,
         isFromUni: true,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, uniMessage]);
       setIsTyping(false);
-      onUniMessage?.(randomResponse);
+      onUniMessage?.(option.response);
+      
+      // Show follow-up options
+      if (option.id === 'restart') {
+        setCurrentOptions([
+          { id: '1', text: 'Tentang Gadang Barubah', response: 'Gadang Barubah adalah tempat yang menyediakan pengalaman terbaik untuk Anda. Kami berkomitmen memberikan pelayanan yang memuaskan!' },
+          { id: '2', text: 'Produk & Layanan', response: 'Kami menawarkan berbagai produk dan layanan berkualitas tinggi. Setiap produk kami dibuat dengan penuh perhatian untuk kepuasan Anda.' },
+          { id: '3', text: 'Cara Pemesanan', response: 'Pemesanan sangat mudah! Anda bisa menghubungi kami atau datang langsung. Tim kami siap membantu proses pemesanan Anda.' },
+          { id: '4', text: 'Kontak Kami', response: 'Anda bisa menghubungi kami kapan saja. Kami selalu siap melayani dan menjawab pertanyaan Anda dengan ramah!' }
+        ]);
+      } else {
+        setCurrentOptions(followUpOptions);
+      }
+      
+      setTimeout(() => {
+        setShowOptions(true);
+      }, 1000);
     }, 1500);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
   };
 
   if (!isVisible) {
@@ -145,24 +162,22 @@ export default function Chatbox({ isVisible = true, onToggle, onUniMessage }: Ch
             <div ref={messagesEndRef} />
           </div>
           
-          <div className="flex space-x-2">
-            <Input
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Tulis pesan Anda..."
-              className="flex-1"
-              data-testid="input-chat-message"
-            />
-            <Button
-              onClick={handleSendMessage}
-              size="icon"
-              className="shrink-0"
-              data-testid="button-send-message"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
+          {/* Choice buttons */}
+          {showOptions && !isTyping && (
+            <div className="space-y-2">
+              {currentOptions.map((option) => (
+                <Button
+                  key={option.id}
+                  onClick={() => handleOptionClick(option)}
+                  variant="outline"
+                  className="w-full text-left justify-start text-sm h-auto py-2 px-3 hover-elevate"
+                  data-testid={`button-option-${option.id}`}
+                >
+                  {option.text}
+                </Button>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
