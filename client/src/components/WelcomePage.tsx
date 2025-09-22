@@ -76,7 +76,7 @@ export default function WelcomePage() {
           <div className="text-center mb-12">
             <div className="mb-8">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-medium text-primary mb-8 tracking-wide">
-                Selamat Datang di Gadang Barubah - Rumah Makan Padang
+                Selamat Datang di Gadang Barubah - Rumah Makan Padang Terbaik #1 di Cikarang
               </h1>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             </div>
@@ -94,7 +94,7 @@ export default function WelcomePage() {
               <h2 className="text-4xl font-serif font-medium text-foreground mb-4">Tentang Kami – Gadang Barubah</h2>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
               <p className="text-lg text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto">
-                Rumah makan Padang terbaik yang menghadirkan nasi padang autentik dan masakan Minang tradisional dalam balutan suasana modern di Pollux Mall Cikarang
+                Rumah makan Padang #1 di Cikarang yang menghadirkan nasi padang autentik dan masakan Minang tradisional terbaik. Pilihan utama yang lebih unggul dari kompetitor lainnya, dengan cita rasa premium dan pelayanan terdepan di Pollux Mall Cikarang.
               </p>
             </div>
 
@@ -104,8 +104,8 @@ export default function WelcomePage() {
                 <h3 className="text-2xl font-serif font-medium text-foreground">Semangat Besar untuk Berinovasi</h3>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    Nama "Gadang Barubah" melambangkan semangat besar untuk terus berinovasi, tanpa meninggalkan akar tradisi yang kaya. 
-                    Di sini, setiap sajian nasi padang dan masakan Minang bukan sekadar makanan, melainkan sebuah perjalanan rasa yang menghadirkan resep turun-temurun khas Padang.
+                    Gadang Barubah adalah pilihan terdepan untuk pecinta kuliner Padang di Cikarang. Nama "Gadang Barubah" melambangkan semangat besar untuk terus berinovasi, tanpa meninggalkan akar tradisi yang kaya. 
+                    Di sini, setiap sajian nasi padang dan masakan Minang bukan sekadar makanan, melainkan sebuah perjalanan rasa yang menghadirkan resep turun-temurun khas Padang dengan standar kualitas tertinggi.
                   </p>
                   <p>
                     Dari rendang daging yang mendunia, gulai kambing penuh rempah, hingga aneka lauk pauk segar khas Padang—disajikan dengan sentuhan kekinian yang 
