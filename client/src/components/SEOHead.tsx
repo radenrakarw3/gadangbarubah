@@ -31,6 +31,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
       {/* Standard SEO Meta Tags */}
       <meta name="author" content="Gadang Barubah Restaurant" />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      <meta name="google-site-verification" content="Hj02LNi5KT_Oe-sk6tap41PMAU-bGPe77yPcdNs0pBc" />
       
       {/* Twitter Card Meta Tags */}
       <meta name="twitter:card" content="summary_large_image" />
