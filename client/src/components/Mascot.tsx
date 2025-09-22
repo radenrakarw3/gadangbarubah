@@ -47,7 +47,7 @@ export default function Mascot({ isAnimating = false, message }: MascotProps) {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="flex items-center justify-center gap-6 flex-wrap">
       <div className="relative">
         <img
           src={mascotImage}
@@ -60,7 +60,7 @@ export default function Mascot({ isAnimating = false, message }: MascotProps) {
       
       {message && (
         <div className="bg-accent text-accent-foreground px-4 py-3 rounded-xl max-w-[min(20rem,90vw)] text-center font-medium relative break-words">
-          <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-accent"></div>
+          <div className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-r-8 border-transparent border-r-accent"></div>
           {message}
         </div>
       )}
