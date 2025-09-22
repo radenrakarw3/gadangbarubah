@@ -30,33 +30,54 @@ export const antiSpamSlowDown = slowDown({
   skipFailedRequests: false, // Count failed requests
 });
 
-// Bot detection based on User-Agent
+// Bot detection - ALLOW legitimate search engines, BLOCK malicious bots
 export const botDetection = (req: Request, res: Response, next: NextFunction) => {
   const userAgent = req.get('User-Agent') || '';
   
-  // Common bot patterns - allow legitimate browsers
-  const botPatterns = [
+  // LEGITIMATE search engine bots (ALLOW these for SEO)
+  const legitimateSearchEngines = [
     /googlebot/i,
     /bingbot/i,
-    /slurp/i,
-    /duckduckbot/i,
-    /baiduspider/i,
-    /yandexbot/i,
-    /facebookexternalhit/i,
-    /twitterbot/i,
+    /slurp/i,                    // Yahoo
+    /duckduckbot/i,              // DuckDuckGo
+    /baiduspider/i,              // Baidu
+    /yandexbot/i,                // Yandex
+    /facebookexternalhit/i,      // Facebook social crawler
+    /twitterbot/i,               // Twitter social crawler
+    /linkedinbot/i,              // LinkedIn social crawler
+    /whatsapp/i,                 // WhatsApp link preview
+    /telegrambot/i,              // Telegram link preview
+    /slackbot/i                  // Slack link preview
+  ];
+
+  // MALICIOUS bot patterns (BLOCK these)
+  const maliciousBotPatterns = [
     /curl/i,
     /wget/i,
     /python.*requests/i,
-    /^$/,  // Empty user agent
+    /^$/,                        // Empty user agent
     /phantomjs/i,
     /scrapy/i,
-    /nutch/i
+    /nutch/i,
+    /robot/i,
+    /spider/i,
+    /crawler/i,
+    /bot/i                       // Generic bot (but legitimate ones already allowed above)
   ];
 
-  const isBot = botPatterns.some(pattern => pattern.test(userAgent));
+  // First check if it's a legitimate search engine
+  const isLegitimateSearchEngine = legitimateSearchEngines.some(pattern => pattern.test(userAgent));
   
-  if (isBot) {
-    console.log(`🤖 Bot detected - User-Agent: ${userAgent}, IP: ${req.ip}`);
+  if (isLegitimateSearchEngine) {
+    console.log(`✅ Legitimate search engine allowed - User-Agent: ${userAgent}, IP: ${req.ip}`);
+    return next(); // ALLOW legitimate search engines
+  }
+
+  // Then check if it's a malicious bot
+  const isMaliciousBot = maliciousBotPatterns.some(pattern => pattern.test(userAgent));
+  
+  if (isMaliciousBot) {
+    console.log(`🚫 Malicious bot blocked - User-Agent: ${userAgent}, IP: ${req.ip}`);
     return res.status(403).json({
       success: false,
       message: "Access denied",
@@ -64,6 +85,7 @@ export const botDetection = (req: Request, res: Response, next: NextFunction) =>
     });
   }
 
+  // Allow normal browsers and unidentified legitimate traffic
   next();
 };
 

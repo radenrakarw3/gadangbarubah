@@ -99,29 +99,40 @@ export const pageSEOConfigs = {
 };
 
 export function getSEOConfigByPath(path: string) {
+  // Normalize path: remove trailing slash, convert to lowercase
+  const normalizedPath = path.toLowerCase().replace(/\/$/, '') || '/';
+  
   // Route mapping logic
-  if (path === '/' || path === '') return pageSEOConfigs.home;
-  if (path === '/uni') return pageSEOConfigs.services;
-  if (path === '/services/outlet') return pageSEOConfigs.outlet;
-  if (path === '/services/delivery') return pageSEOConfigs.delivery;
-  if (path === '/services/partnership') return pageSEOConfigs.partnership;
-  if (path === '/services/catering') return pageSEOConfigs.catering;
-  if (path === '/member/login' || path === '/services/membership') return pageSEOConfigs.memberLogin;
-  if (path === '/member/register') return pageSEOConfigs.memberRegister;
-  if (path === '/member/dashboard') return pageSEOConfigs.comingSoon;
+  if (normalizedPath === '/') return pageSEOConfigs.home;
+  if (normalizedPath === '/uni') return pageSEOConfigs.services;
+  if (normalizedPath === '/services/outlet') return pageSEOConfigs.outlet;
+  if (normalizedPath === '/services/delivery') return pageSEOConfigs.delivery;
+  if (normalizedPath === '/services/partnership') return pageSEOConfigs.partnership;
+  if (normalizedPath === '/services/catering') return pageSEOConfigs.catering;
+  if (normalizedPath === '/member/login' || normalizedPath === '/services/membership') return pageSEOConfigs.memberLogin;
+  if (normalizedPath === '/member/register') return pageSEOConfigs.memberRegister;
+  if (normalizedPath === '/member/dashboard') return pageSEOConfigs.comingSoon;
   
   // Default fallback
   return pageSEOConfigs.notFound;
 }
 
-export function generateSEOTags(seoConfig: ReturnType<typeof createSEOConfig>) {
+export function generateSEOTags(seoConfig: ReturnType<typeof createSEOConfig>, currentPath?: string) {
+  // Normalize path for consistent comparison
+  const normalizedPath = currentPath ? currentPath.toLowerCase().replace(/\/$/, '') || '/' : '';
+  
+  // Set robots meta based on page type
+  const robotsContent = normalizedPath === '/404' || normalizedPath === '/member/login' || normalizedPath === '/member/register' 
+    ? 'noindex, nofollow' 
+    : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+    
   return {
     title: `<title>${seoConfig.title}</title>`,
     meta: `
       <meta name="description" content="${seoConfig.description}" />
       <meta name="keywords" content="${seoConfig.keywords}" />
       <meta name="author" content="Gadang Barubah Restaurant" />
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      <meta name="robots" content="${robotsContent}" />
       <meta name="google-site-verification" content="Hj02LNi5KT_Oe-sk6tap41PMAU-bGPe77yPcdNs0pBc" />
       
       <!-- Open Graph Meta Tags -->

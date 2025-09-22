@@ -21,8 +21,8 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "blob:"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      connectSrc: ["'self'", "ws:", "wss:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
+      connectSrc: ["'self'", "ws:", "wss:", "https://www.google-analytics.com", "https://analytics.google.com"],
       frameSrc: ["'none'"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
@@ -99,7 +99,7 @@ app.get("*", async (req, res, next) => {
 
     // Get SEO config for this path
     const seoConfig = getSEOConfigByPath(req.path);
-    const seoTags = generateSEOTags(seoConfig);
+    const seoTags = generateSEOTags(seoConfig, req.path);
 
     // Replace SSR placeholders with actual SEO content
     template = template.replace(`<!--ssr-helmet-title-->`, seoTags.title);
