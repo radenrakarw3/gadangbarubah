@@ -11,8 +11,35 @@ interface ImageSlideshowProps {
 
 export default function ImageSlideshow({ images, interval = 5000 }: ImageSlideshowProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [preloadedImages, setPreloadedImages] = useState<string[]>([]);
+
+  // Preload all images for smooth transitions
+  useEffect(() => {
+    const preloadImages = async () => {
+      const promises = images.map((image) => {
+        return new Promise<string>((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(image.src);
+          img.onerror = reject;
+          img.src = image.src;
+        });
+      });
+      
+      try {
+        const loaded = await Promise.all(promises);
+        setPreloadedImages(loaded);
+      } catch (error) {
+        console.warn('Some images failed to preload:', error);
+        setPreloadedImages(images.map(img => img.src));
+      }
+    };
+
+    preloadImages();
+  }, [images]);
 
   useEffect(() => {
+    if (preloadedImages.length === 0) return;
+    
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => 
         prevIndex === images.length - 1 ? 0 : prevIndex + 1
@@ -20,7 +47,7 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
     }, interval);
 
     return () => clearInterval(timer);
-  }, [images.length, interval]);
+  }, [images.length, interval, preloadedImages]);
 
   return (
     <div className="relative overflow-hidden rounded-lg shadow-lg aspect-square w-full max-w-lg mx-auto">
@@ -35,6 +62,7 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
             src={image.src}
             alt={image.alt}
             className="w-full h-full object-cover"
+            loading="eager"
             data-testid={`img-slide-${index}`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
