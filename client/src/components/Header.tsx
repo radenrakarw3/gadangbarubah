@@ -16,7 +16,7 @@ export default function Header({ showBackButton = false, backPath = '/' }: Heade
   };
 
   return (
-    <header className="bg-background/98 backdrop-blur-sm border-b border-border/20 py-3 px-4 sticky top-0 z-50 transition-all duration-300" data-testid="header-section">
+    <header className="bg-background/98 backdrop-blur-sm border-b border-border/20 py-3 px-4 fixed top-0 left-0 right-0 z-50 transition-all duration-300" data-testid="header-section">
       <div className="max-w-6xl mx-auto flex items-center justify-between min-h-[60px]">
         {/* Back Button */}
         <div className="w-20 flex justify-start">
