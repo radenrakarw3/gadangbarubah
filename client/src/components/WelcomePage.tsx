@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight } from 'lucide-react';
 import Logo from './Logo';
+import restaurantImage from '@assets/DSC07140_1758564407964.jpg';
 
 export default function WelcomePage() {
   const [, navigate] = useLocation();
@@ -34,6 +35,24 @@ export default function WelcomePage() {
               <p className="text-lg sm:text-xl text-muted-foreground font-light leading-relaxed max-w-2xl mx-auto">
                 Cita Rasa Autentik Minangkabau dengan Sentuhan Kemewahan
               </p>
+            </div>
+          </div>
+          
+          {/* Restaurant Image */}
+          <div className="mb-10">
+            <div className="relative overflow-hidden rounded-lg shadow-lg">
+              <img 
+                src={restaurantImage} 
+                alt="Sajian autentik Minangkabau di Gadang Barubah"
+                className="w-full h-[400px] sm:h-[500px] object-cover"
+                data-testid="img-restaurant-hero"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <p className="text-lg sm:text-xl font-serif font-light text-center">
+                  Cita Rasa Autentik yang Tak Terlupakan
+                </p>
+              </div>
             </div>
           </div>
           
