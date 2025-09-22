@@ -42,8 +42,8 @@ export default function MemberLogin() {
         title: "Login Berhasil!",
         description: `Selamat datang, ${response.member.namaLengkap}!`,
       });
-      // For now, navigate back to home. Later we can add member dashboard
-      navigate('/');
+      // Navigate to member dashboard (coming soon page)
+      navigate('/member/dashboard');
     },
     onError: (error: any) => {
       toast({

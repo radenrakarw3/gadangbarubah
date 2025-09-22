@@ -11,6 +11,7 @@ import PartnershipPage from "@/components/services/PartnershipPage";
 import CateringPage from "@/components/services/CateringPage";
 import MemberLogin from "@/pages/MemberLogin";
 import MemberRegister from "@/pages/MemberRegister";
+import ComingSoon from "@/pages/ComingSoon";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/services/catering" component={CateringPage} />
       <Route path="/member/login" component={MemberLogin} />
       <Route path="/member/register" component={MemberRegister} />
+      <Route path="/member/dashboard" component={ComingSoon} />
       <Route component={NotFound} />
     </Switch>
   );
