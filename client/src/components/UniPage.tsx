@@ -9,9 +9,9 @@ import restaurantBgImage from '@assets/DSC03165_1758566711557.jpg';
 const services = [
   {
     id: 'outlet',
-    name: 'Dining Experience',
+    name: 'Outlet Location',
     icon: Store,
-    description: 'Rasakan pengalaman bersantap eksklusif di outlet premium kami dengan suasana mewah dan menu signature yang tak terlupakan.',
+    description: 'Kunjungi lokasi outlet premium kami dengan suasana mewah, VIP room eksklusif, dan pengalaman kuliner yang tak terlupakan.',
     path: '/services/outlet'
   },
   {
