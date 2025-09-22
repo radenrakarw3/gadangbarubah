@@ -83,12 +83,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// SEO Head injection middleware (only in production for real SEO benefits)
+// SEO Head injection middleware - COMPLETELY DISABLED TO PREVENT BLANK PAGES
 app.get("*", async (req, res, next) => {
-  // Skip in development mode to avoid interfering with Vite HMR
-  if (app.get("env") === "development") {
-    return next();
-  }
+  // DISABLED - This was causing blank pages in production
+  return next();
   
   // Skip API routes, static assets, and Vite-specific routes
   if (req.path.startsWith("/api") || 
