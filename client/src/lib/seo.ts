@@ -42,7 +42,7 @@ export const pageSEOConfigs = {
   }),
   
   outlet: createSEOConfig({
-    title: "Lokasi Outlet Gadang Barubah - Restoran Padang Premium di Pollux Mall",
+    title: "Lokasi Outlet Gadang Barubah - Restoran Padang Premium",
     description: "Kunjungi outlet premium Gadang Barubah di berbagai lokasi. Nikmati suasana mewah, VIP room eksklusif, dan pengalaman kuliner Padang autentik yang tak terlupakan.",
     keywords: "outlet gadang barubah, restoran padang premium, outlet padang, lokasi gadang barubah, vip room padang, rumah makan mewah, tempat makan padang terbaik, alternatif restoran padang",
     path: "/services/outlet"
