@@ -11,7 +11,7 @@ export function BacklinksFooter() {
             <h3 className="text-xl font-bold text-gold mb-4">Lokasi & Kontak</h3>
             <div className="space-y-3">
               <a 
-                href="https://maps.google.com/?q=Restoran+Gadang+Barubah+Padang" 
+                href="https://maps.app.goo.gl/JcR1hDXTawCkjGu7A" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-start gap-3 text-cream/80 hover:text-gold transition-colors group"
@@ -19,21 +19,23 @@ export function BacklinksFooter() {
               >
                 <MapPin className="w-5 h-5 mt-0.5 text-gold flex-shrink-0" />
                 <span className="group-hover:underline">
-                  Jl. Veteran No. 123<br />
-                  Padang, Sumatera Barat<br />
-                  Indonesia 25111
+                  Main Gate, Mall Cikarang<br />
+                  Jl. Raya Cikarang - Cibarusah, Pasirsari<br />
+                  Cikarang Sel., Kabupaten Bekasi<br />
+                  Jawa Barat 17530<br />
+                  Pollux, Lantai GF
                 </span>
               </a>
               
               <a 
-                href="https://wa.me/6281234567890?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20menu%20dan%20reservasi" 
+                href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20menu%20dan%20reservasi" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-cream/80 hover:text-gold transition-colors group"
                 data-testid="link-whatsapp-footer"
               >
                 <Phone className="w-5 h-5 text-gold" />
-                <span className="group-hover:underline">+62 812-3456-7890</span>
+                <span className="group-hover:underline">089509766739</span>
               </a>
               
               <div className="flex items-center gap-3 text-cream/80">
@@ -163,7 +165,7 @@ export function BacklinksFooter() {
         {/* Copyright & SEO Links */}
         <div className="border-t border-gold/20 mt-8 pt-8 text-center">
           <p className="text-cream/60 text-sm mb-4">
-            © 2024 Gadang Barubah Restaurant. Restoran Padang Terbaik di Sumatera Barat
+            © 2025 Gadang Barubah
           </p>
           
           {/* SEO Internal Links */}
