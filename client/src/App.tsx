@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
 import { initializeAnalytics, trackPageView } from "@/lib/analytics";
 import { useEffect } from "react";
+import PromoPopup from "@/components/PromoPopup";
 import WelcomePage from "@/components/WelcomePage";
 import UniPage from "@/components/UniPage";
 import OutletPage from "@/components/services/OutletPage";
@@ -57,6 +58,7 @@ function App() {
         <HelmetProvider>
           <Toaster />
           <Router />
+          <PromoPopup />
         </HelmetProvider>
       </TooltipProvider>
     </QueryClientProvider>
