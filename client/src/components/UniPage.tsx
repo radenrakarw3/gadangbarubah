@@ -9,7 +9,6 @@ import SEOHead from './SEOHead';
 import Mascot from './Mascot';
 import { BacklinksFooter } from './BacklinksFooter';
 import { StructuredData } from './StructuredData';
-import { PhotoPopup } from './PhotoPopup';
 import restaurantBgImage from '@assets/DSC03165_1758566711557.jpg';
 import rendangKiloanImage from '@assets/DSC02799_1758569186868.jpg';
 
@@ -245,9 +244,6 @@ export default function UniPage() {
       
       {/* Footer dengan Backlinks untuk SEO */}
       <BacklinksFooter />
-      
-      {/* Photo Upload Popup */}
-      <PhotoPopup />
     </div>
   );
 }
