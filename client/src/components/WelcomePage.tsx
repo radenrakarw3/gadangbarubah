@@ -91,27 +91,25 @@ export default function WelcomePage() {
           <div className="mb-10 space-y-16">
             {/* Story Header */}
             <div className="text-center">
-              <h2 className="text-4xl font-serif font-medium text-foreground mb-4">Kisah Gadang Barubah</h2>
+              <h2 className="text-4xl font-serif font-medium text-foreground mb-4">Tentang Kami – Gadang Barubah</h2>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
               <p className="text-lg text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto">
-                Sebuah perjalanan yang dimulai dari mimpi untuk menghadirkan keagungan kuliner Minangkabau dalam balutan kemewahan modern
+                Rumah makan Padang yang menghadirkan cita rasa otentik Minangkabau dalam balutan suasana modern di Pollux Mall Cikarang
               </p>
             </div>
 
-            {/* Story Section 1 - Exterior */}
+            {/* Story Section 1 - Heritage & Innovation */}
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
-                <h3 className="text-2xl font-serif font-medium text-foreground">Arsitektur yang Menceritakan Kebesaran</h3>
+                <h3 className="text-2xl font-serif font-medium text-foreground">Semangat Besar untuk Berinovasi</h3>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    Berdiri megah dengan desain kontemporer yang memukau, Gadang Barubah hadir sebagai landmark kuliner yang tak terlupakan. 
-                    Setiap sudut bangunan dirancang untuk mencerminkan filosofi "Gadang" - kebesaran yang tak hanya terlihat dari kemegahan fisik, 
-                    namun juga dari kehangatan yang terpancar dari setiap detailnya.
+                    Nama "Gadang Barubah" melambangkan semangat besar untuk terus berinovasi, tanpa meninggalkan akar tradisi yang kaya. 
+                    Di sini, setiap sajian bukan sekadar makanan, melainkan sebuah perjalanan rasa yang menghadirkan resep turun-temurun khas Minang.
                   </p>
                   <p>
-                    Fasad modern yang berpadu dengan elemen tradisional menciptakan harmoni sempurna antara warisan masa lalu dan inovasi masa kini. 
-                    Di sinilah perjalanan kuliner Anda dimulai - dari langkah pertama memasuki kawasan yang dirancang khusus untuk memberikan 
-                    pengalaman yang luar biasa.
+                    Dari rendang yang mendunia, gulai penuh rempah, hingga aneka lauk pauk segar—disajikan dengan sentuhan kekinian yang 
+                    menggugah selera. Harmoni tradisi dan inovasi hadir dalam setiap hidangan, membawa cita rasa autentik yang tak lekang oleh waktu.
                   </p>
                 </div>
               </div>
@@ -127,20 +125,19 @@ export default function WelcomePage() {
               </div>
             </div>
 
-            {/* Story Section 2 - Interior/Night */}
+            {/* Story Section 2 - Philosophy & Experience */}
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="lg:order-2 space-y-6">
-                <h3 className="text-2xl font-serif font-medium text-foreground">Atmosfer yang Memanjakan Jiwa</h3>
+                <h3 className="text-2xl font-serif font-medium text-foreground">Bahasa Universal yang Menyatukan</h3>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    Ketika malam tiba, Gadang Barubah bertransformasi menjadi oasis kuliner yang hangat dan mengundang. 
-                    Pencahayaan yang dipilih dengan cermat menciptakan suasana intimacy yang sempurna, 
-                    di mana setiap momen bersantap menjadi pengalaman yang berkesan.
+                    Kami percaya, kuliner adalah bahasa universal yang mampu menyatukan. Karena itu, Gadang Barubah berkomitmen 
+                    menghadirkan pengalaman bersantap yang hangat, ramah, dan berkesan, baik untuk keluarga, sahabat, maupun kolega.
                   </p>
                   <p>
-                    Interior yang didesain dengan perpaduan elemen tradisional dan modern mencerminkan kekayaan budaya Minangkabau 
-                    dalam balutan kemewahan kontemporer. Di sinilah cerita-cerita indah tercipta, di mana cita rasa bertemu dengan kehangatan, 
-                    dan setiap hidangan disajikan bukan hanya sebagai makanan, tetapi sebagai karya seni yang memanjakan seluruh indra.
+                    Biarkan aroma rempah dan cita rasa autentik membawa Anda seolah berkunjung langsung ke ranah Minang, sekaligus 
+                    merasakan kenyamanan ruang modern yang kami hadirkan di tengah kota. Setiap momen menjadi istimewa dalam suasana 
+                    yang dirancang khusus untuk menciptakan kebersamaan.
                   </p>
                 </div>
               </div>
@@ -160,16 +157,16 @@ export default function WelcomePage() {
             <Card className="border-border/50 shadow-sm bg-gradient-to-br from-background to-muted/20">
               <CardContent className="p-8 sm:p-12 text-center">
                 <div className="max-w-4xl mx-auto space-y-6">
-                  <h3 className="text-3xl font-serif font-medium text-foreground mb-6">Lebih dari Sekadar Restoran</h3>
+                  <h3 className="text-3xl font-serif font-medium text-foreground mb-6">Destinasi Kuliner Warisan Indonesia</h3>
                   <p className="text-lg text-muted-foreground leading-relaxed">
-                    Gadang Barubah adalah destinasi di mana tradisi kuliner Minangkabau yang kaya bertemu dengan standar pelayanan kelas dunia. 
-                    Setiap hidangan yang kami sajikan adalah hasil dari dedikasi para chef berpengalaman yang memahami esensi cita rasa otentik, 
-                    dipadu dengan inovasi modern yang memukau.
+                    Gadang Barubah bukan hanya tempat makan, melainkan sebuah destinasi kuliner yang mengajak Anda menjelajahi 
+                    kekayaan warisan Indonesia. Setiap hidangan menceritakan kisah budaya yang terjaga, dengan rasa yang autentik 
+                    dan pelayanan yang penuh kehangatan.
                   </p>
                   <p className="text-base text-muted-foreground leading-relaxed">
-                    Kami tidak hanya menyajikan makanan, tetapi menghadirkan pengalaman kuliner yang akan terukir dalam ingatan. 
-                    Dari kehangatan sambutan hingga kelezatan hidangan penutup, setiap momen di Gadang Barubah dirancang untuk menjadi 
-                    bagian dari cerita hidup yang tak terlupakan.
+                    Di tengah hiruk pikuk kehidupan modern, kami hadirkan ruang di mana tradisi bertemu dengan kenyamanan. 
+                    Tempat di mana setiap gigitan membawa kenangan, dan setiap kunjungan menjadi bagian dari perjalanan 
+                    kuliner yang tak terlupakan bersama keluarga dan orang tersayang.
                   </p>
                   <div className="pt-4">
                     <div className="inline-block w-16 h-px bg-primary"></div>
