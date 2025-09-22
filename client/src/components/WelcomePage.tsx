@@ -77,9 +77,6 @@ export default function WelcomePage() {
                 Gadang Barubah
               </h2>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
-              <p className="text-lg sm:text-xl text-muted-foreground font-light leading-relaxed max-w-2xl mx-auto">
-                Cita Rasa Autentik Minangkabau dengan Sentuhan Kemewahan
-              </p>
             </div>
           </div>
           
