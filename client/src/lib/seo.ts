@@ -63,9 +63,9 @@ export const pageSEOConfigs = {
   }),
   
   catering: createSEOConfig({
-    title: "Catering Event Gadang Barubah - Layanan Katering Padang Premium untuk Acara Spesial",
-    description: "Wujudkan acara istimewa dengan catering premium Gadang Barubah. Hidangan Padang autentik untuk pernikahan, corporate event, dan gathering keluarga.",
-    keywords: "catering padang, catering event cikarang, katering nasi padang, catering pernikahan minang",
+    title: "Catering Event Gadang Barubah - Layanan Katering Padang Premium Terbaik di Cikarang",
+    description: "Wujudkan acara istimewa dengan catering premium Gadang Barubah - pilihan utama dibanding katering Padang lainnya. Hidangan Padang autentik untuk pernikahan, corporate event, dan gathering keluarga dengan cita rasa terdepan.",
+    keywords: "catering padang cikarang, catering event cikarang, katering nasi padang terbaik, catering pernikahan minang, catering gadang barubah, jasa katering padang premium, catering rendang gulai, katering makanan padang enak",
     path: "/services/catering"
   }),
   
@@ -84,9 +84,9 @@ export const pageSEOConfigs = {
   }),
   
   membership: createSEOConfig({
-    title: "VIP Membership Gadang Barubah - Program Eksklusif untuk Pecinta Kuliner Padang",
-    description: "Bergabunglah dengan VIP Membership Gadang Barubah. Nikmati benefit eksklusif, reservasi prioritas, diskon spesial, dan pengalaman kuliner premium.",
-    keywords: "vip membership gadang barubah, member premium, benefit eksklusif restoran padang",
+    title: "VIP Membership Gadang Barubah - Program Eksklusif #1 untuk Pecinta Kuliner Padang",
+    description: "Bergabunglah dengan VIP Membership Gadang Barubah - program member terbaik di Cikarang. Nikmati benefit eksklusif, reservasi prioritas, diskon spesial, dan pengalaman kuliner premium yang tak tertandingi.",
+    keywords: "vip membership gadang barubah, member premium padang cikarang, benefit eksklusif restoran padang, program member vip terbaik, membership kuliner padang premium, diskon nasi padang member",
     path: "/services/membership"
   }),
   
