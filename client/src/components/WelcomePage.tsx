@@ -3,7 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight } from 'lucide-react';
 import Logo from './Logo';
-import restaurantImage from '@assets/DSC07140_1758564407964.jpg';
+import ImageSlideshow from './ImageSlideshow';
+import image1 from '@assets/DSC07140_1758564407964.jpg';
+import image2 from '@assets/DSC02436_1758564588903.jpg';
+import image3 from '@assets/DSC02371_1758564588950.jpg';
+import image4 from '@assets/DSC07168_1758564588951.jpg';
+import image5 from '@assets/DSC07153_1758564588952.jpg';
+import image6 from '@assets/DSC07152_1758564588952.jpg';
+import image7 from '@assets/DSC07130_1758564588953.jpg';
 
 export default function WelcomePage() {
   const [, navigate] = useLocation();
@@ -11,6 +18,44 @@ export default function WelcomePage() {
   const handleContinue = () => {
     navigate('/uni');
   };
+
+  const slideshowImages = [
+    {
+      src: image1,
+      alt: "Sajian autentik Minangkabau di Gadang Barubah",
+      caption: "Cita Rasa Autentik yang Tak Terlupakan"
+    },
+    {
+      src: image2,
+      alt: "Presentasi makanan premium dengan minuman segar",
+      caption: "Presentasi Berkelas dengan Cita Rasa Istimewa"
+    },
+    {
+      src: image3,
+      alt: "Pelayanan prima dari staf Gadang Barubah",
+      caption: "Pelayanan Tulus dari Hati"
+    },
+    {
+      src: image4,
+      alt: "Pengalaman bersantap bersama keluarga",
+      caption: "Momen Berkualitas Bersama Orang Terkasih"
+    },
+    {
+      src: image5,
+      alt: "Hidangan tradisional dengan sentuhan modern",
+      caption: "Tradisi Kuliner yang Diwariskan Turun Temurun"
+    },
+    {
+      src: image6,
+      alt: "Detail makanan dengan plating yang sempurna",
+      caption: "Keahlian Kuliner yang Sempurna"
+    },
+    {
+      src: image7,
+      alt: "Proses memasak dengan keahlian tinggi",
+      caption: "Passion dan Dedikasi dalam Setiap Sajian"
+    }
+  ];
 
   return (
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
@@ -38,22 +83,9 @@ export default function WelcomePage() {
             </div>
           </div>
           
-          {/* Restaurant Image */}
+          {/* Restaurant Images Slideshow */}
           <div className="mb-10">
-            <div className="relative overflow-hidden rounded-lg shadow-lg">
-              <img 
-                src={restaurantImage} 
-                alt="Sajian autentik Minangkabau di Gadang Barubah"
-                className="w-full h-[400px] sm:h-[500px] object-cover"
-                data-testid="img-restaurant-hero"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <p className="text-lg sm:text-xl font-serif font-light text-center">
-                  Cita Rasa Autentik yang Tak Terlupakan
-                </p>
-              </div>
-            </div>
+            <ImageSlideshow images={slideshowImages} interval={5000} />
           </div>
           
           {/* About Us Section */}
