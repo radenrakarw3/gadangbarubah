@@ -48,10 +48,10 @@ export default function PartnershipPage() {
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
       <Header showBackButton={true} backPath="/uni" />
 
-      <main className="px-4 py-8">
+      <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Title */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
               Program Kemitraan Eksklusif
             </h1>

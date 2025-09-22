@@ -16,10 +16,10 @@ export default function WelcomePage() {
       <Header />
       
       {/* Main content */}
-      <main className="px-4 sm:px-6 lg:px-8 py-12">
+      <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Welcome Section */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <div className="mb-8">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light text-foreground mb-6 tracking-wide">
                 Selamat Datang di
@@ -35,7 +35,7 @@ export default function WelcomePage() {
           </div>
           
           {/* About Us Section */}
-          <Card className="mb-12 border-border/50 shadow-sm">
+          <Card className="mb-10 border-border/50 shadow-sm">
             <CardContent className="p-8 sm:p-12">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-serif font-medium text-foreground mb-2">Tentang Kami</h2>

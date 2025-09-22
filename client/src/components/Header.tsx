@@ -16,30 +16,33 @@ export default function Header({ showBackButton = false, backPath = '/' }: Heade
   };
 
   return (
-    <header className="bg-background/95 backdrop-blur-md border-b border-border/30 py-6 px-4 sticky top-0 z-50" data-testid="header-section">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
+    <header className="bg-background/98 backdrop-blur-sm border-b border-border/20 py-3 px-4 sticky top-0 z-50 transition-all duration-300" data-testid="header-section">
+      <div className="max-w-6xl mx-auto flex items-center justify-between min-h-[60px]">
         {/* Back Button */}
-        <div className="w-24 flex justify-start">
+        <div className="w-20 flex justify-start">
           {showBackButton && (
             <Button
               onClick={handleBack}
               variant="ghost"
+              size="sm"
               className="hover:bg-accent/10 text-muted-foreground hover:text-foreground transition-colors"
               data-testid="button-back"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Kembali</span>
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline ml-1 text-sm">Kembali</span>
             </Button>
           )}
         </div>
         
-        {/* Logo - Always centered and consistent size */}
+        {/* Logo - Scaled but still prominent */}
         <div className="flex-1 flex justify-center">
-          <Logo />
+          <div className="transform scale-75 sm:scale-90 transition-transform duration-300">
+            <Logo />
+          </div>
         </div>
         
         {/* Spacer for balance */}
-        <div className="w-24"></div>
+        <div className="w-20"></div>
       </div>
     </header>
   );

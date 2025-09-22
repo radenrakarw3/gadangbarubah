@@ -61,10 +61,10 @@ export default function UniPage() {
       <Header showBackButton={true} backPath="/" />
       
       {/* Main content */}
-      <main className="px-4 sm:px-6 lg:px-8 py-12">
+      <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-5xl mx-auto">
           {/* Introduction */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
               Layanan Premium Kami
             </h1>
@@ -75,7 +75,7 @@ export default function UniPage() {
           </div>
 
           {/* Mascot Section */}
-          <div className="flex justify-center mb-12">
+          <div className="flex justify-center mb-10">
             <div className="max-w-md">
               <Mascot 
                 isAnimating={false}
