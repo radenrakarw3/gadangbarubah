@@ -27,14 +27,44 @@ export function AnimatedUni() {
   }, [showSpeechBubble]);
 
   return (
-    <div className="relative text-center mb-8">
-      {/* Speech Bubble */}
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-8 mb-8">
+      {/* Animated Uni Mascot - Mobile: Center, Desktop: Left side */}
+      <div className="relative inline-block text-center lg:text-left">
+        {/* Outer wrapper for float animation */}
+        <div className="animate-float motion-reduce:animate-none">
+          {/* Inner wrapper for hover effects */}
+          <div className="hover:animate-wave motion-reduce:hover:animate-none transition-all duration-300 hover:scale-105 cursor-pointer">
+            <img 
+              src={uniMascotImage}
+              alt="Uni - Mascot resmi Gadang Barubah Restaurant dengan pakaian tradisional Minangkabau"
+              className="w-64 sm:w-80 h-auto mx-auto rounded-lg shadow-lg"
+              data-testid="img-uni-mascot"
+              onClick={() => setShowSpeechBubble(!showSpeechBubble)}
+            />
+          </div>
+        </div>
+        
+        {/* Floating sparkles */}
+        <div className="absolute top-4 right-4 animate-ping motion-reduce:animate-none hidden sm:block">
+          <Sparkles className="w-5 h-5 text-[hsl(var(--minang-gold-primary))]" />
+        </div>
+        <div className="absolute top-8 left-6 animate-pulse delay-500 motion-reduce:animate-none hidden sm:block">
+          <Star className="w-4 h-4 text-[hsl(var(--minang-gold-primary))]" />
+        </div>
+        <div className="absolute bottom-8 right-8 animate-bounce delay-1000 motion-reduce:animate-none hidden sm:block">
+          <Zap className="w-5 h-5 text-[hsl(var(--minang-gold-primary))]" />
+        </div>
+      </div>
+
+      {/* Speech Bubble - Mobile: Below mascot, Desktop: Side by side */}
       {showSpeechBubble && (
         <div 
-          className="absolute -top-32 sm:-top-36 left-1/2 transform -translate-x-1/2 z-10 animate-bounce-in"
+          className="mt-6 lg:mt-0 lg:ml-0 animate-bounce-in motion-reduce:animate-none"
           data-testid="speech-bubble-container"
+          role="note"
+          aria-live="polite"
         >
-          <div className="relative bg-white dark:bg-gray-800 border-2 border-[hsl(var(--minang-gold-primary))] border-opacity-30 rounded-2xl p-4 shadow-lg max-w-xs">
+          <div className="relative bg-white dark:bg-gray-800 border-2 border-[hsl(var(--minang-gold-primary))] border-opacity-30 rounded-2xl p-4 shadow-lg max-w-sm mx-auto lg:mx-0">
             {/* Close Button */}
             <button 
               onClick={() => setShowSpeechBubble(false)}
@@ -79,39 +109,12 @@ export function AnimatedUni() {
               Klik tombol di bawah yuk!
             </div>
             
-            {/* Speech bubble tail */}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white dark:border-t-gray-800"></div>
+            {/* Speech bubble tail - adaptive positioning */}
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white dark:border-b-gray-800 lg:hidden"></div>
+            <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-1 w-0 h-0 border-t-8 border-b-8 border-l-8 border-t-transparent border-b-transparent border-l-white dark:border-l-gray-800 hidden lg:block"></div>
           </div>
         </div>
       )}
-      
-      {/* Animated Uni Mascot */}
-      <div className="relative inline-block">
-        {/* Outer wrapper for float animation */}
-        <div className="animate-float motion-reduce:animate-none">
-          {/* Inner wrapper for hover effects */}
-          <div className="hover:animate-wave motion-reduce:hover:animate-none transition-all duration-300 hover:scale-105 cursor-pointer">
-            <img 
-              src={uniMascotImage}
-              alt="Uni - Mascot resmi Gadang Barubah Restaurant dengan pakaian tradisional Minangkabau"
-              className="w-64 sm:w-80 h-auto mx-auto rounded-lg shadow-lg"
-              data-testid="img-uni-mascot"
-              onClick={() => setShowSpeechBubble(!showSpeechBubble)}
-            />
-          </div>
-        </div>
-        
-        {/* Floating sparkles */}
-        <div className="absolute top-4 right-4 animate-ping motion-reduce:animate-none hidden sm:block">
-          <Sparkles className="w-5 h-5 text-[hsl(var(--minang-gold-primary))]" />
-        </div>
-        <div className="absolute top-8 left-6 animate-pulse delay-500 motion-reduce:animate-none hidden sm:block">
-          <Star className="w-4 h-4 text-[hsl(var(--minang-gold-primary))]" />
-        </div>
-        <div className="absolute bottom-8 right-8 animate-bounce delay-1000 motion-reduce:animate-none hidden sm:block">
-          <Zap className="w-5 h-5 text-[hsl(var(--minang-gold-primary))]" />
-        </div>
-      </div>
     </div>
   );
 }
