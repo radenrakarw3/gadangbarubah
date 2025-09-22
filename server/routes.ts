@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertMemberSchema, loginMemberSchema } from "@shared/schema";
 import rateLimit from "express-rate-limit";
+import { memberEndpointSecurity } from "./security";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Rate limiting for member login - prevent brute force attacks
@@ -17,8 +18,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   });
 
-  // Member Registration
-  app.post("/api/members/register", async (req, res) => {
+  // Member Registration with enhanced security
+  app.post("/api/members/register", memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = insertMemberSchema.parse(req.body);
       
@@ -50,8 +51,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Member Login with rate limiting
-  app.post("/api/members/login", loginRateLimit, async (req, res) => {
+  // Member Login with enhanced security
+  app.post("/api/members/login", memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = loginMemberSchema.parse(req.body);
       

@@ -1,10 +1,45 @@
 import express, { type Request, Response, NextFunction } from "express";
+import helmet from "helmet";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { strictRateLimit, antiSpamSlowDown, botDetection, geoSecurity, honeypot, requestValidator } from "./security";
+import { securityLoggingMiddleware, costMonitoringMiddleware } from "./monitoring";
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
+// Enable trust proxy for accurate IP detection (important for rate limiting)
+app.set('trust proxy', 1);
+
+// Enhanced security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'", "ws:", "wss:"],
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Disable for Vite compatibility
+}));
+
+// Apply security middleware in order
+app.use(securityLoggingMiddleware); // Monitor and block bad IPs
+app.use(costMonitoringMiddleware);  // Track expensive operations
+app.use(geoSecurity);               // Block suspicious IPs first
+app.use(botDetection);              // Block bots early
+app.use(strictRateLimit);           // Rate limit all requests
+app.use(antiSpamSlowDown);          // Slow down rapid requests
+app.use(requestValidator);          // Validate request content
+app.use(honeypot);                  // Honeypot for forms
+
+app.use(express.json({ limit: '10mb' })); // Limit payload size
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
 app.use((req, res, next) => {
   const start = Date.now();

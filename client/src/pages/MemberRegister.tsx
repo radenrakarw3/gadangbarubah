@@ -36,7 +36,7 @@ export default function MemberRegister() {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       namaLengkap: '',
-      jenisKelamin: '' as 'Uda' | 'Uni' | '',
+      jenisKelamin: undefined as 'Uda' | 'Uni' | undefined,
       noWhatsApp: '',
       tanggalLahir: '',
       kodePos: '',
@@ -275,6 +275,22 @@ export default function MemberRegister() {
                         <FormMessage />
                       </FormItem>
                     )}
+                  />
+
+                  {/* Hidden honeypot fields to catch bots */}
+                  <input
+                    type="text"
+                    name="website"
+                    style={{ display: 'none' }}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                  <input
+                    type="email"
+                    name="email_confirmation"
+                    style={{ display: 'none' }}
+                    tabIndex={-1}
+                    autoComplete="off"
                   />
 
                   <Button

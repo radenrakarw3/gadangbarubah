@@ -153,6 +153,15 @@ export default function MemberLogin() {
                     )}
                   />
 
+                  {/* Hidden honeypot fields to catch bots */}
+                  <input
+                    type="text"
+                    name="website"
+                    style={{ display: 'none' }}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+
                   <Button
                     type="submit"
                     className="w-full text-base"
