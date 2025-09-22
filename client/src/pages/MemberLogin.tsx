@@ -8,9 +8,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { ArrowLeft, Lock, Phone, MessageCircle } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import Logo from '@/components/Logo';
+import { pageSEOConfigs } from '@/lib/seo';
 import { z } from 'zod';
 
 const loginSchema = z.object({
@@ -22,6 +24,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function MemberLogin() {
   const [, navigate] = useLocation();
+  const seoConfig = pageSEOConfigs.memberLogin;
   const { toast } = useToast();
 
   const form = useForm<LoginFormData>({
@@ -66,6 +69,28 @@ export default function MemberLogin() {
 
   return (
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
+      <Helmet>
+        <title>{seoConfig.title}</title>
+        <meta name="description" content={seoConfig.description} />
+        <meta name="keywords" content={seoConfig.keywords} />
+        <link rel="canonical" href={seoConfig.canonical} />
+        
+        <meta property="og:title" content={seoConfig.ogTitle} />
+        <meta property="og:description" content={seoConfig.ogDescription} />
+        <meta property="og:url" content={seoConfig.ogUrl} />
+        <meta property="og:type" content={seoConfig.ogType} />
+        <meta property="og:site_name" content={seoConfig.ogSiteName} />
+        <meta property="og:image" content="https://gadangbarubahindonesia.id/og-image.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="id_ID" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seoConfig.twitterTitle} />
+        <meta name="twitter:description" content={seoConfig.twitterDescription} />
+        <meta name="twitter:image" content="https://gadangbarubahindonesia.id/og-image.jpg" />
+      </Helmet>
+      
       {/* Header */}
       <div className="px-4 pt-8 pb-4">
         <div className="max-w-md mx-auto flex items-center justify-between">

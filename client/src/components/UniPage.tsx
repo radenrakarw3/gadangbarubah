@@ -3,7 +3,9 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import Logo from './Logo';
+import { pageSEOConfigs } from '@/lib/seo';
 import Mascot from './Mascot';
 import restaurantBgImage from '@assets/DSC03165_1758566711557.jpg';
 import rendangKiloanImage from '@assets/DSC02799_1758569186868.jpg';
@@ -48,6 +50,7 @@ const services = [
 
 export default function UniPage() {
   const [, navigate] = useLocation();
+  const seoConfig = pageSEOConfigs.services;
   
   // Scroll to top when component mounts
   useEffect(() => {
@@ -71,6 +74,28 @@ export default function UniPage() {
 
   return (
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
+      <Helmet>
+        <title>{seoConfig.title}</title>
+        <meta name="description" content={seoConfig.description} />
+        <meta name="keywords" content={seoConfig.keywords} />
+        <link rel="canonical" href={seoConfig.canonical} />
+        
+        <meta property="og:title" content={seoConfig.ogTitle} />
+        <meta property="og:description" content={seoConfig.ogDescription} />
+        <meta property="og:url" content={seoConfig.ogUrl} />
+        <meta property="og:type" content={seoConfig.ogType} />
+        <meta property="og:site_name" content={seoConfig.ogSiteName} />
+        <meta property="og:image" content="https://gadangbarubahindonesia.id/og-image.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="id_ID" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seoConfig.twitterTitle} />
+        <meta name="twitter:description" content={seoConfig.twitterDescription} />
+        <meta name="twitter:image" content="https://gadangbarubahindonesia.id/og-image.jpg" />
+      </Helmet>
+      
       {/* Top section with back button and logo */}
       <div className="px-4 pt-8 pb-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
