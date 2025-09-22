@@ -27,8 +27,8 @@ export const createSEOConfig = (config: SEOConfig) => {
 
 export const pageSEOConfigs = {
   home: createSEOConfig({
-    title: "Gadang Barubah - #1 Rumah Makan Padang Terbaik di Cikarang | Nasi Padang Autentik Premium",
-    description: "Gadang Barubah - Rumah makan Padang premium terbaik di Pollux Mall Cikarang. Lebih enak dari Payakumbuah, Pagi Sore, Bumus! Nikmati nasi padang autentik, rendang terbaik, gulai khas Minang. Reservasi sekarang! Telp: 089509766739",
+    title: "Gadang Barubah - Rumah Makan Padang Premium di Cikarang",
+    description: "Gadang Barubah - Rumah makan Padang premium di Pollux Mall Cikarang. Nikmati nasi padang autentik, rendang terbaik, gulai khas Minang dengan cita rasa tradisional yang istimewa. Reservasi: 089509766739",
     keywords: "gadang barubah, gadangbarubah, gadang barubah cikarang, rumah makan padang terbaik cikarang, nasi padang enak cikarang, restoran padang pollux mall, gadang barubah indonesia, alternatif payakumbuah, pengganti pagi sore, lebih baik dari bumus, selain padang merdeka, rumah makan padang premium, rendang enak cikarang, gulai padang terbaik, masakan minang autentik, gadangbarubahindonesia",
     path: "/",
     ogType: "restaurant"
@@ -36,21 +36,21 @@ export const pageSEOConfigs = {
   
   services: createSEOConfig({
     title: "Layanan Premium Gadang Barubah - Outlet, Delivery, Catering & VIP Membership",
-    description: "Jelajahi layanan lengkap Gadang Barubah yang lebih unggul dari kompetitor: lokasi outlet premium, delivery nasi padang, catering event, dan VIP membership. Pengalaman kuliner Minang terbaik di Cikarang.",
+    description: "Jelajahi layanan lengkap Gadang Barubah: lokasi outlet premium, delivery nasi padang, catering event, dan VIP membership. Pengalaman kuliner Minang premium di Cikarang.",
     keywords: "layanan gadang barubah, delivery nasi padang cikarang, catering padang cikarang, vip membership padang, outlet padang premium, gadang barubah services, layanan restoran padang terbaik, alternatif delivery padang cikarang",
     path: "/uni"
   }),
   
   outlet: createSEOConfig({
-    title: "Lokasi Outlet Gadang Barubah - Restoran Padang #1 di Pollux Mall Cikarang",
-    description: "Kunjungi outlet premium Gadang Barubah di Pollux Mall Cikarang - pilihan terbaik dibanding Payakumbuah, Pagi Sore, Bumus. Nikmati suasana mewah, VIP room eksklusif, dan pengalaman kuliner Padang yang tak terlupakan.",
+    title: "Lokasi Outlet Gadang Barubah - Restoran Padang Premium di Pollux Mall",
+    description: "Kunjungi outlet premium Gadang Barubah di Pollux Mall Cikarang. Nikmati suasana mewah, VIP room eksklusif, dan pengalaman kuliner Padang autentik yang tak terlupakan.",
     keywords: "outlet gadang barubah, restoran padang pollux mall, outlet padang cikarang, lokasi gadang barubah, vip room padang cikarang, rumah makan mewah cikarang, tempat makan padang terbaik, alternatif restoran padang cikarang",
     path: "/services/outlet"
   }),
   
   delivery: createSEOConfig({
-    title: "Delivery Nasi Padang Premium Gadang Barubah - Lebih Enak & Murah dari Kompetitor",
-    description: "Pesan delivery nasi padang premium Gadang Barubah langsung ke rumah - kualitas lebih baik dari Payakumbuah, Pagi Sore, Bumus. Rendang, gulai, dan lauk Minang autentik dengan kualitas restoran. Order sekarang! WhatsApp: 089509766739",
+    title: "Delivery Nasi Padang Premium Gadang Barubah - Antar ke Rumah",
+    description: "Pesan delivery nasi padang premium Gadang Barubah langsung ke rumah. Rendang, gulai, dan lauk Minang autentik dengan kualitas restoran. Order mudah via WhatsApp: 089509766739",
     keywords: "delivery nasi padang cikarang, pesan gadang barubah online, antar nasi padang cikarang, delivery rendang cikarang, gofood gadang barubah, grabfood nasi padang, delivery makanan padang, order nasi padang cikarang, alternatif delivery padang",
     path: "/services/delivery"
   }),
@@ -63,8 +63,8 @@ export const pageSEOConfigs = {
   }),
   
   catering: createSEOConfig({
-    title: "Catering Event Gadang Barubah - Layanan Katering Padang Premium Terbaik di Cikarang",
-    description: "Wujudkan acara istimewa dengan catering premium Gadang Barubah - pilihan utama dibanding katering Padang lainnya. Hidangan Padang autentik untuk pernikahan, corporate event, dan gathering keluarga dengan cita rasa terdepan.",
+    title: "Catering Event Gadang Barubah - Layanan Katering Padang Premium",
+    description: "Wujudkan acara istimewa dengan catering premium Gadang Barubah. Hidangan Padang autentik untuk pernikahan, corporate event, dan gathering keluarga dengan cita rasa tradisional yang autentik.",
     keywords: "catering padang cikarang, catering event cikarang, katering nasi padang terbaik, catering pernikahan minang, catering gadang barubah, jasa katering padang premium, catering rendang gulai, katering makanan padang enak",
     path: "/services/catering"
   }),

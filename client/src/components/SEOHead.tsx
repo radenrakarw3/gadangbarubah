@@ -26,16 +26,9 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
       <meta property="og:image:height" content="630" />
       <meta property="og:locale" content="id_ID" />
       
-      {/* Additional SEO Meta Tags for Competitive Targeting */}
-      <meta name="geo.region" content="ID-JB" />
-      <meta name="geo.placename" content="Cikarang, Bekasi" />
-      <meta name="geo.position" content="-6.2564, 107.1568" />
-      <meta name="ICBM" content="-6.2564, 107.1568" />
+      {/* Standard SEO Meta Tags */}
       <meta name="author" content="Gadang Barubah Restaurant" />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      
-      {/* Competitive Alternative Keywords */}
-      <meta name="alternative-names" content="rumah makan padang terbaik cikarang, restoran padang premium, nasi padang enak cikarang" />
       
       {/* Twitter Card Meta Tags */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -78,13 +71,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           "sameAs": [
             "https://www.instagram.com/gadangbarubahindonesia",
             "https://wa.me/6289509766739"
-          ],
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "bestRating": "5",
-            "ratingCount": "127"
-          }
+          ]
         })}
       </script>
     </Helmet>
