@@ -17,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 const billFormSchema = z.object({
-  memberId: z.string().min(1, 'Member ID harus diisi'),
+  noWhatsApp: z.string().min(10, 'Nomor WhatsApp minimal 10 digit'),
   billAmount: z.number().min(1000, 'Minimal bill Rp 1,000'),
 });
 
@@ -32,12 +32,12 @@ export default function KasirDashboard() {
   const form = useForm<BillFormData>({
     resolver: zodResolver(billFormSchema),
     defaultValues: {
-      memberId: '',
+      noWhatsApp: '',
       billAmount: 0,
     },
   });
 
-  const memberId = form.watch('memberId');
+  const noWhatsApp = form.watch('noWhatsApp');
   const billAmount = form.watch('billAmount');
 
   // Calculate points whenever bill amount changes (1 point per 1000 rupiah)
@@ -46,12 +46,12 @@ export default function KasirDashboard() {
     setCalculatedPoints(points);
   }, [billAmount]);
 
-  // Fetch member details when memberId changes
+  // Fetch member details when noWhatsApp changes
   const { data: memberData, isLoading: memberLoading } = useQuery({
-    queryKey: ['/api/members', memberId, 'profile'],
+    queryKey: ['/api/members/whatsapp', noWhatsApp, 'profile'],
     queryFn: async () => {
-      if (!memberId) return null;
-      const response = await fetch(`/api/members/${memberId}/profile`);
+      if (!noWhatsApp) return null;
+      const response = await fetch(`/api/members/whatsapp/${noWhatsApp}/profile`);
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('Member tidak ditemukan');
@@ -61,22 +61,27 @@ export default function KasirDashboard() {
       const result = await response.json();
       return result.data;
     },
-    enabled: !!memberId,
+    enabled: !!noWhatsApp && noWhatsApp.length >= 10,
     retry: false,
   });
 
   // Process bill mutation
   const processBillMutation = useMutation({
     mutationFn: async (data: BillFormData) => {
+      // Get the member ID from the memberData
+      if (!memberData) {
+        throw new Error('Data member tidak tersedia');
+      }
+      
       const response = await fetch('/api/kasir/bills', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          memberId: data.memberId,
-          billAmount: data.billAmount,
-          pointsEarned: Math.floor(data.billAmount / 1000),
+          memberId: memberData.id,
+          totalAmount: data.billAmount,
+          kasirId: "kasir-1" // Should be from auth session in production
         }),
       });
       if (!response.ok) {
@@ -90,7 +95,7 @@ export default function KasirDashboard() {
         description: `Member mendapat ${calculatedPoints} points dari bill Rp ${billAmount.toLocaleString()}`,
       });
       // Invalidate member profile to update points
-      queryClient.invalidateQueries({ queryKey: ['/api/members', memberId, 'profile'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/members/whatsapp', noWhatsApp, 'profile'] });
       // Reset form
       form.reset();
       setSelectedMember(null);
@@ -161,15 +166,15 @@ export default function KasirDashboard() {
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <FormField
                       control={form.control}
-                      name="memberId"
+                      name="noWhatsApp"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Member ID</FormLabel>
+                          <FormLabel>Nomor WhatsApp Member</FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder="Masukkan Member ID" 
+                              placeholder="081234567890" 
                               {...field}
-                              data-testid="input-member-id"
+                              data-testid="input-whatsapp-member"
                             />
                           </FormControl>
                           <FormMessage />
@@ -178,7 +183,7 @@ export default function KasirDashboard() {
                     />
 
                     {/* Member Info Display */}
-                    {memberId && (
+                    {noWhatsApp && noWhatsApp.length >= 10 && (
                       <div className="p-3 bg-muted rounded-lg">
                         {memberLoading ? (
                           <div className="flex items-center gap-2">
@@ -252,7 +257,8 @@ export default function KasirDashboard() {
                       type="submit" 
                       className="w-full"
                       disabled={
-                        !memberId || 
+                        !noWhatsApp || 
+                        noWhatsApp.length < 10 ||
                         !memberData || 
                         billAmount < 1000 ||
                         processBillMutation.isPending

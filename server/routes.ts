@@ -124,6 +124,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get member profile by WhatsApp number (for kasir)
+  app.get("/api/members/whatsapp/:noWhatsApp/profile", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { noWhatsApp } = req.params;
+      
+      const member = await storage.getMemberByWhatsApp(noWhatsApp);
+      if (!member) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Member tidak ditemukan" 
+        });
+      }
+      
+      // Get member points (initialize if doesn't exist)
+      let memberPoints = await storage.getMemberPoints(member.id);
+      if (!memberPoints) {
+        memberPoints = await storage.initializeMemberPoints(member.id);
+      }
+      
+      res.json({
+        success: true,
+        data: {
+          id: member.id,
+          namaLengkap: member.namaLengkap,
+          noWhatsApp: member.noWhatsApp,
+          totalPoints: memberPoints.totalPoints
+        }
+      });
+    } catch (error: any) {
+      console.error('Get member profile by WhatsApp error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data member" 
+      });
+    }
+  });
+
   app.get("/api/members/:memberId/voucher-claims", memberEndpointSecurity, async (req, res) => {
     try {
       const { memberId } = req.params;
