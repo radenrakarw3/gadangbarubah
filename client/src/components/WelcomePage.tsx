@@ -27,20 +27,28 @@ export default function WelcomePage() {
   const [showPromoPopup, setShowPromoPopup] = useState(false);
   const [hasShownPopup, setHasShownPopup] = useState(false);
 
-  // Scroll detection to show popup at middle of page
+  // Scroll detection to show popup at middle of page with performance optimization
   useEffect(() => {
     if (hasShownPopup) return;
 
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollPercentage = scrollTop / (documentHeight - windowHeight);
+    let ticking = false;
 
-      // Show popup when user scrolls to 50% of the page
-      if (scrollPercentage >= 0.5 && !hasShownPopup) {
-        setShowPromoPopup(true);
-        setHasShownPopup(true);
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const windowHeight = window.innerHeight;
+          const documentHeight = document.documentElement.scrollHeight;
+          const scrollPercentage = scrollTop / (documentHeight - windowHeight);
+
+          // Show popup when user scrolls to 50% of the page
+          if (scrollPercentage >= 0.5 && !hasShownPopup) {
+            setShowPromoPopup(true);
+            setHasShownPopup(true);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
