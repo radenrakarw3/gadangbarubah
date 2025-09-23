@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, User, Ticket, Gift, Phone, Loader2 } from 'lucide-react';
@@ -8,12 +8,15 @@ import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import { pageSEOConfigs } from '@/lib/seo';
 import { cn } from '@/lib/utils';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 type TabType = 'profile' | 'vouchers' | 'promo';
 
 export default function MemberDashboard() {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<TabType>('profile');
+  const { toast } = useToast();
   
   // For demo purposes, using a hardcoded member ID - in real app this would come from auth context
   const memberId = '123e4567-e89b-12d3-a456-426614174000';
@@ -59,6 +62,38 @@ export default function MemberDashboard() {
     },
     retry: 1,
   });
+
+  // Voucher claiming mutation
+  const claimVoucherMutation = useMutation({
+    mutationFn: async (voucherId: string) => {
+      const response = await apiRequest(`/api/vouchers/${voucherId}/claim`, {
+        method: 'POST',
+        body: JSON.stringify({ memberId }),
+      });
+      return response;
+    },
+    onSuccess: (data, voucherId) => {
+      toast({
+        title: "Voucher berhasil diklaim!",
+        description: "Voucher telah ditambahkan ke akun Anda.",
+      });
+      // Invalidate and refetch member profile to update points
+      queryClient.invalidateQueries({ queryKey: ['/api/members', memberId, 'profile'] });
+      // Optionally invalidate vouchers list to update availability
+      queryClient.invalidateQueries({ queryKey: ['/api/vouchers/active'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal mengklaim voucher",
+        description: error.message || "Terjadi kesalahan saat mengklaim voucher",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleClaimVoucher = (voucherId: string) => {
+    claimVoucherMutation.mutate(voucherId);
+  };
 
   const renderProfileSection = () => {
     if (profileLoading) {
@@ -152,10 +187,23 @@ export default function MemberDashboard() {
                   </div>
                   <Button 
                     size="sm" 
-                    disabled={!memberProfile || memberProfile.totalPoints < voucher.pointsCost}
+                    disabled={
+                      !memberProfile || 
+                      memberProfile.totalPoints < voucher.pointsCost ||
+                      claimVoucherMutation.isPending
+                    }
+                    onClick={() => handleClaimVoucher(voucher.id)}
                     data-testid={`button-claim-voucher-${voucher.id}`}
                   >
-                    {memberProfile && memberProfile.totalPoints >= voucher.pointsCost ? 'Claim' : 'Points Kurang'}
+                    {claimVoucherMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : null}
+                    {claimVoucherMutation.isPending 
+                      ? 'Claiming...' 
+                      : memberProfile && memberProfile.totalPoints >= voucher.pointsCost 
+                        ? 'Claim' 
+                        : 'Points Kurang'
+                    }
                   </Button>
                 </div>
               </CardContent>
