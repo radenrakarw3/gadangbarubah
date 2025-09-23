@@ -85,7 +85,7 @@ export function AnimatedUni() {
             <ul className="text-xs text-gray-600 dark:text-gray-300 space-y-1 mb-3">
               <li className="flex items-center gap-2" data-testid="service-item-outlet">
                 <MapPin className="w-3 h-3 text-[hsl(var(--minang-gold-primary))]" />
-                Lokasi Outlet Terbaik
+                Lokasi Outlet
               </li>
               <li className="flex items-center gap-2" data-testid="service-item-delivery">
                 <Truck className="w-3 h-3 text-[hsl(var(--minang-gold-primary))]" />

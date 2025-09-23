@@ -96,7 +96,7 @@ export default function MembershipPage() {
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Bergabunglah dengan komunitas eksklusif pecinta masakan Minang dan nikmati benefit istimewa untuk pengalaman kuliner nasi padang terbaik di Cikarang
+              Bergabunglah dengan komunitas eksklusif pecinta masakan Minang dan nikmati benefit istimewa untuk pengalaman kuliner nasi padang di Cikarang
             </p>
           </div>
 

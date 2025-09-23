@@ -213,7 +213,7 @@ export default function CateringPage() {
                   
                   <div className="pt-4 border-t border-border/50">
                     <p className="text-sm text-muted-foreground">
-                      <strong>Booking minimal H-3 untuk hasil terbaik</strong>
+                      <strong>Booking minimal H-3 untuk hasil optimal</strong>
                     </p>
                   </div>
                 </div>

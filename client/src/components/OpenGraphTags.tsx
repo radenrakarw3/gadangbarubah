@@ -2,7 +2,7 @@ export function OpenGraphTags() {
   return (
     <>
       {/* Open Graph for Facebook */}
-      <meta property="og:title" content="Gadang Barubah - Restoran Padang Terbaik di Sumatera Barat" />
+      <meta property="og:title" content="Gadang Barubah - Restoran Padang di Sumatera Barat" />
       <meta property="og:description" content="Nikmati kelezatan masakan Padang authentic di Gadang Barubah. Spesialis rendang, nasi padang, dan sate padang dengan cita rasa tradisional Minangkabau. Pesan sekarang!" />
       <meta property="og:type" content="website" />
       <meta property="og:url" content="https://gadangbarubahindonesia.id" />
@@ -14,12 +14,12 @@ export function OpenGraphTags() {
       
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="Gadang Barubah - Restoran Padang Terbaik" />
-      <meta name="twitter:description" content="Restoran Padang terbaik dengan masakan Minang authentic. Rendang, nasi padang, dan sate padang terbaik di Sumatera Barat." />
+      <meta name="twitter:title" content="Gadang Barubah - Restoran Padang" />
+      <meta name="twitter:description" content="Restoran Padang dengan masakan Minang authentic. Rendang, nasi padang, dan sate padang di Sumatera Barat." />
       <meta name="twitter:image" content="https://gadangbarubahindonesia.id/assets/gadang-barubah-og-image.jpg" />
       
       {/* WhatsApp Preview */}
-      <meta property="og:image:alt" content="Gadang Barubah Restaurant - Restoran Padang Terbaik dengan masakan Minang authentic" />
+      <meta property="og:image:alt" content="Gadang Barubah Restaurant - Restoran Padang dengan masakan Minang authentic" />
       
       {/* Additional Social Meta */}
       <meta property="business:contact_data:street_address" content="Jl. Veteran No. 123" />

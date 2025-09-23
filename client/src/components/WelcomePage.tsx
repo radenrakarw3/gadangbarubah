@@ -81,7 +81,7 @@ export default function WelcomePage() {
           <div className="text-center mb-12">
             <div className="mb-8">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-medium text-primary mb-8 tracking-wide">
-                Selamat Datang di Gadang Barubah - Rumah Makan Padang Terbaik Indonesia
+                Selamat Datang di Gadang Barubah - Rumah Makan Padang Indonesia
               </h1>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             </div>
@@ -99,7 +99,7 @@ export default function WelcomePage() {
               <h2 className="text-4xl font-serif font-medium text-foreground mb-4">Tentang Kami – Gadang Barubah</h2>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
               <p className="text-lg text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto">
-                Rumah makan Padang terbaik yang menghadirkan nasi padang autentik dan masakan Minang tradisional terbaik. Pilihan utama untuk pecinta kuliner Padang dengan cita rasa istimewa dan pelayanan terdepan di seluruh Indonesia.
+                Rumah makan Padang yang menghadirkan nasi padang autentik dan masakan Minang tradisional. Pilihan untuk pecinta kuliner Padang dengan cita rasa istimewa dan pelayanan di seluruh Indonesia.
               </p>
             </div>
 

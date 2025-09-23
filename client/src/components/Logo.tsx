@@ -6,7 +6,7 @@ export default function Logo() {
       <div className="relative">
         <img
           src={logoImage}
-          alt="Logo Gadang Barubah - Rumah Makan Padang Terbaik Cikarang"
+          alt="Logo Gadang Barubah - Rumah Makan Padang Cikarang"
           className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain animate-pulse"
           data-testid="logo-image"
           style={{

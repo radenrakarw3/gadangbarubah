@@ -187,7 +187,7 @@ export default function OutletPage() {
           {/* Title */}
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-serif font-light text-foreground mb-6">
-              Outlet Rumah Makan Padang Terbaik Cikarang
+              Outlet Rumah Makan Padang Cikarang
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">

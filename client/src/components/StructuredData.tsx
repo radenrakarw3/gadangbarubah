@@ -7,7 +7,7 @@ export function StructuredData() {
         "@id": "https://gadangbarubahindonesia.id/#restaurant",
         "name": "Gadang Barubah Restaurant",
         "alternateName": "Gadang Barubah",
-        "description": "Restoran Padang terbaik di Sumatera Barat yang menyajikan masakan Minang authentic dengan cita rasa tradisional. Spesialis nasi padang, rendang, dan sate padang.",
+        "description": "Restoran Padang di Sumatera Barat yang menyajikan masakan Minang authentic dengan cita rasa tradisional. Spesialis nasi padang, rendang, dan sate padang.",
         "url": "https://gadangbarubahindonesia.id",
         "telephone": "+62812-3456-7890",
         "email": "info@gadangbarubahindonesia.id",
@@ -112,7 +112,7 @@ export function StructuredData() {
         "@type": "LocalBusiness",
         "@id": "https://gadangbarubahindonesia.id/#localbusiness",
         "name": "Gadang Barubah Restaurant",
-        "description": "Restoran Padang terbaik di Sumatera Barat",
+        "description": "Restoran Padang di Sumatera Barat",
         "url": "https://gadangbarubahindonesia.id",
         "telephone": "+62812-3456-7890",
         "address": {
@@ -142,7 +142,7 @@ export function StructuredData() {
         "@id": "https://gadangbarubahindonesia.id/#website", 
         "url": "https://gadangbarubahindonesia.id",
         "name": "Gadang Barubah Restaurant",
-        "description": "Website resmi Restoran Gadang Barubah - Restoran Padang terbaik di Sumatera Barat",
+        "description": "Website resmi Restoran Gadang Barubah - Restoran Padang di Sumatera Barat",
         "inLanguage": "id-ID",
         "potentialAction": {
           "@type": "SearchAction",
