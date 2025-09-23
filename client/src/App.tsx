@@ -23,6 +23,7 @@ import AdminBills from "@/pages/AdminBills";
 import KasirDashboard from "@/pages/KasirDashboard";
 import LoginAdmin from "@/components/LoginAdmin";
 import LoginKasir from "@/components/LoginKasir";
+import ScrollToTop from "@/components/ScrollToTop";
 import NotFound from "@/pages/not-found";
 
 // Protected Admin Route Component
@@ -112,12 +113,25 @@ function App() {
   // Initialize analytics once on app load
   useEffect(() => {
     initializeAnalytics();
+    
+    // Disable browser scroll restoration to prevent unwanted scroll positions
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    
+    // Cleanup on unmount (optional)
+    return () => {
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'auto';
+      }
+    };
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <HelmetProvider>
+          <ScrollToTop />
           <Toaster />
           <Router />
         </HelmetProvider>
