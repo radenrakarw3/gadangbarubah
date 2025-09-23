@@ -22,6 +22,8 @@ export interface IStorage {
   getMemberByWhatsApp(noWhatsApp: string): Promise<Member | undefined>;
   createMember(member: InsertMember & { pin: string }): Promise<Member>;
   loginMember(noWhatsApp: string, pin: string): Promise<Member | undefined>;
+  updateMember(id: string, member: Partial<Omit<InsertMember, 'pin'>>): Promise<Member>;
+  deleteMember(id: string): Promise<void>;
   
   // Member points methods
   getMemberPoints(memberId: string): Promise<MemberPoints | undefined>;
@@ -117,6 +119,34 @@ export class DatabaseStorage implements IStorage {
       return member;
     }
     return undefined;
+  }
+
+  async updateMember(id: string, updateData: Partial<Omit<InsertMember, 'pin'>>): Promise<Member> {
+    const [updatedMember] = await db
+      .update(members)
+      .set(updateData)
+      .where(eq(members.id, id))
+      .returning();
+    
+    if (!updatedMember) {
+      throw new Error('Member tidak ditemukan atau gagal diperbarui');
+    }
+    
+    return updatedMember;
+  }
+
+  async deleteMember(id: string): Promise<void> {
+    // Delete related records first (foreign key constraints)
+    await db.delete(memberPoints).where(eq(memberPoints.memberId, id));
+    await db.delete(bills).where(eq(bills.memberId, id));
+    await db.delete(voucherClaims).where(eq(voucherClaims.memberId, id));
+    
+    // Delete the member
+    const result = await db.delete(members).where(eq(members.id, id));
+    
+    if (result.rowCount === 0) {
+      throw new Error('Member tidak ditemukan');
+    }
   }
 
   // Member points methods

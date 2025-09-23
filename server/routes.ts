@@ -438,6 +438,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update member endpoint
+  app.put("/api/admin/members/:id", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { namaLengkap, jenisKelamin, noWhatsApp, tanggalLahir, kodePos } = req.body;
+      
+      // Basic validation
+      if (!namaLengkap || !jenisKelamin || !noWhatsApp || !tanggalLahir || !kodePos) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Semua field harus diisi" 
+        });
+      }
+      
+      // Check if member exists
+      const existingMember = await storage.getMember(id);
+      if (!existingMember) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Member tidak ditemukan" 
+        });
+      }
+      
+      // Check if WhatsApp number is already used by another member
+      const memberWithSameWhatsApp = await storage.getMemberByWhatsApp(noWhatsApp);
+      if (memberWithSameWhatsApp && memberWithSameWhatsApp.id !== id) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Nomor WhatsApp sudah digunakan member lain" 
+        });
+      }
+      
+      const updatedMember = await storage.updateMember(id, {
+        namaLengkap,
+        jenisKelamin,
+        noWhatsApp,
+        tanggalLahir,
+        kodePos
+      });
+      
+      res.json({
+        success: true,
+        message: "Data member berhasil diperbarui!",
+        data: updatedMember
+      });
+    } catch (error: any) {
+      console.error('Update member error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.message || "Gagal memperbarui data member" 
+      });
+    }
+  });
+
+  // Delete member endpoint
+  app.delete("/api/admin/members/:id", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Check if member exists
+      const existingMember = await storage.getMember(id);
+      if (!existingMember) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Member tidak ditemukan" 
+        });
+      }
+      
+      await storage.deleteMember(id);
+      res.json({
+        success: true,
+        message: "Member berhasil dihapus!"
+      });
+    } catch (error: any) {
+      console.error('Delete member error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.message || "Gagal menghapus member" 
+      });
+    }
+  });
+
   app.get("/api/admin/bills", memberEndpointSecurity, async (req, res) => {
     try {
       const bills = await storage.getAllBills();
