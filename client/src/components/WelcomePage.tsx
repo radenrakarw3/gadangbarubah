@@ -1,7 +1,7 @@
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, User, Download, FileText } from 'lucide-react';
+import { ChevronRight, User, Download, FileText, UtensilsCrossed, ShoppingBag, Package } from 'lucide-react';
 import Logo from './Logo';
 import SEOHead from './SEOHead';
 import ImageSlideshow from './ImageSlideshow';
@@ -224,144 +224,180 @@ export default function WelcomePage() {
           {/* Featured Menu Section */}
           <div className="mb-10">
             <div className="text-center mb-8">
-              <h3 className="text-3xl font-serif font-medium text-foreground mb-4">Menu Pilihan Populer</h3>
+              <h3 className="text-3xl font-serif font-medium text-foreground mb-4">Gadang Barubah Bisa Kirim Buat Kamu</h3>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-4"></div>
               <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                Nikmati hidangan signature kami yang telah menjadi favorit pelanggan selama bertahun-tahun
+                Pesan sekarang dan nikmati kelezatan masakan Padang favorit langsung di rumah Anda
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="max-w-4xl mx-auto space-y-4">
               {/* Nasi Tumpeng */}
-              <Card className="border-border/50 shadow-sm hover-elevate transition-all duration-300">
-                <div className="aspect-[3/4] relative overflow-hidden">
-                  <img 
-                    src={nasiTumpengImage} 
-                    alt="Nasi Tumpeng Gadang Barubah - paket lengkap untuk 10-15 porsi dengan lauk tradisional Minang" 
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                    loading="lazy"
-                    data-testid="img-nasi-tumpeng"
-                  />
-                  <div className="absolute top-4 right-4 bg-background/95 backdrop-blur-sm px-3 py-1 rounded-full">
-                    <span className="text-sm font-medium text-primary">10-15 Porsi</span>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-xl font-serif font-medium text-foreground mb-2">Nasi Tumpeng</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Paket lengkap dengan nasi putih, ayam pop, ayam gulai, rendang, dendeng batokok, dan berbagai lauk tradisional Minang lainnya.
-                      </p>
+              <Card className="overflow-hidden border-border/30 shadow-sm bg-gradient-to-br from-background to-muted/5 hover-elevate hover:shadow-md transition-all duration-300">
+                <CardContent className="p-0">
+                  <div className="flex items-center">
+                    {/* Image Section */}
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
+                      <img 
+                        src={nasiTumpengImage} 
+                        alt="Nasi Tumpeng Gadang Barubah - paket lengkap untuk 10-15 porsi dengan lauk tradisional Minang" 
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        data-testid="img-nasi-tumpeng"
+                      />
                     </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-2xl font-bold text-primary">Rp 1.500.000</div>
-                      <Button 
-                        asChild
-                        size="sm" 
-                        variant="outline"
-                        className="text-primary border-primary/30"
-                        data-testid="button-order-tumpeng"
-                      >
-                        <a 
-                          href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20memesan%20Nasi%20Tumpeng" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          data-testid="link-order-tumpeng"
+                    
+                    {/* Content Section */}
+                    <div className="flex-1 p-4 sm:p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center mb-1 sm:mb-2">
+                            <UtensilsCrossed className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2" />
+                            <h4 className="font-serif text-base sm:text-lg font-medium text-foreground">
+                              Nasi Tumpeng
+                            </h4>
+                            <div className="ml-2 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
+                              10-15 Porsi
+                            </div>
+                          </div>
+                          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2 sm:mb-3">
+                            Paket lengkap dengan nasi putih, ayam pop, ayam gulai, rendang, dendeng batokok
+                          </p>
+                          <div className="text-base sm:text-lg font-bold text-primary">
+                            Rp 1.500.000
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          size="sm"
+                          className="ml-3 sm:ml-4 text-xs sm:text-sm"
+                          asChild
+                          data-testid="button-order-tumpeng"
                         >
-                          Pesan Sekarang
-                        </a>
-                      </Button>
+                          <a
+                            href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20memesan%20Nasi%20Tumpeng"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-testid="link-order-tumpeng"
+                          >
+                            Order
+                          </a>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
               {/* Nasi Box */}
-              <Card className="border-border/50 shadow-sm hover-elevate transition-all duration-300">
-                <div className="aspect-[3/4] relative overflow-hidden">
-                  <img 
-                    src={nasiBoxImage} 
-                    alt="Saji Gadang Menu Nasi Box - berbagai pilihan menu praktis dengan harga mulai 40-46 ribu" 
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                    loading="lazy"
-                    data-testid="img-nasi-box"
-                  />
-                  <div className="absolute top-4 right-4 bg-background/95 backdrop-blur-sm px-3 py-1 rounded-full">
-                    <span className="text-sm font-medium text-primary">Per Box</span>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-xl font-serif font-medium text-foreground mb-2">Saji Gadang Menu</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Nasi box praktis dengan pilihan lauk ayam, rendang daging, gulai cincang, dendeng lombok, dan masakan Minang lainnya.
-                      </p>
+              <Card className="overflow-hidden border-border/30 shadow-sm bg-gradient-to-br from-background to-muted/5 hover-elevate hover:shadow-md transition-all duration-300">
+                <CardContent className="p-0">
+                  <div className="flex items-center">
+                    {/* Image Section */}
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
+                      <img 
+                        src={nasiBoxImage} 
+                        alt="Saji Gadang Menu Nasi Box - berbagai pilihan menu praktis dengan harga mulai 40-46 ribu" 
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        data-testid="img-nasi-box"
+                      />
                     </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-2xl font-bold text-primary">Rp 40.000 - 46.000</div>
-                      <Button 
-                        asChild
-                        size="sm" 
-                        variant="outline"
-                        className="text-primary border-primary/30"
-                        data-testid="button-order-nasibox"
-                      >
-                        <a 
-                          href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20memesan%20Saji%20Gadang%20Menu%20(Nasi%20Box)" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          data-testid="link-order-nasibox"
+                    
+                    {/* Content Section */}
+                    <div className="flex-1 p-4 sm:p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center mb-1 sm:mb-2">
+                            <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2" />
+                            <h4 className="font-serif text-base sm:text-lg font-medium text-foreground">
+                              Saji Gadang Menu
+                            </h4>
+                            <div className="ml-2 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
+                              Per Box
+                            </div>
+                          </div>
+                          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2 sm:mb-3">
+                            Nasi box praktis dengan pilihan lauk ayam, rendang, gulai cincang, dendeng lombok
+                          </p>
+                          <div className="text-base sm:text-lg font-bold text-primary">
+                            Rp 40.000 - 46.000
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          size="sm"
+                          className="ml-3 sm:ml-4 text-xs sm:text-sm"
+                          asChild
+                          data-testid="button-order-nasibox"
                         >
-                          Pesan Sekarang
-                        </a>
-                      </Button>
+                          <a
+                            href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20memesan%20Saji%20Gadang%20Menu%20(Nasi%20Box)"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-testid="link-order-nasibox"
+                          >
+                            Order
+                          </a>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
               {/* Rendang Kiloan */}
-              <Card className="border-border/50 shadow-sm hover-elevate transition-all duration-300">
-                <div className="aspect-[3/4] relative overflow-hidden">
-                  <img 
-                    src={rendangKiloanImage} 
-                    alt="Rendang Kiloan Gadang Barubah - rendang autentik Padang dalam kemasan praktis" 
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                    loading="lazy"
-                    data-testid="img-rendang-kiloan"
-                  />
-                  <div className="absolute top-4 right-4 bg-background/95 backdrop-blur-sm px-3 py-1 rounded-full">
-                    <span className="text-sm font-medium text-primary">Per Kg</span>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-xl font-serif font-medium text-foreground mb-2">Rendang Kiloan</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Rendang daging sapi autentik khas Padang dalam kemasan praktis. Cocok untuk oleh-oleh atau acara keluarga.
-                      </p>
+              <Card className="overflow-hidden border-border/30 shadow-sm bg-gradient-to-br from-background to-muted/5 hover-elevate hover:shadow-md transition-all duration-300">
+                <CardContent className="p-0">
+                  <div className="flex items-center">
+                    {/* Image Section */}
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
+                      <img 
+                        src={rendangKiloanImage} 
+                        alt="Rendang Kiloan Gadang Barubah - rendang autentik Padang dalam kemasan praktis" 
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        data-testid="img-rendang-kiloan"
+                      />
                     </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-lg font-bold text-primary">Hubungi Kami</div>
-                      <Button 
-                        asChild
-                        size="sm" 
-                        variant="outline"
-                        className="text-primary border-primary/30"
-                        data-testid="button-order-rendang"
-                      >
-                        <a 
-                          href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20Rendang%20Kiloan" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          data-testid="link-order-rendang"
+                    
+                    {/* Content Section */}
+                    <div className="flex-1 p-4 sm:p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center mb-1 sm:mb-2">
+                            <Package className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2" />
+                            <h4 className="font-serif text-base sm:text-lg font-medium text-foreground">
+                              Rendang Kiloan
+                            </h4>
+                            <div className="ml-2 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
+                              Per Kg
+                            </div>
+                          </div>
+                          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2 sm:mb-3">
+                            Rendang berkualitas dalam kemasan praktis untuk keluarga dan oleh-oleh
+                          </p>
+                          <div className="text-xs text-primary/70 font-medium">
+                            ✨ Rasa otentik • Kemasan berkualitas • Tahan lama
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          size="sm"
+                          className="ml-3 sm:ml-4 text-xs sm:text-sm"
+                          asChild
+                          data-testid="button-order-rendang"
                         >
-                          Pesan Sekarang
-                        </a>
-                      </Button>
+                          <a
+                            href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20Rendang%20Kiloan"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-testid="link-order-rendang"
+                          >
+                            Order
+                          </a>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
