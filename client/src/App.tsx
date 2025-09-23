@@ -19,6 +19,7 @@ import MemberDashboard from "@/pages/MemberDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminVouchers from "@/pages/AdminVouchers";
 import AdminPromos from "@/pages/AdminPromos";
+import KasirDashboard from "@/pages/KasirDashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/vouchers" component={AdminVouchers} />
       <Route path="/admin/promos" component={AdminPromos} />
+      <Route path="/kasir" component={KasirDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
