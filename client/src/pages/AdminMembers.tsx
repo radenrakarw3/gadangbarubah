@@ -17,6 +17,7 @@ import { queryClient } from '@/lib/queryClient';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import * as XLSX from 'xlsx';
 
 type AdminMemberData = {
   id: string;
@@ -212,31 +213,22 @@ export default function AdminMembers() {
 
       const demographicExport = Object.values(demographicData);
 
-      // Create Excel workbook with multiple sheets
-      const wb = {
-        SheetNames: ['Data Member', 'Ringkasan', 'Demografis'],
-        Sheets: {
-          'Data Member': exportData,
-          'Ringkasan': summaryData,
-          'Demografis': demographicExport
-        }
-      };
-
-      // Simulate Excel export (in real app, you'd use a library like xlsx)
-      const jsonString = JSON.stringify({
-        timestamp: new Date().toISOString(),
-        sheets: wb
-      }, null, 2);
+      // Create Excel workbook with multiple sheets using xlsx library
+      const wb = XLSX.utils.book_new();
       
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `data-member-gadang-barubah-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // Create worksheets from data
+      const memberSheet = XLSX.utils.json_to_sheet(exportData);
+      const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+      const demographicSheet = XLSX.utils.json_to_sheet(demographicExport);
+      
+      // Add worksheets to workbook
+      XLSX.utils.book_append_sheet(wb, memberSheet, 'Data Member');
+      XLSX.utils.book_append_sheet(wb, summarySheet, 'Ringkasan');
+      XLSX.utils.book_append_sheet(wb, demographicSheet, 'Demografis');
+      
+      // Generate Excel file and download
+      const fileName = `data-member-gadang-barubah-${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
 
       toast({
         title: "Export berhasil!",
