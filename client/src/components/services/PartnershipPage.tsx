@@ -78,7 +78,7 @@ export default function PartnershipPage() {
           {/* Title */}
           <div className="text-center mb-10">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
-              Kemitraan Rumah Makan Padang Premium
+              Kemitraan Rumah Makan Padang Terbaik
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">

@@ -15,7 +15,7 @@ export function OpenGraphTags() {
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="Gadang Barubah - Restoran Padang Terbaik" />
-      <meta name="twitter:description" content="Restoran Padang premium dengan masakan Minang authentic. Rendang, nasi padang, dan sate padang terbaik di Sumatera Barat." />
+      <meta name="twitter:description" content="Restoran Padang terbaik dengan masakan Minang authentic. Rendang, nasi padang, dan sate padang terbaik di Sumatera Barat." />
       <meta name="twitter:image" content="https://gadangbarubahindonesia.id/assets/gadang-barubah-og-image.jpg" />
       
       {/* WhatsApp Preview */}

@@ -47,7 +47,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           "@type": "Restaurant",
           "name": "Gadang Barubah",
           "alternateName": ["Gadang Barubah Restaurant", "Rumah Makan Padang Gadang Barubah"],
-          "description": "Rumah makan Padang premium dengan cabang di berbagai kota Indonesia. Nasi padang autentik, rendang terbaik, dan masakan Minang tradisional dengan cita rasa yang tak tertandingi.",
+          "description": "Rumah makan Padang terbaik dengan cabang di berbagai kota Indonesia. Nasi padang autentik, rendang terbaik, dan masakan Minang tradisional dengan cita rasa yang tak tertandingi.",
           "image": "https://gadangbarubahindonesia.id/og-image.jpg",
           "url": "https://gadangbarubahindonesia.id",
           "telephone": "+6289509766739",
@@ -63,7 +63,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           "acceptsReservations": true,
           "paymentAccepted": ["Cash", "Credit Card", "Debit Card"],
           "currenciesAccepted": "IDR",
-          "keywords": "rumah makan padang, nasi padang, restoran padang premium, rendang, gulai, masakan minang, gadang barubah, cabang indonesia",
+          "keywords": "rumah makan padang, nasi padang, restoran padang terbaik, rendang, gulai, masakan minang, gadang barubah, cabang indonesia",
           "sameAs": [
             "https://www.instagram.com/gadangbarubahindonesia",
             "https://wa.me/6289509766739"
@@ -80,7 +80,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           "alternateName": ["Gadang Barubah", "gadangbarubahindonesia.id"],
           "url": "https://gadangbarubahindonesia.id",
           "logo": "https://gadangbarubahindonesia.id/og-image.jpg",
-          "description": "Rumah makan Padang premium dengan cabang di berbagai kota Indonesia",
+          "description": "Rumah makan Padang terbaik dengan cabang di berbagai kota Indonesia",
           "foundingDate": "2024",
           "industry": "Restaurant & Food Service",
           "numberOfEmployees": "10-50",
@@ -110,7 +110,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           "name": "Gadang Barubah Indonesia",
           "alternateName": "gadangbarubahindonesia.id",
           "url": "https://gadangbarubahindonesia.id",
-          "description": "Website resmi Gadang Barubah - Rumah makan Padang premium Indonesia",
+          "description": "Website resmi Gadang Barubah - Rumah makan Padang terbaik Indonesia",
           "inLanguage": "id-ID",
           "copyrightYear": "2024",
           "author": {

@@ -35,7 +35,7 @@ export default function WelcomePage() {
     },
     {
       src: image2,
-      alt: "Presentasi masakan Padang premium dengan minuman segar",
+      alt: "Presentasi masakan Padang berkualitas dengan minuman segar",
       caption: "Presentasi Berkelas dengan Cita Rasa Istimewa"
     },
     {
@@ -81,7 +81,7 @@ export default function WelcomePage() {
           <div className="text-center mb-12">
             <div className="mb-8">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-medium text-primary mb-8 tracking-wide">
-                Selamat Datang di Gadang Barubah - Rumah Makan Padang Premium Indonesia
+                Selamat Datang di Gadang Barubah - Rumah Makan Padang Terbaik Indonesia
               </h1>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             </div>
@@ -99,7 +99,7 @@ export default function WelcomePage() {
               <h2 className="text-4xl font-serif font-medium text-foreground mb-4">Tentang Kami – Gadang Barubah</h2>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
               <p className="text-lg text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto">
-                Rumah makan Padang premium yang menghadirkan nasi padang autentik dan masakan Minang tradisional terbaik. Pilihan utama untuk pecinta kuliner Padang dengan cita rasa premium dan pelayanan terdepan di seluruh Indonesia.
+                Rumah makan Padang terbaik yang menghadirkan nasi padang autentik dan masakan Minang tradisional terbaik. Pilihan utama untuk pecinta kuliner Padang dengan cita rasa istimewa dan pelayanan terdepan di seluruh Indonesia.
               </p>
             </div>
 

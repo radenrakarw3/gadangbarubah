@@ -33,7 +33,7 @@ export default function OutletPage() {
     },
     {
       src: interiorMain,
-      title: "Interior Premium",
+      title: "Interior Berkelas",
       description: "Suasana interior rumah makan Padang dengan konsep warna hangat dan buffet area nasi padang yang elegan"
     },
     {
@@ -150,8 +150,8 @@ export default function OutletPage() {
       phone: "0895-0976-6739",
       hours: "10:00 - 22:00",
       icon: Store,
-      type: "Premium Restaurant",
-      description: "Outlet flagship kami di Mall Cikarang dengan konsep premium dining dan VIP room eksklusif.",
+      type: "Restoran Unggulan",
+      description: "Outlet flagship kami di Mall Cikarang dengan konsep berkelas dan VIP room eksklusif.",
       googleMaps: "https://maps.app.goo.gl/jP1JMKQZBU9AXSLz5"
     }
   ];
@@ -187,7 +187,7 @@ export default function OutletPage() {
           {/* Title */}
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-serif font-light text-foreground mb-6">
-              Outlet Rumah Makan Padang Premium Cikarang
+              Outlet Rumah Makan Padang Terbaik Cikarang
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
@@ -277,7 +277,7 @@ export default function OutletPage() {
               </h2>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Jelajahi berbagai sudut dan suasana outlet premium kami yang dirancang untuk kenyamanan Anda
+                Jelajahi berbagai sudut dan suasana outlet unggulan kami yang dirancang untuk kenyamanan Anda
               </p>
             </div>
             

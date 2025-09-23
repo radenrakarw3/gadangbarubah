@@ -17,12 +17,12 @@ const services = [
     id: 'outlet',
     name: 'Outlet Location',
     icon: Store,
-    description: 'Kunjungi rumah makan Padang premium kami di Pollux Mall Cikarang dengan suasana mewah, VIP room eksklusif, dan pengalaman kuliner nasi padang yang tak terlupakan.',
+    description: 'Kunjungi rumah makan Padang terbaik kami di Pollux Mall Cikarang dengan suasana mewah, VIP room eksklusif, dan pengalaman kuliner nasi padang yang tak terlupakan.',
     path: '/services/outlet'
   },
   {
     id: 'delivery',
-    name: 'Premium Delivery',
+    name: 'Delivery Terbaik',
     icon: Truck,
     description: 'Nikmati kelezatan nasi padang, rendang, dan gulai berkualitas restoran langsung di rumah Anda dengan layanan antar yang menjaga cita rasa autentik.',
     path: '/services/delivery'
@@ -31,7 +31,7 @@ const services = [
     id: 'partnership',
     name: 'Business Partnership',
     icon: Handshake,
-    description: 'Bergabunglah dalam ekosistem kuliner Padang premium kami dengan program kemitraan rumah makan yang memberikan keuntungan berkelanjutan.',
+    description: 'Bergabunglah dalam ekosistem kuliner Padang terbaik kami dengan program kemitraan rumah makan yang memberikan keuntungan berkelanjutan.',
     path: '/services/partnership'
   },
   {
@@ -45,7 +45,7 @@ const services = [
     id: 'catering',
     name: 'Event Catering',
     icon: UtensilsCrossed,
-    description: 'Wujudkan acara istimewa Anda dengan layanan katering nasi padang dan masakan Minang premium yang menciptakan momen tak terlupakan.',
+    description: 'Wujudkan acara istimewa Anda dengan layanan katering nasi padang dan masakan Minang terbaik yang menciptakan momen tak terlupakan.',
     path: '/services/catering'
   }
 ];
@@ -135,7 +135,7 @@ export default function UniPage() {
               <div className="max-w-2xl mx-auto">
                 <Mascot 
                   isAnimating={false}
-                  message="Selamat datang di Gadang Barubah - rumah makan Padang premium Indonesia! Saya Uni, siap membantu Anda menemukan pengalaman kuliner nasi padang dan masakan Minang premium yang tak tertandingi."
+                  message="Selamat datang di Gadang Barubah - rumah makan Padang terbaik Indonesia! Saya Uni, siap membantu Anda menemukan pengalaman kuliner nasi padang dan masakan Minang terbaik yang tak tertandingi."
                 />
               </div>
             </div>
@@ -192,7 +192,7 @@ export default function UniPage() {
                   <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
                     <img 
                       src={rendangKiloanImage}
-                      alt="Rendang Kiloan Gadang Barubah - packaging premium dengan rendang segar"
+                      alt="Rendang Kiloan Gadang Barubah - packaging berkualitas dengan rendang segar"
                       className="w-full h-full object-cover object-bottom"
                       data-testid="img-rendang-kiloan"
                     />
@@ -209,10 +209,10 @@ export default function UniPage() {
                           </h3>
                         </div>
                         <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2 sm:mb-3">
-                          Nikmati kelezatan rendang premium dalam kemasan praktis untuk keluarga
+                          Nikmati kelezatan rendang berkualitas dalam kemasan praktis untuk keluarga
                         </p>
                         <div className="text-xs text-primary/70 font-medium">
-                          ✨ Rasa otentik • Kemasan premium • Tahan lama
+                          ✨ Rasa otentik • Kemasan berkualitas • Tahan lama
                         </div>
                       </div>
                       

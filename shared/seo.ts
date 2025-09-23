@@ -14,7 +14,7 @@ export const createSEOConfig = (config: SEOConfig) => {
   return {
     title: config.title,
     description: config.description,
-    keywords: config.keywords || "gadang barubah, rumah makan padang terbaik, nasi padang premium, restoran padang, gadangbarubahindonesia",
+    keywords: config.keywords || "gadang barubah, rumah makan padang terbaik, nasi padang unggulan, restoran padang, gadangbarubahindonesia",
     canonical: `${baseUrl}${config.path}`,
     ogTitle: config.title,
     ogDescription: config.description,
@@ -29,52 +29,52 @@ export const createSEOConfig = (config: SEOConfig) => {
 
 export const pageSEOConfigs = {
   home: createSEOConfig({
-    title: "Gadang Barubah - Rumah Makan Padang Premium Indonesia",
-    description: "Gadang Barubah - Rumah makan Padang premium dengan cabang di berbagai kota. Nikmati nasi padang autentik, rendang terbaik, gulai khas Minang dengan cita rasa tradisional yang istimewa. Reservasi: 089509766739",
-    keywords: "gadang barubah, gadangbarubah, gadangbarubahindonesia.id, gadangbarubahindonesia, rumah makan padang terbaik, nasi padang enak, restoran padang premium, gadang barubah indonesia, alternatif payakumbuah, pengganti pagi sore, lebih baik dari bumus, selain padang merdeka, rumah makan padang premium, rendang enak, gulai padang terbaik, masakan minang autentik",
+    title: "Gadang Barubah - Rumah Makan Padang Terbaik Indonesia",
+    description: "Gadang Barubah - Rumah makan Padang terbaik dengan cabang di berbagai kota. Nikmati nasi padang autentik, rendang terbaik, gulai khas Minang dengan cita rasa tradisional yang istimewa. Reservasi: 089509766739",
+    keywords: "gadang barubah, gadangbarubah, gadangbarubahindonesia.id, gadangbarubahindonesia, rumah makan padang terbaik, nasi padang enak, restoran padang unggulan, gadang barubah indonesia, alternatif payakumbuah, pengganti pagi sore, lebih baik dari bumus, selain padang merdeka, rumah makan padang terbaik, rendang enak, gulai padang terbaik, masakan minang autentik",
     path: "/",
     ogType: "restaurant"
   }),
   
   services: createSEOConfig({
-    title: "Layanan Premium Gadang Barubah - Outlet, Delivery, Catering & VIP Membership",
-    description: "Jelajahi layanan lengkap Gadang Barubah: lokasi outlet premium, delivery nasi padang, catering event, dan VIP membership. Pengalaman kuliner Minang premium di seluruh Indonesia.",
-    keywords: "layanan gadang barubah, delivery nasi padang, catering padang, vip membership padang, outlet padang premium, gadang barubah services, layanan restoran padang terbaik, alternatif delivery padang",
+    title: "Layanan Unggulan Gadang Barubah - Outlet, Delivery, Catering & VIP Membership",
+    description: "Jelajahi layanan lengkap Gadang Barubah: lokasi outlet terbaik, delivery nasi padang, catering event, dan VIP membership. Pengalaman kuliner Minang terbaik di seluruh Indonesia.",
+    keywords: "layanan gadang barubah, delivery nasi padang, catering padang, vip membership padang, outlet padang unggulan, gadang barubah services, layanan restoran padang terbaik, alternatif delivery padang",
     path: "/uni"
   }),
   
   outlet: createSEOConfig({
-    title: "Lokasi Outlet Gadang Barubah - Restoran Padang Premium",
-    description: "Kunjungi outlet premium Gadang Barubah di berbagai lokasi. Nikmati suasana mewah, VIP room eksklusif, dan pengalaman kuliner Padang autentik yang tak terlupakan.",
-    keywords: "outlet gadang barubah, restoran padang premium, outlet padang, lokasi gadang barubah, vip room padang, rumah makan mewah, tempat makan padang terbaik, alternatif restoran padang",
+    title: "Lokasi Outlet Gadang Barubah - Restoran Padang Terbaik",
+    description: "Kunjungi outlet unggulan Gadang Barubah di berbagai lokasi. Nikmati suasana mewah, VIP room eksklusif, dan pengalaman kuliner Padang autentik yang tak terlupakan.",
+    keywords: "outlet gadang barubah, restoran padang terbaik, outlet padang, lokasi gadang barubah, vip room padang, rumah makan mewah, tempat makan padang terbaik, alternatif restoran padang",
     path: "/services/outlet"
   }),
   
   delivery: createSEOConfig({
-    title: "Delivery Premium Gadang Barubah - Nasi Padang Antar ke Rumah",
-    description: "Pesan nasi padang, rendang, dan gulai premium Gadang Barubah dengan layanan delivery. Cita rasa autentik Minang diantar langsung ke rumah Anda.",
-    keywords: "delivery gadang barubah, pesan nasi padang online, antar makanan padang, delivery rendang, pesan gulai online, layanan antar makanan padang premium",
+    title: "Delivery Terbaik Gadang Barubah - Nasi Padang Antar ke Rumah",
+    description: "Pesan nasi padang, rendang, dan gulai terbaik Gadang Barubah dengan layanan delivery. Cita rasa autentik Minang diantar langsung ke rumah Anda.",
+    keywords: "delivery gadang barubah, pesan nasi padang online, antar makanan padang, delivery rendang, pesan gulai online, layanan antar makanan padang terbaik",
     path: "/services/delivery"
   }),
   
   partnership: createSEOConfig({
     title: "Kemitraan Bisnis Gadang Barubah - Peluang Franchise Restoran Padang",
-    description: "Bergabunglah dengan program kemitraan Gadang Barubah. Peluang bisnis franchise rumah makan Padang premium dengan sistem yang telah terbukti dan dukungan penuh.",
+    description: "Bergabunglah dengan program kemitraan Gadang Barubah. Peluang bisnis franchise rumah makan Padang terbaik dengan sistem yang telah terbukti dan dukungan penuh.",
     keywords: "franchise gadang barubah, kemitraan restoran padang, bisnis rumah makan padang, franchise makanan, peluang usaha kuliner, kemitraan bisnis gadang barubah",
     path: "/services/partnership"
   }),
   
   catering: createSEOConfig({
-    title: "Catering Event Gadang Barubah - Layanan Katering Padang Premium",
+    title: "Catering Event Gadang Barubah - Layanan Katering Padang Terbaik",
     description: "Layanan catering Gadang Barubah untuk acara pernikahan, corporate event, dan gathering. Menu Padang autentik untuk acara istimewa Anda.",
-    keywords: "catering gadang barubah, katering padang, catering pernikahan padang, catering event makanan padang, layanan katering premium, menu catering padang",
+    keywords: "catering gadang barubah, katering padang, catering pernikahan padang, catering event makanan padang, layanan katering terbaik, menu catering padang",
     path: "/services/catering"
   }),
   
   memberLogin: createSEOConfig({
-    title: "Login Member VIP Gadang Barubah - Akses Eksklusif Premium",
+    title: "Login Member VIP Gadang Barubah - Akses Eksklusif Istimewa",
     description: "Login ke akun VIP member Gadang Barubah untuk menikmati benefit eksklusif, diskon khusus, dan layanan prioritas untuk pengalaman kuliner yang istimewa.",
-    keywords: "login member gadang barubah, vip member, akun premium gadang barubah, member eksklusif, login vip restoran padang",
+    keywords: "login member gadang barubah, vip member, akun istimewa gadang barubah, member eksklusif, login vip restoran padang",
     path: "/member/login",
     noIndex: true
   }),
@@ -82,21 +82,21 @@ export const pageSEOConfigs = {
   memberRegister: createSEOConfig({
     title: "Daftar VIP Member Gadang Barubah - Bergabung Program Eksklusif",
     description: "Daftar sebagai VIP member Gadang Barubah dan nikmati benefit eksklusif seperti diskon khusus, reservasi prioritas, dan menu spesial untuk member.",
-    keywords: "daftar member gadang barubah, registrasi vip member, membership gadang barubah, daftar member premium, program vip restoran padang",
+    keywords: "daftar member gadang barubah, registrasi vip member, membership gadang barubah, daftar member eksklusif, program vip restoran padang",
     path: "/member/register",
     noIndex: true
   }),
   
   comingSoon: createSEOConfig({
     title: "Coming Soon - Fitur Baru Gadang Barubah",
-    description: "Fitur baru Gadang Barubah segera hadir! Pantai terus update terbaru dari rumah makan Padang premium favorit Anda.",
+    description: "Fitur baru Gadang Barubah segera hadir! Pantai terus update terbaru dari rumah makan Padang favorit Anda.",
     keywords: "coming soon gadang barubah, fitur baru, update gadang barubah, segera hadir",
     path: "/member/dashboard"
   }),
   
   notFound: createSEOConfig({
     title: "Halaman Tidak Ditemukan - Gadang Barubah",
-    description: "Halaman yang Anda cari tidak ditemukan. Kembali ke beranda untuk menjelajahi layanan dan hidangan premium Gadang Barubah.",
+    description: "Halaman yang Anda cari tidak ditemukan. Kembali ke beranda untuk menjelajahi layanan dan hidangan terbaik Gadang Barubah.",
     keywords: "404, halaman tidak ditemukan, gadang barubah",
     path: "/404",
     noIndex: true
