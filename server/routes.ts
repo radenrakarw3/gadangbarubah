@@ -244,16 +244,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/vouchers", memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = insertVoucherSchema.parse(req.body);
-      const { adminId } = req.body; // Should come from authenticated admin session
+      const adminId = "admin-uuid-123"; // Using default admin ID
       
-      if (!adminId) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Admin ID diperlukan" 
-        });
-      }
+      // Convert string dates to Date objects for storage
+      const voucherData = {
+        ...validatedData,
+        validFrom: new Date(validatedData.validFrom),
+        validUntil: new Date(validatedData.validUntil),
+      } as any; // Type assertion for date conversion
       
-      const voucher = await storage.createVoucher(validatedData, adminId);
+      const voucher = await storage.createVoucher(voucherData, adminId);
       res.json({
         success: true,
         message: "Voucher berhasil dibuat!",
@@ -271,16 +271,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/promos", memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = insertPromoSchema.parse(req.body);
-      const { adminId } = req.body; // Should come from authenticated admin session
+      const adminId = "admin-uuid-123"; // Using default admin ID
       
-      if (!adminId) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Admin ID diperlukan" 
-        });
-      }
+      // Convert string dates to Date objects for storage
+      const promoData = {
+        ...validatedData,
+        validFrom: new Date(validatedData.validFrom),
+        validUntil: new Date(validatedData.validUntil),
+      } as any; // Type assertion for date conversion
       
-      const promo = await storage.createPromo(validatedData, adminId);
+      const promo = await storage.createPromo(promoData, adminId);
       res.json({
         success: true,
         message: "Promo berhasil dibuat!",

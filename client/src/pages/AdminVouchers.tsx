@@ -67,8 +67,7 @@ export default function AdminVouchers() {
         },
         body: JSON.stringify({
           ...data,
-          validFrom: new Date(data.validFrom).toISOString(),
-          validUntil: new Date(data.validUntil).toISOString(),
+          // Send date strings directly
         }),
       });
       if (!response.ok) {

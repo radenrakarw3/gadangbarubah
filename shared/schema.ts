@@ -92,16 +92,21 @@ export const loginMemberSchema = z.object({
 });
 
 // Voucher schemas
-export const insertVoucherSchema = createInsertSchema(vouchers).omit({
-  id: true,
-  createdAt: true,
-  createdBy: true,
+export const insertVoucherSchema = z.object({
+  title: z.string().min(1, "Judul voucher harus diisi"),
+  description: z.string().min(1, "Deskripsi harus diisi"),
+  pointsCost: z.number().min(1, "Points cost minimal 1"),
+  validFrom: z.string().min(1, "Tanggal mulai harus diisi"),
+  validUntil: z.string().min(1, "Tanggal berakhir harus diisi"),
+  isActive: z.boolean().optional().default(true),
 });
 
-export const insertPromoSchema = createInsertSchema(promos).omit({
-  id: true,
-  createdAt: true,
-  createdBy: true,
+export const insertPromoSchema = z.object({
+  title: z.string().min(1, "Judul promo harus diisi"),
+  description: z.string().min(1, "Deskripsi harus diisi"),
+  validFrom: z.string().min(1, "Tanggal mulai harus diisi"),
+  validUntil: z.string().min(1, "Tanggal berakhir harus diisi"),
+  isActive: z.boolean().optional().default(true),
 });
 
 export const insertBillSchema = createInsertSchema(bills).omit({
