@@ -61,7 +61,7 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
           <img
             src={image.src}
             alt={image.alt}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center md:object-top"
             loading="eager"
             data-testid={`img-slide-${index}`}
           />
