@@ -290,6 +290,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoints for data member dan riwayat transaksi
+  app.get("/api/admin/members", memberEndpointSecurity, async (req, res) => {
+    try {
+      const members = await storage.getAllMembers();
+      res.json({
+        success: true,
+        data: members
+      });
+    } catch (error: any) {
+      console.error('Get all members error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data member" 
+      });
+    }
+  });
+
+  app.get("/api/admin/bills", memberEndpointSecurity, async (req, res) => {
+    try {
+      const bills = await storage.getAllBills();
+      res.json({
+        success: true,
+        data: bills
+      });
+    } catch (error: any) {
+      console.error('Get all bills error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data transaksi" 
+      });
+    }
+  });
+
   // Kasir Routes - Create Bills and Award Points
   app.post("/api/kasir/bills", memberEndpointSecurity, async (req, res) => {
     try {

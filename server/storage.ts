@@ -48,6 +48,10 @@ export interface IStorage {
   claimVoucher(memberId: string, voucherId: string): Promise<VoucherClaim>;
   getMemberVoucherClaims(memberId: string): Promise<VoucherClaim[]>;
   redeemVoucherClaim(claimId: string): Promise<VoucherClaim>;
+  
+  // Admin methods - Data member dan riwayat transaksi
+  getAllMembers(): Promise<Array<Member & { totalPoints: number; billsCount: number }>>;
+  getAllBills(): Promise<Array<Bill & { memberName: string; memberWhatsApp: string }>>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -305,6 +309,54 @@ export class DatabaseStorage implements IStorage {
     }
     
     return claim;
+  }
+
+  // Admin methods - Data member dan riwayat transaksi
+  async getAllMembers(): Promise<Array<Member & { totalPoints: number; billsCount: number }>> {
+    const result = await db
+      .select({
+        id: members.id,
+        namaLengkap: members.namaLengkap,
+        jenisKelamin: members.jenisKelamin,
+        noWhatsApp: members.noWhatsApp,
+        tanggalLahir: members.tanggalLahir,
+        kodePos: members.kodePos,
+        pinHash: members.pinHash,
+        totalPoints: sql<number>`COALESCE(${memberPoints.totalPoints}, 0)`,
+        billsCount: sql<number>`COALESCE(bill_counts.count, 0)`,
+      })
+      .from(members)
+      .leftJoin(memberPoints, eq(members.id, memberPoints.memberId))
+      .leftJoin(
+        sql`(
+          SELECT member_id, COUNT(*) as count 
+          FROM ${bills} 
+          GROUP BY member_id
+        ) as bill_counts`,
+        sql`${members.id} = bill_counts.member_id`
+      )
+      .orderBy(desc(members.id));
+    
+    return result as Array<Member & { totalPoints: number; billsCount: number }>;
+  }
+
+  async getAllBills(): Promise<Array<Bill & { memberName: string; memberWhatsApp: string }>> {
+    const result = await db
+      .select({
+        id: bills.id,
+        memberId: bills.memberId,
+        totalAmount: bills.totalAmount,
+        pointsAwarded: bills.pointsAwarded,
+        processedBy: bills.processedBy,
+        createdAt: bills.createdAt,
+        memberName: members.namaLengkap,
+        memberWhatsApp: members.noWhatsApp,
+      })
+      .from(bills)
+      .leftJoin(members, eq(bills.memberId, members.id))
+      .orderBy(desc(bills.createdAt));
+    
+    return result as Array<Bill & { memberName: string; memberWhatsApp: string }>;
   }
 }
 
