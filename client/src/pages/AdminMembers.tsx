@@ -16,7 +16,7 @@ type AdminMemberData = {
   noWhatsApp: string;
   tanggalLahir: string;
   kodePos: string;
-  pinHash: string;
+  // pinHash is excluded for security
   totalPoints: number;
   billsCount: number;
 };
@@ -25,7 +25,7 @@ export default function AdminMembers() {
   const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: membersData, isLoading } = useQuery({
+  const { data: membersData, isLoading } = useQuery<{ success: boolean; data: AdminMemberData[] }>({
     queryKey: ['/api/admin/members'],
     enabled: true,
   });

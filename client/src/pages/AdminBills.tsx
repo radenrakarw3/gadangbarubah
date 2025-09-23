@@ -16,7 +16,7 @@ type AdminBillData = {
   totalAmount: number;
   pointsAwarded: number;
   processedBy: string;
-  createdAt: Date;
+  createdAt: string; // API returns ISO string, parse when needed
   memberName: string | null;
   memberWhatsApp: string | null;
 };
@@ -26,7 +26,7 @@ export default function AdminBills() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'amount-high' | 'amount-low' | 'points-high' | 'points-low'>('newest');
 
-  const { data: billsData, isLoading } = useQuery({
+  const { data: billsData, isLoading } = useQuery<{ success: boolean; data: AdminBillData[] }>({
     queryKey: ['/api/admin/bills'],
     enabled: true,
   });
@@ -35,8 +35,8 @@ export default function AdminBills() {
 
   // Filter bills based on search query
   const filteredBills = bills.filter((bill: AdminBillData) =>
-    bill.memberName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    bill.memberWhatsApp?.includes(searchQuery) ||
+    (bill.memberName ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (bill.memberWhatsApp ?? '').includes(searchQuery) ||
     bill.totalAmount.toString().includes(searchQuery) ||
     bill.pointsAwarded.toString().includes(searchQuery)
   );
@@ -60,9 +60,9 @@ export default function AdminBills() {
     }
   });
 
-  const formatDate = (date: Date) => {
+  const formatDate = (dateString: string) => {
     try {
-      const dateObj = new Date(date);
+      const dateObj = new Date(dateString);
       return dateObj.toLocaleDateString('id-ID', {
         day: 'numeric',
         month: 'short',

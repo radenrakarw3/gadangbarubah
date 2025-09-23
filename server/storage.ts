@@ -50,7 +50,7 @@ export interface IStorage {
   redeemVoucherClaim(claimId: string): Promise<VoucherClaim>;
   
   // Admin methods - Data member dan riwayat transaksi
-  getAllMembers(): Promise<Array<Member & { totalPoints: number; billsCount: number }>>;
+  getAllMembers(): Promise<Array<Omit<Member, 'pinHash'> & { totalPoints: number; billsCount: number }>>;
   getAllBills(): Promise<Array<Bill & { memberName: string; memberWhatsApp: string }>>;
 }
 
@@ -312,7 +312,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Admin methods - Data member dan riwayat transaksi
-  async getAllMembers(): Promise<Array<Member & { totalPoints: number; billsCount: number }>> {
+  async getAllMembers(): Promise<Array<Omit<Member, 'pinHash'> & { totalPoints: number; billsCount: number }>> {
     const result = await db
       .select({
         id: members.id,
@@ -321,7 +321,7 @@ export class DatabaseStorage implements IStorage {
         noWhatsApp: members.noWhatsApp,
         tanggalLahir: members.tanggalLahir,
         kodePos: members.kodePos,
-        pinHash: members.pinHash,
+        // Exclude pinHash for security
         totalPoints: sql<number>`COALESCE(${memberPoints.totalPoints}, 0)`,
         billsCount: sql<number>`COALESCE(bill_counts.count, 0)`,
       })
@@ -337,7 +337,7 @@ export class DatabaseStorage implements IStorage {
       )
       .orderBy(desc(members.id));
     
-    return result as Array<Member & { totalPoints: number; billsCount: number }>;
+    return result as Array<Omit<Member, 'pinHash'> & { totalPoints: number; billsCount: number }>;
   }
 
   async getAllBills(): Promise<Array<Bill & { memberName: string; memberWhatsApp: string }>> {
