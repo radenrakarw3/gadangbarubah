@@ -33,16 +33,17 @@ export default function KasirDashboard() {
     resolver: zodResolver(billFormSchema),
     defaultValues: {
       noWhatsApp: '',
-      billAmount: 0,
+      billAmount: '' as any,
     },
   });
 
   const noWhatsApp = form.watch('noWhatsApp');
-  const billAmount = form.watch('billAmount');
+  const billAmount = form.watch('billAmount') as any;
 
   // Calculate points whenever bill amount changes (1 point per 1000 rupiah)
   useEffect(() => {
-    const points = Math.floor(billAmount / 1000);
+    const amount = typeof billAmount === 'string' ? parseInt(billAmount) : billAmount;
+    const points = amount && amount > 0 ? Math.floor(amount / 1000) : 0;
     setCalculatedPoints(points);
   }, [billAmount]);
 
@@ -80,7 +81,7 @@ export default function KasirDashboard() {
         },
         body: JSON.stringify({
           memberId: memberData.id,
-          totalAmount: data.billAmount,
+          totalAmount: typeof data.billAmount === 'string' ? parseInt(data.billAmount) : data.billAmount,
           kasirId: "kasir-1" // Should be from auth session in production
         }),
       });
@@ -90,9 +91,10 @@ export default function KasirDashboard() {
       return response.json();
     },
     onSuccess: (data) => {
+      const amount = typeof billAmount === 'string' ? parseInt(billAmount) : billAmount;
       toast({
         title: "Bill berhasil diproses!",
-        description: `Member mendapat ${calculatedPoints} points dari bill Rp ${billAmount.toLocaleString()}`,
+        description: `Member mendapat ${calculatedPoints} points dari bill Rp ${amount ? amount.toLocaleString() : '0'}`,
       });
       // Invalidate member profile to update points
       queryClient.invalidateQueries({ queryKey: ['/api/members/whatsapp', noWhatsApp, 'profile'] });
@@ -226,7 +228,10 @@ export default function KasirDashboard() {
                               type="number" 
                               placeholder="150000"
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                field.onChange(value === '' ? '' : parseInt(value) || '');
+                              }}
                               data-testid="input-bill-amount"
                             />
                           </FormControl>
@@ -236,7 +241,7 @@ export default function KasirDashboard() {
                     />
 
                     {/* Points calculation display */}
-                    {billAmount > 0 && (
+                    {calculatedPoints > 0 && (
                       <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                         <div className="flex items-center justify-between">
                           <div>
@@ -260,7 +265,7 @@ export default function KasirDashboard() {
                         !noWhatsApp || 
                         noWhatsApp.length < 10 ||
                         !memberData || 
-                        billAmount < 1000 ||
+                        calculatedPoints === 0 ||
                         processBillMutation.isPending
                       }
                       data-testid="button-process-bill"
