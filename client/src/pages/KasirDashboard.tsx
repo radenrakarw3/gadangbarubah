@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { ArrowLeft, Receipt, User, Calculator, CheckCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Receipt, User, Calculator, CheckCircle, Loader2, Ticket } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
@@ -27,6 +28,7 @@ export default function KasirDashboard() {
   const [, navigate] = useLocation();
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [calculatedPoints, setCalculatedPoints] = useState(0);
+  const [activeTab, setActiveTab] = useState<'bills' | 'vouchers'>('bills');
   const { toast } = useToast();
 
   const form = useForm<BillFormData>({
@@ -64,6 +66,12 @@ export default function KasirDashboard() {
     },
     enabled: !!noWhatsApp && noWhatsApp.length >= 10,
     retry: false,
+  });
+
+  // Fetch all voucher claims for kasir
+  const { data: voucherClaimsData, isLoading: voucherClaimsLoading } = useQuery({
+    queryKey: ['/api/kasir/voucher-claims'],
+    enabled: activeTab === 'vouchers',
   });
 
   // Process bill mutation
@@ -112,6 +120,36 @@ export default function KasirDashboard() {
     },
   });
 
+  // Redeem voucher mutation
+  const redeemVoucherMutation = useMutation({
+    mutationFn: async (claimId: string) => {
+      const response = await fetch(`/api/kasir/voucher-claims/${claimId}/redeem`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Gagal menebus voucher');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Voucher berhasil ditebus!",
+        description: "Voucher telah berhasil ditebus untuk member",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/kasir/voucher-claims'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menebus voucher",
+        description: error.message || "Terjadi kesalahan saat menebus voucher",
+        variant: "destructive",
+      });
+    },
+  });
+
   const onSubmit = (data: BillFormData) => {
     processBillMutation.mutate(data);
   };
@@ -152,9 +190,25 @@ export default function KasirDashboard() {
           <div className="p-4 space-y-6">
             <div className="text-center">
               <Receipt className="h-12 w-12 text-primary mx-auto mb-3" />
-              <h2 className="text-2xl font-bold mb-2">Proses Bill</h2>
-              <p className="text-muted-foreground">Berikan points kepada member berdasarkan total belanja</p>
+              <h2 className="text-2xl font-bold mb-2">Kasir Dashboard</h2>
+              <p className="text-muted-foreground">Kelola transaksi dan voucher member</p>
             </div>
+
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'bills' | 'vouchers')}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="bills" className="flex items-center gap-2" data-testid="tab-bills">
+                  <Calculator className="h-4 w-4" />
+                  Proses Bill
+                </TabsTrigger>
+                <TabsTrigger value="vouchers" className="flex items-center gap-2" data-testid="tab-vouchers">
+                  <Ticket className="h-4 w-4" />
+                  Kelola Voucher
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Bills Tab Content */}
+              <TabsContent value="bills" className="space-y-4">{/* Wrapper untuk bills content */}
 
             <Card>
               <CardHeader>
@@ -291,6 +345,86 @@ export default function KasirDashboard() {
               <p>Sistem Points: 1 point untuk setiap Rp 1,000</p>
               <p>Minimal transaksi: Rp 1,000</p>
             </div>
+            </TabsContent>
+
+              {/* Vouchers Tab Content */}
+              <TabsContent value="vouchers" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Ticket className="h-5 w-5" />
+                      Kelola Voucher Claims
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {voucherClaimsLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                        <span>Memuat data voucher claims...</span>
+                      </div>
+                    ) : voucherClaimsData?.data && voucherClaimsData.data.length > 0 ? (
+                      <div className="space-y-4">
+                        {voucherClaimsData.data.map((claim: any) => (
+                          <div key={claim.id} className="p-4 border rounded-lg space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h4 className="font-medium" data-testid={`text-voucher-title-${claim.id}`}>
+                                  {claim.voucherTitle}
+                                </h4>
+                                <p className="text-sm text-muted-foreground" data-testid={`text-member-info-${claim.id}`}>
+                                  {claim.memberName} - {claim.memberWhatsApp}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Diklaim: {new Date(claim.claimedAt).toLocaleString('id-ID')}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <Badge 
+                                  variant={claim.status === 'claimed' ? 'secondary' : 'default'}
+                                  data-testid={`badge-status-${claim.id}`}
+                                >
+                                  {claim.status === 'claimed' ? 'Menunggu' : 'Ditebus'}
+                                </Badge>
+                                <p className="text-sm font-medium text-primary">
+                                  {claim.pointsUsed} points
+                                </p>
+                              </div>
+                            </div>
+                            
+                            {claim.status === 'claimed' && (
+                              <Button
+                                size="sm"
+                                onClick={() => redeemVoucherMutation.mutate(claim.id)}
+                                disabled={redeemVoucherMutation.isPending}
+                                className="w-full"
+                                data-testid={`button-redeem-${claim.id}`}
+                              >
+                                {redeemVoucherMutation.isPending ? (
+                                  <>
+                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                    Memproses...
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    Tebus Voucher
+                                  </>
+                                )}
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Ticket className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground">Belum ada voucher yang diklaim</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>

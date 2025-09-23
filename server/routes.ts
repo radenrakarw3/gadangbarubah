@@ -388,6 +388,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all voucher claims for kasir
+  app.get("/api/kasir/voucher-claims", memberEndpointSecurity, async (req, res) => {
+    try {
+      const claims = await storage.getAllVoucherClaims();
+      res.json({
+        success: true,
+        data: claims
+      });
+    } catch (error: any) {
+      console.error('Get voucher claims error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data voucher claims" 
+      });
+    }
+  });
+
   app.post("/api/kasir/voucher-claims/:claimId/redeem", memberEndpointSecurity, async (req, res) => {
     try {
       const { claimId } = req.params;

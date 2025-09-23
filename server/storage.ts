@@ -52,6 +52,9 @@ export interface IStorage {
   // Admin methods - Data member dan riwayat transaksi
   getAllMembers(): Promise<Array<Omit<Member, 'pinHash'> & { totalPoints: number; billsCount: number }>>;
   getAllBills(): Promise<Array<Bill & { memberName: string; memberWhatsApp: string }>>;
+  
+  // Kasir methods - Voucher claims management
+  getAllVoucherClaims(): Promise<Array<VoucherClaim & { voucherTitle: string; memberName: string; memberWhatsApp: string }>>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -357,6 +360,29 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(bills.createdAt));
     
     return result as Array<Bill & { memberName: string; memberWhatsApp: string }>;
+  }
+
+  // Kasir methods - Voucher claims management
+  async getAllVoucherClaims(): Promise<Array<VoucherClaim & { voucherTitle: string; memberName: string; memberWhatsApp: string }>> {
+    const result = await db
+      .select({
+        id: voucherClaims.id,
+        voucherId: voucherClaims.voucherId,
+        memberId: voucherClaims.memberId,
+        pointsUsed: voucherClaims.pointsUsed,
+        status: voucherClaims.status,
+        claimedAt: voucherClaims.claimedAt,
+        redeemedAt: voucherClaims.redeemedAt,
+        voucherTitle: vouchers.title,
+        memberName: members.namaLengkap,
+        memberWhatsApp: members.noWhatsApp,
+      })
+      .from(voucherClaims)
+      .leftJoin(vouchers, eq(voucherClaims.voucherId, vouchers.id))
+      .leftJoin(members, eq(voucherClaims.memberId, members.id))
+      .orderBy(desc(voucherClaims.claimedAt));
+    
+    return result as Array<VoucherClaim & { voucherTitle: string; memberName: string; memberWhatsApp: string }>;
   }
 }
 

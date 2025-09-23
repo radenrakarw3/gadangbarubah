@@ -78,15 +78,19 @@ export default function MemberDashboard() {
   // Voucher claiming mutation
   const claimVoucherMutation = useMutation({
     mutationFn: async (voucherId: string) => {
-      const response = await fetch(`/api/vouchers/${voucherId}/claim`, {
+      const response = await fetch('/api/vouchers/claim', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ memberId }),
+        body: JSON.stringify({ 
+          voucherId,
+          memberId 
+        }),
       });
       if (!response.ok) {
-        throw new Error('Failed to claim voucher');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to claim voucher');
       }
       return response.json();
     },
