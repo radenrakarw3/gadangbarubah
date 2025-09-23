@@ -22,6 +22,7 @@ const voucherFormSchema = z.object({
   title: z.string().min(1, 'Judul voucher harus diisi'),
   description: z.string().min(1, 'Deskripsi harus diisi'),
   pointsCost: z.number().min(1, 'Points cost minimal 1'),
+  validFrom: z.string().min(1, 'Tanggal mulai harus diisi'),
   validUntil: z.string().min(1, 'Tanggal berakhir harus diisi'),
 });
 
@@ -37,7 +38,8 @@ export default function AdminVouchers() {
     defaultValues: {
       title: '',
       description: '',
-      pointsCost: 0,
+      pointsCost: 100, // Start with a valid number instead of 0
+      validFrom: '',
       validUntil: '',
     },
   });
@@ -65,6 +67,7 @@ export default function AdminVouchers() {
         },
         body: JSON.stringify({
           ...data,
+          validFrom: new Date(data.validFrom).toISOString(),
           validUntil: new Date(data.validUntil).toISOString(),
         }),
       });
@@ -186,9 +189,30 @@ export default function AdminVouchers() {
                               <Input 
                                 type="number" 
                                 placeholder="500"
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                value={field.value || ''}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  field.onChange(value === '' ? 100 : parseInt(value) || 100);
+                                }}
                                 data-testid="input-voucher-points"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="validFrom"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Berlaku Mulai</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="date" 
+                                {...field}
+                                data-testid="input-voucher-from-date"
                               />
                             </FormControl>
                             <FormMessage />
