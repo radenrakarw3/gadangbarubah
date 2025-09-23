@@ -1,7 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertMemberSchema, loginMemberSchema } from "@shared/schema";
+import { 
+  insertMemberSchema, loginMemberSchema, insertVoucherSchema, 
+  insertPromoSchema, insertBillSchema, claimVoucherSchema 
+} from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { memberEndpointSecurity } from "./security";
 
@@ -52,7 +55,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Member Login with enhanced security
-  app.post("/api/members/login", memberEndpointSecurity, async (req, res) => {
+  app.post("/api/members/login", loginRateLimit, memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = loginMemberSchema.parse(req.body);
       
@@ -80,6 +83,256 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ 
         success: false, 
         message: error.errors ? "Data tidak valid" : "Gagal login" 
+      });
+    }
+  });
+
+  // Member Dashboard Routes
+  app.get("/api/members/:memberId/profile", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { memberId } = req.params;
+      
+      const member = await storage.getMember(memberId);
+      if (!member) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Member tidak ditemukan" 
+        });
+      }
+      
+      // Get member points (initialize if doesn't exist)
+      let memberPoints = await storage.getMemberPoints(memberId);
+      if (!memberPoints) {
+        memberPoints = await storage.initializeMemberPoints(memberId);
+      }
+      
+      res.json({
+        success: true,
+        data: {
+          id: member.id,
+          namaLengkap: member.namaLengkap,
+          noWhatsApp: member.noWhatsApp,
+          totalPoints: memberPoints.totalPoints
+        }
+      });
+    } catch (error: any) {
+      console.error('Get member profile error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data profil" 
+      });
+    }
+  });
+
+  app.get("/api/members/:memberId/voucher-claims", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { memberId } = req.params;
+      
+      const claims = await storage.getMemberVoucherClaims(memberId);
+      res.json({
+        success: true,
+        data: claims
+      });
+    } catch (error: any) {
+      console.error('Get voucher claims error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data voucher claims" 
+      });
+    }
+  });
+
+  // Voucher Routes
+  app.get("/api/vouchers/active", memberEndpointSecurity, async (req, res) => {
+    try {
+      const activeVouchers = await storage.getActiveVouchers();
+      res.json({
+        success: true,
+        data: activeVouchers
+      });
+    } catch (error: any) {
+      console.error('Get active vouchers error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data voucher" 
+      });
+    }
+  });
+
+  app.post("/api/vouchers/claim", memberEndpointSecurity, async (req, res) => {
+    try {
+      const validatedData = claimVoucherSchema.parse(req.body);
+      const { memberId } = req.body; // Should come from authenticated session in real app
+      
+      if (!memberId) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Member ID diperlukan" 
+        });
+      }
+      
+      const claim = await storage.claimVoucher(memberId, validatedData.voucherId);
+      res.json({
+        success: true,
+        message: "Voucher berhasil di-claim!",
+        data: claim
+      });
+    } catch (error: any) {
+      console.error('Claim voucher error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.message || "Gagal claim voucher" 
+      });
+    }
+  });
+
+  // Promo Routes
+  app.get("/api/promos/active", memberEndpointSecurity, async (req, res) => {
+    try {
+      const activePromos = await storage.getActivePromos();
+      res.json({
+        success: true,
+        data: activePromos
+      });
+    } catch (error: any) {
+      console.error('Get active promos error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data promo" 
+      });
+    }
+  });
+
+  // Admin Routes - Create Vouchers and Promos
+  app.post("/api/admin/vouchers", memberEndpointSecurity, async (req, res) => {
+    try {
+      const validatedData = insertVoucherSchema.parse(req.body);
+      const { adminId } = req.body; // Should come from authenticated admin session
+      
+      if (!adminId) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Admin ID diperlukan" 
+        });
+      }
+      
+      const voucher = await storage.createVoucher(validatedData, adminId);
+      res.json({
+        success: true,
+        message: "Voucher berhasil dibuat!",
+        data: voucher
+      });
+    } catch (error: any) {
+      console.error('Create voucher error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.errors ? "Data tidak valid" : "Gagal membuat voucher" 
+      });
+    }
+  });
+
+  app.post("/api/admin/promos", memberEndpointSecurity, async (req, res) => {
+    try {
+      const validatedData = insertPromoSchema.parse(req.body);
+      const { adminId } = req.body; // Should come from authenticated admin session
+      
+      if (!adminId) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Admin ID diperlukan" 
+        });
+      }
+      
+      const promo = await storage.createPromo(validatedData, adminId);
+      res.json({
+        success: true,
+        message: "Promo berhasil dibuat!",
+        data: promo
+      });
+    } catch (error: any) {
+      console.error('Create promo error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.errors ? "Data tidak valid" : "Gagal membuat promo" 
+      });
+    }
+  });
+
+  app.get("/api/admin/vouchers", memberEndpointSecurity, async (req, res) => {
+    try {
+      const vouchers = await storage.getVouchers();
+      res.json({
+        success: true,
+        data: vouchers
+      });
+    } catch (error: any) {
+      console.error('Get all vouchers error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data voucher" 
+      });
+    }
+  });
+
+  app.get("/api/admin/promos", memberEndpointSecurity, async (req, res) => {
+    try {
+      const promos = await storage.getPromos();
+      res.json({
+        success: true,
+        data: promos
+      });
+    } catch (error: any) {
+      console.error('Get all promos error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data promo" 
+      });
+    }
+  });
+
+  // Kasir Routes - Create Bills and Award Points
+  app.post("/api/kasir/bills", memberEndpointSecurity, async (req, res) => {
+    try {
+      const validatedData = insertBillSchema.parse(req.body);
+      const { kasirId } = req.body; // Should come from authenticated kasir session
+      
+      if (!kasirId) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Kasir ID diperlukan" 
+        });
+      }
+      
+      const bill = await storage.createBillAndAwardPoints(validatedData, kasirId);
+      res.json({
+        success: true,
+        message: `Bill berhasil diproses! Member mendapat ${bill.pointsAwarded} points.`,
+        data: bill
+      });
+    } catch (error: any) {
+      console.error('Create bill error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.errors ? "Data tidak valid" : "Gagal memproses bill" 
+      });
+    }
+  });
+
+  app.post("/api/kasir/voucher-claims/:claimId/redeem", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { claimId } = req.params;
+      
+      const claim = await storage.redeemVoucherClaim(claimId);
+      res.json({
+        success: true,
+        message: "Voucher berhasil ditebus!",
+        data: claim
+      });
+    } catch (error: any) {
+      console.error('Redeem voucher error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.message || "Gagal menebus voucher" 
       });
     }
   });
