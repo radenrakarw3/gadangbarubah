@@ -1,10 +1,12 @@
 import { useLocation } from 'wouter';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight, User, Download, FileText, UtensilsCrossed, ShoppingBag, Package } from 'lucide-react';
 import Logo from './Logo';
 import SEOHead from './SEOHead';
 import ImageSlideshow from './ImageSlideshow';
+import PromotionalPopup from './PromotionalPopup';
 import image1 from '@assets/DSC07140_1758564407964.jpg';
 import image2 from '@assets/DSC02436_1758564588903.jpg';
 import image3 from '@assets/DSC02371_1758564588950.jpg';
@@ -22,6 +24,33 @@ import { AnimatedUni } from './AnimatedUni';
 
 export default function WelcomePage() {
   const [, navigate] = useLocation();
+  const [showPromoPopup, setShowPromoPopup] = useState(false);
+  const [hasShownPopup, setHasShownPopup] = useState(false);
+
+  // Scroll detection to show popup at middle of page
+  useEffect(() => {
+    if (hasShownPopup) return;
+
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollPercentage = scrollTop / (documentHeight - windowHeight);
+
+      // Show popup when user scrolls to 50% of the page
+      if (scrollPercentage >= 0.5 && !hasShownPopup) {
+        setShowPromoPopup(true);
+        setHasShownPopup(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasShownPopup]);
+
+  const handleClosePopup = () => {
+    setShowPromoPopup(false);
+  };
 
   const handleContinue = () => {
     navigate('/uni');
@@ -471,6 +500,12 @@ export default function WelcomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Promotional Popup */}
+      <PromotionalPopup 
+        isVisible={showPromoPopup} 
+        onClose={handleClosePopup}
+      />
     </div>
   );
 }
