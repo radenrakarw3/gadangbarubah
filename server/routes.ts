@@ -374,6 +374,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update promo endpoint
+  app.put("/api/admin/promos/:id", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertPromoSchema.parse(req.body);
+      
+      // Convert string dates to Date objects for storage
+      const promoData = {
+        ...validatedData,
+        validFrom: new Date(validatedData.validFrom),
+        validUntil: new Date(validatedData.validUntil),
+      } as any;
+      
+      const updatedPromo = await storage.updatePromo(id, promoData);
+      res.json({
+        success: true,
+        message: "Promo berhasil diperbarui!",
+        data: updatedPromo
+      });
+    } catch (error: any) {
+      console.error('Update promo error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.errors ? "Data tidak valid" : error.message || "Gagal memperbarui promo" 
+      });
+    }
+  });
+
+  // Delete promo endpoint
+  app.delete("/api/admin/promos/:id", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      await storage.deletePromo(id);
+      res.json({
+        success: true,
+        message: "Promo berhasil dihapus!"
+      });
+    } catch (error: any) {
+      console.error('Delete promo error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.message || "Gagal menghapus promo" 
+      });
+    }
+  });
+
   // Admin endpoints for data member dan riwayat transaksi
   app.get("/api/admin/members", memberEndpointSecurity, async (req, res) => {
     try {

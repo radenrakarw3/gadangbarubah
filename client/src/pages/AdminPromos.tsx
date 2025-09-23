@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { ArrowLeft, Plus, Megaphone, Edit, Trash2, Loader2 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
@@ -30,9 +31,22 @@ type PromoFormData = z.infer<typeof promoFormSchema>;
 export default function AdminPromos() {
   const [, navigate] = useLocation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingPromo, setEditingPromo] = useState<any>(null);
+  const [deletePromoId, setDeletePromoId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<PromoFormData>({
+    resolver: zodResolver(promoFormSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      validFrom: '',
+      validUntil: '',
+    },
+  });
+
+  const editForm = useForm<PromoFormData>({
     resolver: zodResolver(promoFormSchema),
     defaultValues: {
       title: '',
@@ -93,8 +107,110 @@ export default function AdminPromos() {
     },
   });
 
+  // Update promo mutation
+  const updatePromoMutation = useMutation({
+    mutationFn: async (data: PromoFormData & { id: string }) => {
+      const response = await fetch(`/api/admin/promos/${data.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          validFrom: data.validFrom,
+          validUntil: data.validUntil,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update promo');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Promo berhasil diperbarui!",
+        description: "Perubahan promo telah disimpan.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/promos'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/promos/active'] });
+      setIsEditDialogOpen(false);
+      setEditingPromo(null);
+      editForm.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal memperbarui promo",
+        description: error.message || "Terjadi kesalahan saat memperbarui promo",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete promo mutation
+  const deletePromoMutation = useMutation({
+    mutationFn: async (promoId: string) => {
+      const response = await fetch(`/api/admin/promos/${promoId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete promo');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Promo berhasil dihapus!",
+        description: "Promo telah dihapus dari sistem.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/promos'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/promos/active'] });
+      setDeletePromoId(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menghapus promo",
+        description: error.message || "Terjadi kesalahan saat menghapus promo",
+        variant: "destructive",
+      });
+    },
+  });
+
   const onSubmit = (data: PromoFormData) => {
     createPromoMutation.mutate(data);
+  };
+
+  const onEditSubmit = (data: PromoFormData) => {
+    if (editingPromo) {
+      updatePromoMutation.mutate({ ...data, id: editingPromo.id });
+    }
+  };
+
+  const handleEditPromo = (promo: any) => {
+    setEditingPromo(promo);
+    // Format dates for input fields
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    };
+    
+    editForm.reset({
+      title: promo.title,
+      description: promo.description,
+      validFrom: formatDate(promo.validFrom),
+      validUntil: formatDate(promo.validUntil),
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeletePromo = (promoId: string) => {
+    setDeletePromoId(promoId);
+  };
+
+  const confirmDeletePromo = () => {
+    if (deletePromoId) {
+      deletePromoMutation.mutate(deletePromoId);
+    }
   };
 
   return (
@@ -242,6 +358,144 @@ export default function AdminPromos() {
             </div>
           </div>
 
+          {/* Edit Promo Dialog */}
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Edit Promo</DialogTitle>
+              </DialogHeader>
+              
+              <Form {...editForm}>
+                <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+                  <FormField
+                    control={editForm.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Judul Promo</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Contoh: Diskon Spesial Weekend" 
+                            {...field} 
+                            data-testid="input-edit-promo-title"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Deskripsi</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Deskripsi promo..."
+                            {...field}
+                            data-testid="input-edit-promo-description"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="validFrom"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mulai Dari</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field}
+                            data-testid="input-edit-promo-from-date"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="validUntil"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Berlaku Hingga</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field}
+                            data-testid="input-edit-promo-until-date"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="flex gap-2 pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => {
+                        setIsEditDialogOpen(false);
+                        setEditingPromo(null);
+                        editForm.reset();
+                      }}
+                      className="flex-1"
+                      data-testid="button-cancel-edit-promo"
+                    >
+                      Batal
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      disabled={updatePromoMutation.isPending}
+                      className="flex-1"
+                      data-testid="button-update-promo"
+                    >
+                      {updatePromoMutation.isPending && (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      )}
+                      {updatePromoMutation.isPending ? 'Memperbarui...' : 'Perbarui Promo'}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+
+          {/* Delete Confirmation Dialog */}
+          <AlertDialog open={!!deletePromoId} onOpenChange={() => setDeletePromoId(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Hapus Promo</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Apakah Anda yakin ingin menghapus promo ini? Tindakan ini tidak dapat dibatalkan dan akan menghapus promo beserta semua data yang terkait.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel data-testid="button-cancel-delete-promo">Batal</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={confirmDeletePromo}
+                  disabled={deletePromoMutation.isPending}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  data-testid="button-confirm-delete-promo"
+                >
+                  {deletePromoMutation.isPending && (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  )}
+                  {deletePromoMutation.isPending ? 'Menghapus...' : 'Hapus'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
           {/* Main Content */}
           <div className="p-4 space-y-6">
             {isLoading ? (
@@ -295,7 +549,12 @@ export default function AdminPromos() {
                       </div>
                       
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" data-testid={`button-edit-promo-${promo.id}`}>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEditPromo(promo)}
+                          data-testid={`button-edit-promo-${promo.id}`}
+                        >
                           <Edit className="h-4 w-4 mr-1" />
                           Edit
                         </Button>
@@ -303,6 +562,7 @@ export default function AdminPromos() {
                           variant="outline" 
                           size="sm" 
                           className="text-destructive hover:text-destructive"
+                          onClick={() => handleDeletePromo(promo.id)}
                           data-testid={`button-delete-promo-${promo.id}`}
                         >
                           <Trash2 className="h-4 w-4 mr-1" />

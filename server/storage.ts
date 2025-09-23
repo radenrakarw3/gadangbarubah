@@ -41,6 +41,8 @@ export interface IStorage {
   getPromos(): Promise<Promo[]>;
   getActivePromos(): Promise<Promo[]>;
   getPromo(id: string): Promise<Promo | undefined>;
+  updatePromo(id: string, promo: Partial<InsertPromo>): Promise<Promo>;
+  deletePromo(id: string): Promise<void>;
   
   // Bill methods (Kasir)
   createBillAndAwardPoints(bill: InsertBill, processedBy: string): Promise<Bill>;
@@ -242,6 +244,36 @@ export class DatabaseStorage implements IStorage {
   async getPromo(id: string): Promise<Promo | undefined> {
     const [promo] = await db.select().from(promos).where(eq(promos.id, id));
     return promo || undefined;
+  }
+
+  async updatePromo(id: string, promoData: Partial<InsertPromo>): Promise<Promo> {
+    const [updatedPromo] = await db
+      .update(promos)
+      .set(promoData)
+      .where(eq(promos.id, id))
+      .returning();
+      
+    if (!updatedPromo) {
+      throw new Error('Promo tidak ditemukan');
+    }
+    
+    return updatedPromo;
+  }
+
+  async deletePromo(id: string): Promise<void> {
+    // First check if promo exists
+    const promo = await this.getPromo(id);
+    if (!promo) {
+      throw new Error('Promo tidak ditemukan');
+    }
+
+    // Delete the promo (promos don't have related data like voucher claims)
+    const result = await db.delete(promos).where(eq(promos.id, id));
+    
+    // Verify deletion was successful
+    if (result.rowCount === 0) {
+      throw new Error('Gagal menghapus promo');
+    }
   }
 
   // Bill methods (Kasir) - Transactional point awarding
