@@ -25,15 +25,15 @@ export default function PromotionalPopup({ isVisible, onClose }: PromotionalPopu
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-all duration-300 will-change-opacity ${
-        isVisible ? 'opacity-100' : 'opacity-0'
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-all duration-300 ${
+        isVisible ? 'opacity-100 will-change-opacity' : 'opacity-0'
       }`}
       onClick={onClose}
       data-testid="popup-overlay"
     >
       <div 
-        className={`relative mx-4 transform transition-all duration-300 will-change-transform ${
-          isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+        className={`relative mx-4 transform transition-all duration-300 ${
+          isVisible ? 'scale-100 opacity-100 will-change-transform' : 'scale-95 opacity-0'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -50,14 +50,13 @@ export default function PromotionalPopup({ isVisible, onClose }: PromotionalPopu
         </Button>
 
         {/* Promotional Image */}
-        <div className="relative overflow-hidden rounded-lg shadow-2xl max-w-lg w-full will-change-auto">
+        <div className="relative overflow-hidden rounded-lg shadow-2xl max-w-lg w-full">
           <img
             src={promoImage}
             alt="Gratis Dessert Klepon - Belanja di atas Rp100.000 di Gadang Barubah langsung dapat Klepon manis GRATIS"
             className="w-full h-auto object-contain"
             loading="eager"
-            decoding="sync"
-            fetchPriority="high"
+            decoding="async"
             width="500"
             height="500"
             data-testid="img-promo-popup"
