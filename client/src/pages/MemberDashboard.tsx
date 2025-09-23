@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, User, Ticket, Gift, Phone, Loader2 } from 'lucide-react';
+import { ArrowLeft, User, Ticket, Gift, Phone, Loader2, LogOut } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import { pageSEOConfigs } from '@/lib/seo';
@@ -16,15 +16,26 @@ type TabType = 'profile' | 'vouchers' | 'promo';
 export default function MemberDashboard() {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<TabType>('profile');
+  const [memberId, setMemberId] = useState<string | null>(null);
   const { toast } = useToast();
   
-  // For demo purposes, using a hardcoded member ID - in real app this would come from auth context
-  const memberId = '123e4567-e89b-12d3-a456-426614174000';
+  // Get logged-in member ID from localStorage
+  useEffect(() => {
+    const memberData = localStorage.getItem('memberData');
+    if (memberData) {
+      const member = JSON.parse(memberData);
+      setMemberId(member.id);
+    } else {
+      // No logged in member, redirect to login
+      navigate('/member/login');
+    }
+  }, [navigate]);
   
   // Fetch member profile data
   const { data: memberProfile, isLoading: profileLoading, error: profileError } = useQuery({
     queryKey: ['/api/members', memberId, 'profile'],
     queryFn: async () => {
+      if (!memberId) throw new Error('No member ID');
       const response = await fetch(`/api/members/${memberId}/profile`);
       if (!response.ok) {
         throw new Error('Failed to fetch profile');
@@ -32,6 +43,7 @@ export default function MemberDashboard() {
       const result = await response.json();
       return result.data;
     },
+    enabled: !!memberId,
     retry: 1,
   });
   
@@ -66,11 +78,17 @@ export default function MemberDashboard() {
   // Voucher claiming mutation
   const claimVoucherMutation = useMutation({
     mutationFn: async (voucherId: string) => {
-      const response = await apiRequest(`/api/vouchers/${voucherId}/claim`, {
+      const response = await fetch(`/api/vouchers/${voucherId}/claim`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ memberId }),
       });
-      return response;
+      if (!response.ok) {
+        throw new Error('Failed to claim voucher');
+      }
+      return response.json();
     },
     onSuccess: (data, voucherId) => {
       toast({
@@ -78,9 +96,11 @@ export default function MemberDashboard() {
         description: "Voucher telah ditambahkan ke akun Anda.",
       });
       // Invalidate and refetch member profile to update points
-      queryClient.invalidateQueries({ queryKey: ['/api/members', memberId, 'profile'] });
-      // Optionally invalidate vouchers list to update availability
-      queryClient.invalidateQueries({ queryKey: ['/api/vouchers/active'] });
+      if (memberId) {
+        queryClient.invalidateQueries({ queryKey: ['/api/members', memberId, 'profile'] });
+        // Optionally invalidate vouchers list to update availability
+        queryClient.invalidateQueries({ queryKey: ['/api/vouchers/active'] });
+      }
     },
     onError: (error: any) => {
       toast({
@@ -93,6 +113,15 @@ export default function MemberDashboard() {
 
   const handleClaimVoucher = (voucherId: string) => {
     claimVoucherMutation.mutate(voucherId);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('memberData');
+    toast({
+      title: "Logout berhasil",
+      description: "Anda telah keluar dari akun member",
+    });
+    navigate('/member/login');
   };
 
   const renderProfileSection = () => {
@@ -295,7 +324,16 @@ export default function MemberDashboard() {
             <Logo />
           </div>
           
-          <div className="w-20"></div>
+          <Button
+            onClick={handleLogout}
+            variant="ghost"
+            size="sm"
+            className="hover:bg-accent/10 text-muted-foreground hover:text-foreground"
+            data-testid="button-logout"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline ml-1 text-sm">Logout</span>
+          </Button>
         </div>
       </div>
 

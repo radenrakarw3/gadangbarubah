@@ -41,11 +41,14 @@ export default function MemberLogin() {
       return res.json();
     },
     onSuccess: (response: any) => {
+      // Store member data in localStorage for session management
+      localStorage.setItem('memberData', JSON.stringify(response.member));
+      
       toast({
         title: "Login Berhasil!",
         description: `Selamat datang, ${response.member.namaLengkap}!`,
       });
-      // Navigate to member dashboard (coming soon page)
+      // Navigate to member dashboard
       navigate('/member/dashboard');
     },
     onError: (error: any) => {

@@ -55,12 +55,15 @@ export default function MemberRegister() {
       return res.json();
     },
     onSuccess: (response: any) => {
+      // Store member data in localStorage for automatic login after registration
+      localStorage.setItem('memberData', JSON.stringify(response.member));
+      
       toast({
         title: "Registrasi Berhasil!",
-        description: response.message,
+        description: `Selamat datang, ${response.member.namaLengkap}! Anda akan diarahkan ke dashboard.`,
       });
-      // Navigate to login page
-      navigate('/member/login');
+      // Navigate directly to dashboard since we're automatically logging in
+      navigate('/member/dashboard');
     },
     onError: (error: any) => {
       toast({
