@@ -16,6 +16,9 @@ import CateringPage from "@/components/services/CateringPage";
 import MemberLogin from "@/pages/MemberLogin";
 import MemberRegister from "@/pages/MemberRegister";
 import MemberDashboard from "@/pages/MemberDashboard";
+import AdminDashboard from "@/pages/AdminDashboard";
+import AdminVouchers from "@/pages/AdminVouchers";
+import AdminPromos from "@/pages/AdminPromos";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -41,6 +44,9 @@ function Router() {
       <Route path="/member/login" component={MemberLogin} />
       <Route path="/member/register" component={MemberRegister} />
       <Route path="/member/dashboard" component={MemberDashboard} />
+      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/vouchers" component={AdminVouchers} />
+      <Route path="/admin/promos" component={AdminPromos} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,0 +1,135 @@
+import { useState } from 'react';
+import { useLocation } from 'wouter';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Plus, Gift, Megaphone, Users, Receipt } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
+import Logo from '@/components/Logo';
+
+export default function AdminDashboard() {
+  const [, navigate] = useLocation();
+
+  const adminFeatures = [
+    {
+      id: 'vouchers',
+      title: 'Kelola Voucher',
+      description: 'Buat, edit, dan kelola voucher yang dapat diklaim member',
+      icon: Gift,
+      route: '/admin/vouchers',
+      color: 'bg-blue-500',
+    },
+    {
+      id: 'promos',
+      title: 'Kelola Promo',
+      description: 'Buat dan kelola promo terbaru untuk member',
+      icon: Megaphone,
+      route: '/admin/promos',
+      color: 'bg-green-500',
+    },
+    {
+      id: 'members',
+      title: 'Data Member',
+      description: 'Lihat data member dan riwayat points',
+      icon: Users,
+      route: '/admin/members',
+      color: 'bg-purple-500',
+    },
+    {
+      id: 'bills',
+      title: 'Riwayat Transaksi',
+      description: 'Lihat riwayat bill dan pemberian points',
+      icon: Receipt,
+      route: '/admin/bills',
+      color: 'bg-orange-500',
+    },
+  ];
+
+  return (
+    <>
+      <Helmet>
+        <title>Admin Dashboard - Gadang Barubah</title>
+        <meta name="description" content="Dashboard admin untuk mengelola voucher, promo, dan data member Gadang Barubah" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
+        <div className="max-w-md mx-auto">
+          {/* Header */}
+          <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b">
+            <div className="flex items-center justify-between p-4">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => navigate('/')}
+                data-testid="button-back"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div className="flex items-center gap-2">
+                <Logo />
+                <div>
+                  <h1 className="font-semibold text-lg">Admin Panel</h1>
+                  <Badge variant="secondary" className="text-xs">
+                    Administrator
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="p-4 space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2">Dashboard Admin</h2>
+              <p className="text-muted-foreground">Kelola sistem member Gadang Barubah</p>
+            </div>
+
+            <div className="grid gap-4">
+              {adminFeatures.map((feature) => {
+                const IconComponent = feature.icon;
+                return (
+                  <Card 
+                    key={feature.id} 
+                    className="hover-elevate cursor-pointer"
+                    onClick={() => navigate(feature.route)}
+                    data-testid={`card-admin-${feature.id}`}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className={`${feature.color} p-3 rounded-lg`}>
+                          <IconComponent className="h-6 w-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg mb-1">{feature.title}</h3>
+                          <p className="text-muted-foreground text-sm">{feature.description}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Ringkasan Sistem</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-primary" data-testid="text-total-members">0</p>
+                    <p className="text-sm text-muted-foreground">Total Member</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-primary" data-testid="text-active-vouchers">0</p>
+                    <p className="text-sm text-muted-foreground">Voucher Aktif</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
