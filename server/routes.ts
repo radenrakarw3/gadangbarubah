@@ -311,6 +311,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update voucher endpoint
+  app.put("/api/admin/vouchers/:id", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertVoucherSchema.parse(req.body);
+      
+      // Convert string dates to Date objects for storage
+      const voucherData = {
+        ...validatedData,
+        validFrom: new Date(validatedData.validFrom),
+        validUntil: new Date(validatedData.validUntil),
+      } as any;
+      
+      const updatedVoucher = await storage.updateVoucher(id, voucherData);
+      res.json({
+        success: true,
+        message: "Voucher berhasil diperbarui!",
+        data: updatedVoucher
+      });
+    } catch (error: any) {
+      console.error('Update voucher error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.errors ? "Data tidak valid" : error.message || "Gagal memperbarui voucher" 
+      });
+    }
+  });
+
+  // Delete voucher endpoint
+  app.delete("/api/admin/vouchers/:id", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      await storage.deleteVoucher(id);
+      res.json({
+        success: true,
+        message: "Voucher berhasil dihapus!"
+      });
+    } catch (error: any) {
+      console.error('Delete voucher error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.message || "Gagal menghapus voucher" 
+      });
+    }
+  });
+
   app.get("/api/admin/promos", memberEndpointSecurity, async (req, res) => {
     try {
       const promos = await storage.getPromos();

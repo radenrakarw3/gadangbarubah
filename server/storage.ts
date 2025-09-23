@@ -33,6 +33,8 @@ export interface IStorage {
   getVouchers(): Promise<Voucher[]>;
   getActiveVouchers(): Promise<Voucher[]>;
   getVoucher(id: string): Promise<Voucher | undefined>;
+  updateVoucher(id: string, voucher: Partial<InsertVoucher>): Promise<Voucher>;
+  deleteVoucher(id: string): Promise<void>;
   
   // Promo methods (Admin)
   createPromo(promo: InsertPromo, createdBy: string): Promise<Promo>;
@@ -176,6 +178,37 @@ export class DatabaseStorage implements IStorage {
   async getVoucher(id: string): Promise<Voucher | undefined> {
     const [voucher] = await db.select().from(vouchers).where(eq(vouchers.id, id));
     return voucher || undefined;
+  }
+
+  async updateVoucher(id: string, voucherData: Partial<InsertVoucher>): Promise<Voucher> {
+    const [updatedVoucher] = await db
+      .update(vouchers)
+      .set(voucherData)
+      .where(eq(vouchers.id, id))
+      .returning();
+      
+    if (!updatedVoucher) {
+      throw new Error('Voucher tidak ditemukan');
+    }
+    
+    return updatedVoucher;
+  }
+
+  async deleteVoucher(id: string): Promise<void> {
+    // First check if voucher exists
+    const voucher = await this.getVoucher(id);
+    if (!voucher) {
+      throw new Error('Voucher tidak ditemukan');
+    }
+
+    // Check if voucher has any claims before deleting
+    const claims = await db.select().from(voucherClaims).where(eq(voucherClaims.voucherId, id));
+    if (claims.length > 0) {
+      throw new Error('Tidak dapat menghapus voucher yang sudah diklaim oleh member');
+    }
+
+    // Delete the voucher
+    await db.delete(vouchers).where(eq(vouchers.id, id));
   }
 
   // Promo methods (Admin)

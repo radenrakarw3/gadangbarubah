@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { ArrowLeft, Plus, Gift, Edit, Trash2, Loader2 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
@@ -31,6 +32,9 @@ type VoucherFormData = z.infer<typeof voucherFormSchema>;
 export default function AdminVouchers() {
   const [, navigate] = useLocation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingVoucher, setEditingVoucher] = useState<any>(null);
+  const [deleteVoucherId, setDeleteVoucherId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<VoucherFormData>({
@@ -39,6 +43,17 @@ export default function AdminVouchers() {
       title: '',
       description: '',
       pointsCost: 100, // Start with a valid number instead of 0
+      validFrom: '',
+      validUntil: '',
+    },
+  });
+
+  const editForm = useForm<VoucherFormData>({
+    resolver: zodResolver(voucherFormSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      pointsCost: 100,
       validFrom: '',
       validUntil: '',
     },
@@ -94,8 +109,112 @@ export default function AdminVouchers() {
     },
   });
 
+  // Update voucher mutation
+  const updateVoucherMutation = useMutation({
+    mutationFn: async (data: VoucherFormData & { id: string }) => {
+      const response = await fetch(`/api/admin/vouchers/${data.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          pointsCost: data.pointsCost,
+          validFrom: data.validFrom,
+          validUntil: data.validUntil,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update voucher');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Voucher berhasil diperbarui!",
+        description: "Perubahan voucher telah disimpan.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/vouchers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/vouchers/active'] });
+      setIsEditDialogOpen(false);
+      setEditingVoucher(null);
+      editForm.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal memperbarui voucher",
+        description: error.message || "Terjadi kesalahan saat memperbarui voucher",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete voucher mutation
+  const deleteVoucherMutation = useMutation({
+    mutationFn: async (voucherId: string) => {
+      const response = await fetch(`/api/admin/vouchers/${voucherId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete voucher');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Voucher berhasil dihapus!",
+        description: "Voucher telah dihapus dari sistem.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/vouchers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/vouchers/active'] });
+      setDeleteVoucherId(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menghapus voucher",
+        description: error.message || "Terjadi kesalahan saat menghapus voucher",
+        variant: "destructive",
+      });
+    },
+  });
+
   const onSubmit = (data: VoucherFormData) => {
     createVoucherMutation.mutate(data);
+  };
+
+  const onEditSubmit = (data: VoucherFormData) => {
+    if (editingVoucher) {
+      updateVoucherMutation.mutate({ ...data, id: editingVoucher.id });
+    }
+  };
+
+  const handleEditVoucher = (voucher: any) => {
+    setEditingVoucher(voucher);
+    // Format dates for input fields
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    };
+    
+    editForm.reset({
+      title: voucher.title,
+      description: voucher.description,
+      pointsCost: voucher.pointsCost,
+      validFrom: formatDate(voucher.validFrom),
+      validUntil: formatDate(voucher.validUntil),
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteVoucher = (voucherId: string) => {
+    setDeleteVoucherId(voucherId);
+  };
+
+  const confirmDeleteVoucher = () => {
+    if (deleteVoucherId) {
+      deleteVoucherMutation.mutate(deleteVoucherId);
+    }
   };
 
   return (
@@ -266,6 +385,167 @@ export default function AdminVouchers() {
             </div>
           </div>
 
+          {/* Edit Voucher Dialog */}
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Edit Voucher</DialogTitle>
+              </DialogHeader>
+              
+              <Form {...editForm}>
+                <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+                  <FormField
+                    control={editForm.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Judul Voucher</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Contoh: Diskon 20% Menu Utama" 
+                            {...field} 
+                            data-testid="input-edit-voucher-title"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Deskripsi</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Deskripsi voucher..."
+                            {...field}
+                            data-testid="input-edit-voucher-description"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="pointsCost"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Points yang Diperlukan</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            placeholder="500"
+                            value={field.value || ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value === '' ? 100 : parseInt(value) || 100);
+                            }}
+                            data-testid="input-edit-voucher-points"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="validFrom"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Berlaku Mulai</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field}
+                            data-testid="input-edit-voucher-from-date"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="validUntil"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Berlaku Hingga</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field}
+                            data-testid="input-edit-voucher-until-date"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="flex gap-2 pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => {
+                        setIsEditDialogOpen(false);
+                        setEditingVoucher(null);
+                        editForm.reset();
+                      }}
+                      className="flex-1"
+                      data-testid="button-cancel-edit-voucher"
+                    >
+                      Batal
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      disabled={updateVoucherMutation.isPending}
+                      className="flex-1"
+                      data-testid="button-update-voucher"
+                    >
+                      {updateVoucherMutation.isPending && (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      )}
+                      {updateVoucherMutation.isPending ? 'Memperbarui...' : 'Perbarui Voucher'}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+
+          {/* Delete Confirmation Dialog */}
+          <AlertDialog open={!!deleteVoucherId} onOpenChange={() => setDeleteVoucherId(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Hapus Voucher</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Apakah Anda yakin ingin menghapus voucher ini? Tindakan ini tidak dapat dibatalkan dan akan menghapus voucher beserta semua data yang terkait.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel data-testid="button-cancel-delete">Batal</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={confirmDeleteVoucher}
+                  disabled={deleteVoucherMutation.isPending}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  data-testid="button-confirm-delete"
+                >
+                  {deleteVoucherMutation.isPending && (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  )}
+                  {deleteVoucherMutation.isPending ? 'Menghapus...' : 'Hapus'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
           {/* Main Content */}
           <div className="p-4 space-y-6">
             {isLoading ? (
@@ -315,7 +595,12 @@ export default function AdminVouchers() {
                       </div>
                       
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" data-testid={`button-edit-voucher-${voucher.id}`}>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEditVoucher(voucher)}
+                          data-testid={`button-edit-voucher-${voucher.id}`}
+                        >
                           <Edit className="h-4 w-4 mr-1" />
                           Edit
                         </Button>
@@ -323,6 +608,7 @@ export default function AdminVouchers() {
                           variant="outline" 
                           size="sm" 
                           className="text-destructive hover:text-destructive"
+                          onClick={() => handleDeleteVoucher(voucher.id)}
                           data-testid={`button-delete-voucher-${voucher.id}`}
                         >
                           <Trash2 className="h-4 w-4 mr-1" />
