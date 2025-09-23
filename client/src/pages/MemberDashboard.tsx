@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, User, Ticket, Gift, Phone } from 'lucide-react';
+import { ArrowLeft, User, Ticket, Gift, Phone, Loader2 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import { pageSEOConfigs } from '@/lib/seo';
@@ -14,142 +15,198 @@ export default function MemberDashboard() {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<TabType>('profile');
   
-  // Mock data for now - will be replaced with actual data from API
-  const memberData = {
-    id: '123',
-    namaLengkap: 'John Doe',
-    noWhatsApp: '081234567890',
-    totalPoints: 1500
-  };
-
-  const activeVouchers = [
-    {
-      id: '1',
-      title: 'Diskon 20% Menu Utama',
-      description: 'Dapatkan diskon 20% untuk semua menu utama Gadang Barubah',
-      pointsCost: 500,
-      validUntil: new Date('2025-01-31')
+  // For demo purposes, using a hardcoded member ID - in real app this would come from auth context
+  const memberId = '123e4567-e89b-12d3-a456-426614174000';
+  
+  // Fetch member profile data
+  const { data: memberProfile, isLoading: profileLoading, error: profileError } = useQuery({
+    queryKey: ['/api/members', memberId, 'profile'],
+    queryFn: async () => {
+      const response = await fetch(`/api/members/${memberId}/profile`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile');
+      }
+      const result = await response.json();
+      return result.data;
     },
-    {
-      id: '2',
-      title: 'Free Dessert',
-      description: 'Gratis dessert pilihan untuk pembelian minimal Rp 100.000',
-      pointsCost: 300,
-      validUntil: new Date('2025-02-15')
-    }
-  ];
-
-  const activePromos = [
-    {
-      id: '1',
-      title: 'Promo Akhir Tahun',
-      description: 'Nikmati promo spesial akhir tahun dengan diskon hingga 30% untuk paket keluarga',
-      validFrom: new Date('2024-12-01'),
-      validUntil: new Date('2025-01-15')
+    retry: 1,
+  });
+  
+  // Fetch active vouchers
+  const { data: activeVouchers, isLoading: vouchersLoading } = useQuery({
+    queryKey: ['/api/vouchers/active'],
+    queryFn: async () => {
+      const response = await fetch('/api/vouchers/active');
+      if (!response.ok) {
+        throw new Error('Failed to fetch vouchers');
+      }
+      const result = await response.json();
+      return result.data;
     },
-    {
-      id: '2',
-      title: 'Buka Puasa Bersama',
-      description: 'Paket buka puasa keluarga mulai dari Rp 150.000 untuk 4 orang',
-      validFrom: new Date('2025-03-01'),
-      validUntil: new Date('2025-04-30')
+    retry: 1,
+  });
+  
+  // Fetch active promos
+  const { data: activePromos, isLoading: promosLoading } = useQuery({
+    queryKey: ['/api/promos/active'],
+    queryFn: async () => {
+      const response = await fetch('/api/promos/active');
+      if (!response.ok) {
+        throw new Error('Failed to fetch promos');
+      }
+      const result = await response.json();
+      return result.data;
+    },
+    retry: 1,
+  });
+
+  const renderProfileSection = () => {
+    if (profileLoading) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <span className="ml-2 text-muted-foreground">Memuat profil...</span>
+        </div>
+      );
     }
-  ];
 
-  const renderProfileSection = () => (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Profil Saya
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Nama Lengkap</p>
-            <p className="text-lg font-medium">{memberData.namaLengkap}</p>
-          </div>
-          
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Nomor WhatsApp</p>
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              <p className="text-lg">{memberData.noWhatsApp}</p>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Total Points</p>
-            <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-4 border border-primary/20">
-              <p className="text-3xl font-bold text-primary">{memberData.totalPoints.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Points tersedia</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+    if (profileError || !memberProfile) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">Gagal memuat data profil</p>
+        </div>
+      );
+    }
 
-  const renderVouchersSection = () => (
-    <div className="space-y-4">
-      <div className="text-center mb-4">
-        <h2 className="text-lg font-semibold mb-2">Voucher Tersedia</h2>
-        <p className="text-sm text-muted-foreground">Tukarkan points Anda dengan voucher menarik</p>
-      </div>
-      
-      {activeVouchers.map((voucher) => (
-        <Card key={voucher.id}>
-          <CardContent className="p-4">
-            <div className="flex justify-between items-start mb-3">
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-1">{voucher.title}</h3>
-                <p className="text-sm text-muted-foreground mb-2">{voucher.description}</p>
-                <p className="text-xs text-muted-foreground">
-                  Valid hingga: {voucher.validUntil.toLocaleDateString('id-ID')}
-                </p>
+    return (
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Profil Saya
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Nama Lengkap</p>
+              <p className="text-lg font-medium">{memberProfile.namaLengkap}</p>
+            </div>
+            
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Nomor WhatsApp</p>
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <p className="text-lg">{memberProfile.noWhatsApp}</p>
               </div>
             </div>
             
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <Gift className="h-4 w-4 text-primary" />
-                <span className="font-semibold text-primary">{voucher.pointsCost} Points</span>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Total Points</p>
+              <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-4 border border-primary/20">
+                <p className="text-3xl font-bold text-primary">{memberProfile.totalPoints.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">Points tersedia</p>
               </div>
-              <Button 
-                size="sm" 
-                disabled={memberData.totalPoints < voucher.pointsCost}
-                data-testid={`button-claim-voucher-${voucher.id}`}
-              >
-                {memberData.totalPoints >= voucher.pointsCost ? 'Claim' : 'Points Kurang'}
-              </Button>
             </div>
           </CardContent>
         </Card>
-      ))}
-    </div>
-  );
-
-  const renderPromoSection = () => (
-    <div className="space-y-4">
-      <div className="text-center mb-4">
-        <h2 className="text-lg font-semibold mb-2">Promo Terbaru</h2>
-        <p className="text-sm text-muted-foreground">Jangan lewatkan promo menarik dari Gadang Barubah</p>
       </div>
-      
-      {activePromos.map((promo) => (
-        <Card key={promo.id}>
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-lg mb-2">{promo.title}</h3>
-            <p className="text-sm text-muted-foreground mb-3">{promo.description}</p>
-            <p className="text-xs text-muted-foreground">
-              Periode: {promo.validFrom.toLocaleDateString('id-ID')} - {promo.validUntil.toLocaleDateString('id-ID')}
-            </p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
+    );
+  };
+
+  const renderVouchersSection = () => {
+    if (vouchersLoading) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <span className="ml-2 text-muted-foreground">Memuat voucher...</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="text-center mb-4">
+          <h2 className="text-lg font-semibold mb-2">Voucher Tersedia</h2>
+          <p className="text-sm text-muted-foreground">Tukarkan points Anda dengan voucher menarik</p>
+        </div>
+        
+        {activeVouchers && activeVouchers.length > 0 ? (
+          activeVouchers.map((voucher: any) => (
+            <Card key={voucher.id}>
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-1">{voucher.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{voucher.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Valid hingga: {new Date(voucher.validUntil).toLocaleDateString('id-ID')}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Gift className="h-4 w-4 text-primary" />
+                    <span className="font-semibold text-primary">{voucher.pointsCost} Points</span>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    disabled={!memberProfile || memberProfile.totalPoints < voucher.pointsCost}
+                    data-testid={`button-claim-voucher-${voucher.id}`}
+                  >
+                    {memberProfile && memberProfile.totalPoints >= voucher.pointsCost ? 'Claim' : 'Points Kurang'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">Belum ada voucher tersedia</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderPromoSection = () => {
+    if (promosLoading) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <span className="ml-2 text-muted-foreground">Memuat promo...</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="text-center mb-4">
+          <h2 className="text-lg font-semibold mb-2">Promo Terbaru</h2>
+          <p className="text-sm text-muted-foreground">Jangan lewatkan promo menarik dari Gadang Barubah</p>
+        </div>
+        
+        {activePromos && activePromos.length > 0 ? (
+          activePromos.map((promo: any) => (
+            <Card key={promo.id}>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-lg mb-2">{promo.title}</h3>
+                <p className="text-sm text-muted-foreground mb-3">{promo.description}</p>
+                <p className="text-xs text-muted-foreground">
+                  Periode: {new Date(promo.validFrom).toLocaleDateString('id-ID')} - {new Date(promo.validUntil).toLocaleDateString('id-ID')}
+                </p>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">Belum ada promo tersedia</p>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderContent = () => {
     switch (activeTab) {
