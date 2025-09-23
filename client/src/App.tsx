@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
 import { initializeAnalytics, trackPageView } from "@/lib/analytics";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PromoPopup from "@/components/PromoPopup";
 import WelcomePage from "@/components/WelcomePage";
 import UniPage from "@/components/UniPage";
@@ -22,7 +22,67 @@ import AdminPromos from "@/pages/AdminPromos";
 import AdminMembers from "@/pages/AdminMembers";
 import AdminBills from "@/pages/AdminBills";
 import KasirDashboard from "@/pages/KasirDashboard";
+import LoginAdmin from "@/components/LoginAdmin";
+import LoginKasir from "@/components/LoginKasir";
 import NotFound from "@/pages/not-found";
+
+// Protected Admin Route Component
+function ProtectedAdminRoute() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const adminAuth = localStorage.getItem('adminAuth');
+    setIsAuthenticated(adminAuth === 'true');
+    setIsLoading(false);
+  }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuth');
+    setIsAuthenticated(false);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (!isAuthenticated) {
+    return <LoginAdmin onLogin={handleLogin} />;
+  }
+
+  return <AdminDashboard />;
+}
+
+// Protected Kasir Route Component
+function ProtectedKasirRoute() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const kasirAuth = localStorage.getItem('kasirAuth');
+    setIsAuthenticated(kasirAuth === 'true');
+    setIsLoading(false);
+  }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('kasirAuth');
+    setIsAuthenticated(false);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (!isAuthenticated) {
+    return <LoginKasir onLogin={handleLogin} />;
+  }
+
+  return <KasirDashboard />;
+}
 
 function Router() {
   const [location] = useLocation();
@@ -47,12 +107,12 @@ function Router() {
       <Route path="/member/login" component={MemberLogin} />
       <Route path="/member/register" component={MemberRegister} />
       <Route path="/member/dashboard" component={MemberDashboard} />
-      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin" component={ProtectedAdminRoute} />
       <Route path="/admin/vouchers" component={AdminVouchers} />
       <Route path="/admin/promos" component={AdminPromos} />
       <Route path="/admin/members" component={AdminMembers} />
       <Route path="/admin/bills" component={AdminBills} />
-      <Route path="/kasir" component={KasirDashboard} />
+      <Route path="/kasir" component={ProtectedKasirRoute} />
       <Route component={NotFound} />
     </Switch>
   );
