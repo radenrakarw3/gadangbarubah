@@ -30,7 +30,7 @@ export default function AdminMembers() {
     enabled: true,
   });
 
-  const members = membersData?.data || [];
+  const members: AdminMemberData[] = membersData?.data || [];
 
   // Filter members based on search query
   const filteredMembers = members.filter((member: AdminMemberData) =>
