@@ -1,7 +1,7 @@
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, User } from 'lucide-react';
+import { ChevronRight, User, Download, FileText } from 'lucide-react';
 import Logo from './Logo';
 import SEOHead from './SEOHead';
 import ImageSlideshow from './ImageSlideshow';
@@ -14,6 +14,7 @@ import image6 from '@assets/DSC07152_1758564588952.jpg';
 import image7 from '@assets/DSC07130_1758564588953.jpg';
 import restaurantExterior from '@assets/DSC07220_1758565473982.jpg';
 import restaurantNight from '@assets/DSC05600_1758565473997.jpg';
+import menuPdf from '@assets/Menu Gadang Digital 5 September 2025_1758627992252.pdf';
 import { AnimatedUni } from './AnimatedUni';
 
 export default function WelcomePage() {
@@ -172,6 +173,46 @@ export default function WelcomePage() {
                   <div className="pt-4">
                     <div className="inline-block w-16 h-px bg-primary"></div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Menu Download Section */}
+          <div className="mb-10">
+            <Card className="border-border/50 shadow-sm bg-gradient-to-br from-background to-muted/20">
+              <CardContent className="p-8 sm:p-12 text-center">
+                <div className="max-w-3xl mx-auto space-y-6">
+                  <div className="flex justify-center mb-4">
+                    <div className="p-4 bg-primary/10 rounded-full">
+                      <FileText className="w-8 h-8 text-primary" />
+                    </div>
+                  </div>
+                  <h3 className="text-3xl font-serif font-medium text-foreground mb-6">Download Menu Lengkap</h3>
+                  <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+                    Jelajahi koleksi lengkap hidangan autentik Padang kami. Unduh menu digital untuk melihat 
+                    semua pilihan masakan Minang tradisional dengan harga terbaru.
+                  </p>
+                  <div className="flex justify-center">
+                    <Button
+                      asChild
+                      size="lg"
+                      className="text-base font-medium"
+                      data-testid="button-download-menu"
+                    >
+                      <a 
+                        href={menuPdf} 
+                        download="Menu-Gadang-Barubah-2025.pdf"
+                        data-testid="link-download-menu"
+                      >
+                        <Download className="mr-2 h-5 w-5" />
+                        Download Menu PDF
+                      </a>
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground/80">
+                    File PDF • Update September 2025 • Kompatibel dengan semua perangkat
+                  </p>
                 </div>
               </CardContent>
             </Card>
