@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, date } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, date, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -17,6 +17,60 @@ export const members = pgTable("members", {
   tanggalLahir: date("tanggal_lahir").notNull(),
   kodePos: varchar("kode_pos", { length: 10 }).notNull(),
   pinHash: text("pin_hash").notNull(),
+});
+
+// Member points balance - one record per member
+export const memberPoints = pgTable("member_points", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  memberId: varchar("member_id").notNull().unique().references(() => members.id),
+  totalPoints: integer("total_points").notNull().default(0),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Vouchers that can be created by admin
+export const vouchers = pgTable("vouchers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  pointsCost: integer("points_cost").notNull(),
+  validFrom: timestamp("valid_from").notNull(),
+  validUntil: timestamp("valid_until").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: varchar("created_by").notNull().references(() => users.id), // Admin who created it
+});
+
+// Promos created by admin
+export const promos = pgTable("promos", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  validFrom: timestamp("valid_from").notNull(),
+  validUntil: timestamp("valid_until").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: varchar("created_by").notNull().references(() => users.id), // Admin who created it
+});
+
+// Bills processed by kasir to award points
+export const bills = pgTable("bills", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  memberId: varchar("member_id").notNull().references(() => members.id),
+  totalAmount: integer("total_amount").notNull(), // in rupiah
+  pointsAwarded: integer("points_awarded").notNull(),
+  processedBy: varchar("processed_by").notNull().references(() => users.id), // Kasir who processed it
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Track voucher claims by members
+export const voucherClaims = pgTable("voucher_claims", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  voucherId: varchar("voucher_id").notNull().references(() => vouchers.id),
+  memberId: varchar("member_id").notNull().references(() => members.id),
+  pointsUsed: integer("points_used").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("claimed"), // claimed, redeemed, expired
+  claimedAt: timestamp("claimed_at").defaultNow().notNull(),
+  redeemedAt: timestamp("redeemed_at"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -37,8 +91,43 @@ export const loginMemberSchema = z.object({
   pin: z.string().length(6, "PIN harus 6 digit"),
 });
 
+// Voucher schemas
+export const insertVoucherSchema = createInsertSchema(vouchers).omit({
+  id: true,
+  createdAt: true,
+  createdBy: true,
+});
+
+export const insertPromoSchema = createInsertSchema(promos).omit({
+  id: true,
+  createdAt: true,
+  createdBy: true,
+});
+
+export const insertBillSchema = createInsertSchema(bills).omit({
+  id: true,
+  createdAt: true,
+  processedBy: true,
+  pointsAwarded: true, // Will be calculated from totalAmount
+});
+
+export const claimVoucherSchema = z.object({
+  voucherId: z.string().uuid(),
+});
+
+// Type exports
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertMember = z.infer<typeof insertMemberSchema>;
 export type Member = typeof members.$inferSelect;
 export type LoginMember = z.infer<typeof loginMemberSchema>;
+
+export type MemberPoints = typeof memberPoints.$inferSelect;
+export type InsertVoucher = z.infer<typeof insertVoucherSchema>;
+export type Voucher = typeof vouchers.$inferSelect;
+export type InsertPromo = z.infer<typeof insertPromoSchema>;
+export type Promo = typeof promos.$inferSelect;
+export type InsertBill = z.infer<typeof insertBillSchema>;
+export type Bill = typeof bills.$inferSelect;
+export type VoucherClaim = typeof voucherClaims.$inferSelect;
+export type ClaimVoucherRequest = z.infer<typeof claimVoucherSchema>;
