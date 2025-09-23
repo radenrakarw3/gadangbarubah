@@ -38,6 +38,10 @@ export function AnimatedUni() {
               src={uniMascotImage}
               alt="Uni - Mascot resmi Gadang Barubah Restaurant dengan pakaian tradisional Minangkabau"
               className="w-64 sm:w-80 h-auto mx-auto rounded-lg shadow-lg"
+              loading="lazy"
+              decoding="async"
+              width="320"
+              height="400"
               data-testid="img-uni-mascot"
               onClick={() => setShowSpeechBubble(!showSpeechBubble)}
             />
@@ -64,25 +68,25 @@ export function AnimatedUni() {
           role="note"
           aria-live="polite"
         >
-          <div className="relative bg-white dark:bg-gray-800 border-2 border-[hsl(var(--minang-gold-primary))] border-opacity-30 rounded-2xl p-4 shadow-lg max-w-sm mx-auto lg:mx-0">
+          <div className="relative bg-card border-2 border-[hsl(var(--minang-gold-primary))] border-opacity-30 rounded-2xl p-4 shadow-lg max-w-sm mx-auto lg:mx-0">
             {/* Close Button */}
             <button 
               onClick={() => setShowSpeechBubble(false)}
-              className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="absolute top-2 right-2 p-1 rounded-full hover:bg-muted transition-colors"
               aria-label="Tutup pesan Uni"
               data-testid="button-close-speech-bubble"
             >
-              <X className="w-3 h-3 text-gray-500" />
+              <X className="w-3 h-3 text-muted-foreground" />
             </button>
             
-            <div className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2" data-testid="text-uni-greeting">
+            <div className="text-sm font-medium text-foreground mb-2 flex items-center gap-2" data-testid="text-uni-greeting">
               <MessageCircle className="w-4 h-4 text-[hsl(var(--minang-gold-primary))]" />
               Halo! Saya Uni
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed mb-3" data-testid="text-service-intro">
+            <p className="text-xs text-muted-foreground leading-relaxed mb-3" data-testid="text-service-intro">
               Di <span className="font-semibold text-[hsl(var(--minang-gold-primary))]">"Jelajahi Layanan Kami"</span> kamu bisa menemukan:
             </p>
-            <ul className="text-xs text-gray-600 dark:text-gray-300 space-y-1 mb-3">
+            <ul className="text-xs text-muted-foreground space-y-1 mb-3">
               <li className="flex items-center gap-2" data-testid="service-item-outlet">
                 <MapPin className="w-3 h-3 text-[hsl(var(--minang-gold-primary))]" />
                 Lokasi Outlet
@@ -110,8 +114,8 @@ export function AnimatedUni() {
             </div>
             
             {/* Speech bubble tail - adaptive positioning */}
-            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white dark:border-b-gray-800 lg:hidden"></div>
-            <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-1 w-0 h-0 border-t-8 border-b-8 border-l-8 border-t-transparent border-b-transparent border-l-white dark:border-l-gray-800 hidden lg:block"></div>
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-card lg:hidden"></div>
+            <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-1 w-0 h-0 border-t-8 border-b-8 border-l-8 border-t-transparent border-b-transparent border-l-card hidden lg:block"></div>
           </div>
         </div>
       )}

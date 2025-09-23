@@ -287,8 +287,11 @@ export default function OutletPage() {
                   src={atmosphereImages[currentSlide].src}
                   alt={atmosphereImages[currentSlide].title}
                   className="w-full h-full object-cover transition-all duration-500"
-                  loading="eager"
+                  loading={currentSlide === 0 ? "eager" : "lazy"}
+                  fetchPriority={currentSlide === 0 ? "high" : "low"}
                   decoding="async"
+                  width="768"
+                  height="768"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-8">

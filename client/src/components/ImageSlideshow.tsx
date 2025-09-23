@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface ImageSlideshowProps {
   images: Array<{
@@ -11,35 +11,30 @@ interface ImageSlideshowProps {
 
 export default function ImageSlideshow({ images, interval = 5000 }: ImageSlideshowProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [preloadedImages, setPreloadedImages] = useState<string[]>([]);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([0])); // Start with first image
 
-  // Preload all images for smooth transitions
-  useEffect(() => {
-    const preloadImages = async () => {
-      const promises = images.map((image) => {
-        return new Promise<string>((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => resolve(image.src);
-          img.onerror = reject;
-          img.src = image.src;
-        });
-      });
-      
-      try {
-        const loaded = await Promise.all(promises);
-        setPreloadedImages(loaded);
-      } catch (error) {
-        console.warn('Some images failed to preload:', error);
-        setPreloadedImages(images.map(img => img.src));
-      }
-    };
-
-    preloadImages();
-  }, [images]);
-
-  useEffect(() => {
-    if (preloadedImages.length === 0) return;
+  // Preload adjacent images (prev/next) for smoother transitions
+  const preloadAdjacentImages = useCallback((index: number) => {
+    const prevIndex = index === 0 ? images.length - 1 : index - 1;
+    const nextIndex = index === images.length - 1 ? 0 : index + 1;
     
+    [prevIndex, nextIndex].forEach(idx => {
+      if (!loadedImages.has(idx)) {
+        const img = new Image();
+        img.onload = () => {
+          setLoadedImages(prev => new Set(prev).add(idx));
+        };
+        img.src = images[idx].src;
+      }
+    });
+  }, [images, loadedImages]);
+
+  // Preload adjacent images when current index changes
+  useEffect(() => {
+    preloadAdjacentImages(currentIndex);
+  }, [currentIndex, preloadAdjacentImages]);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => 
         prevIndex === images.length - 1 ? 0 : prevIndex + 1
@@ -47,32 +42,43 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
     }, interval);
 
     return () => clearInterval(timer);
-  }, [images.length, interval, preloadedImages]);
+  }, [images.length, interval]);
 
   return (
     <div className="relative overflow-hidden rounded-lg shadow-lg aspect-square md:aspect-video w-full max-w-lg md:max-w-4xl mx-auto">
-      {images.map((image, index) => (
-        <div
-          key={index}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            index === currentIndex ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <img
-            src={image.src}
-            alt={image.alt}
-            className="w-full h-full object-cover"
-            loading="eager"
-            data-testid={`img-slide-${index}`}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
-          <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-            <p className="text-lg sm:text-xl font-serif font-light text-center">
-              {image.caption}
-            </p>
+      {images.map((image, index) => {
+        const isVisible = index === currentIndex;
+        const shouldLoad = index === 0 || loadedImages.has(index) || isVisible;
+        
+        return (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              isVisible ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            {shouldLoad && (
+              <img
+                src={image.src}
+                alt={image.alt}
+                className="w-full h-full object-cover"
+                loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "low"}
+                decoding={index === 0 ? "sync" : "async"}
+                width="960"
+                height="640"
+                data-testid={`img-slide-${index}`}
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+              <p className="text-lg sm:text-xl font-serif font-light text-center">
+                {image.caption}
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
       
       {/* Slide indicators */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">

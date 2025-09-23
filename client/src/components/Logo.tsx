@@ -8,6 +8,10 @@ export default function Logo() {
           src={logoImage}
           alt="Logo Gadang Barubah - Rumah Makan Padang Cikarang"
           className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain animate-pulse"
+          loading="eager"
+          fetchPriority="high"
+          width="192"
+          height="192"
           data-testid="logo-image"
           style={{
             filter: 'drop-shadow(0 0 20px rgba(255, 165, 0, 0.3))',

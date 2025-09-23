@@ -124,6 +124,10 @@ export default function WelcomePage() {
                     src={restaurantExterior} 
                     alt="Eksterior mewah rumah makan Padang Gadang Barubah Indonesia (gadangbarubahindonesia.id)" 
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    width="640"
+                    height="480"
                     data-testid="img-exterior"
                   />
                 </div>
@@ -152,6 +156,10 @@ export default function WelcomePage() {
                     src={restaurantNight} 
                     alt="Suasana malam hangat di rumah makan Padang Gadang Barubah dengan pencahayaan ambient" 
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    width="640"
+                    height="480"
                     data-testid="img-night"
                   />
                 </div>
@@ -243,6 +251,9 @@ export default function WelcomePage() {
                         alt="Nasi Tumpeng Gadang Barubah - paket lengkap untuk 10-15 porsi dengan lauk tradisional Minang" 
                         className="w-full h-full object-cover"
                         loading="lazy"
+                        decoding="async"
+                        width="128"
+                        height="128"
                         data-testid="img-nasi-tumpeng"
                       />
                     </div>
@@ -300,6 +311,9 @@ export default function WelcomePage() {
                         alt="Saji Gadang Menu Nasi Box - berbagai pilihan menu praktis dengan harga mulai 40-46 ribu" 
                         className="w-full h-full object-cover"
                         loading="lazy"
+                        decoding="async"
+                        width="128"
+                        height="128"
                         data-testid="img-nasi-box"
                       />
                     </div>
@@ -357,6 +371,9 @@ export default function WelcomePage() {
                         alt="Rendang Kiloan Gadang Barubah - rendang autentik Padang dalam kemasan praktis" 
                         className="w-full h-full object-cover"
                         loading="lazy"
+                        decoding="async"
+                        width="128"
+                        height="128"
                         data-testid="img-rendang-kiloan"
                       />
                     </div>
