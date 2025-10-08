@@ -59,79 +59,83 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
   };
 
   return (
-    <div className="relative overflow-hidden rounded-lg shadow-lg aspect-square md:aspect-video w-full max-w-lg md:max-w-4xl mx-auto">
-      {images.map((image, index) => {
-        const isVisible = index === currentIndex;
-        const shouldLoad = index === 0 || loadedImages.has(index) || isVisible;
-        
-        return (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              isVisible ? 'opacity-100' : 'opacity-0'
-            }`}
+    <div className="relative w-full mx-auto">
+      <div className="relative overflow-hidden rounded-lg shadow-lg bg-black/5">
+        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}> {/* 16:9 aspect ratio */}
+          {images.map((image, index) => {
+            const isVisible = index === currentIndex;
+            const shouldLoad = index === 0 || loadedImages.has(index) || isVisible;
+            
+            return (
+              <div
+                key={index}
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                  isVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                {shouldLoad && (
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    className="absolute inset-0 w-full h-full object-contain"
+                    loading={index === 0 ? "eager" : "lazy"}
+                    fetchPriority={index === 0 ? "high" : "low"}
+                    decoding={index === 0 ? "sync" : "async"}
+                    width="960"
+                    height="640"
+                    data-testid={`img-slide-${index}`}
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white pointer-events-none">
+                  <p className="text-base md:text-lg lg:text-xl font-serif font-light text-center">
+                    {image.caption}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+          
+          {/* Navigation Buttons */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={goToPrevious}
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-10"
+            data-testid="button-prev-slide"
+            aria-label="Previous slide"
           >
-            {shouldLoad && (
-              <img
-                src={image.src}
-                alt={image.alt}
-                className="w-full h-full object-cover"
-                loading={index === 0 ? "eager" : "lazy"}
-                fetchPriority={index === 0 ? "high" : "low"}
-                decoding={index === 0 ? "sync" : "async"}
-                width="960"
-                height="640"
-                data-testid={`img-slide-${index}`}
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
-            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-              <p className="text-lg sm:text-xl font-serif font-light text-center">
-                {image.caption}
-              </p>
-            </div>
-          </div>
-        );
-      })}
-      
-      {/* Navigation Buttons */}
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={goToPrevious}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-10"
-        data-testid="button-prev-slide"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="h-5 w-5" />
-      </Button>
-      
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={goToNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-10"
-        data-testid="button-next-slide"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="h-5 w-5" />
-      </Button>
+            <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={goToNext}
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-10"
+            data-testid="button-next-slide"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-4 w-4 md:h-5 md:w-5" />
+          </Button>
 
-      {/* Slide indicators */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === currentIndex 
-                ? 'bg-white/90 w-8' 
-                : 'bg-white/50 hover:bg-white/70'
-            }`}
-            data-testid={`button-slide-${index}`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+          {/* Slide indicators */}
+          <div className="absolute bottom-2 md:bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentIndex 
+                    ? 'bg-white/90 w-8' 
+                    : 'bg-white/50 hover:bg-white/70'
+                }`}
+                data-testid={`button-slide-${index}`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
