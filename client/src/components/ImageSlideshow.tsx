@@ -95,29 +95,6 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
               </div>
             );
           })}
-          
-          {/* Navigation Buttons */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={goToPrevious}
-            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-10"
-            data-testid="button-prev-slide"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={goToNext}
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-10"
-            data-testid="button-next-slide"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="h-4 w-4 md:h-5 md:w-5" />
-          </Button>
 
           {/* Slide indicators */}
           <div className="absolute bottom-2 md:bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
@@ -136,6 +113,29 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
             ))}
           </div>
         </div>
+        
+        {/* Navigation Buttons - positioned relative to slideshow container */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={goToPrevious}
+          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-20"
+          data-testid="button-prev-slide"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
+        </Button>
+        
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={goToNext}
+          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-20"
+          data-testid="button-next-slide"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="h-4 w-4 md:h-5 md:w-5" />
+        </Button>
       </div>
     </div>
   );
