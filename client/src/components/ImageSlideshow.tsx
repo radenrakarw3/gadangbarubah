@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ImageSlideshowProps {
   images: Array<{
@@ -44,6 +46,18 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
     return () => clearInterval(timer);
   }, [images.length, interval]);
 
+  const goToPrevious = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
   return (
     <div className="relative overflow-hidden rounded-lg shadow-lg aspect-square md:aspect-video w-full max-w-lg md:max-w-4xl mx-auto">
       {images.map((image, index) => {
@@ -80,6 +94,29 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
         );
       })}
       
+      {/* Navigation Buttons */}
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={goToPrevious}
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-10"
+        data-testid="button-prev-slide"
+        aria-label="Previous slide"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </Button>
+      
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={goToNext}
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-10"
+        data-testid="button-next-slide"
+        aria-label="Next slide"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </Button>
+
       {/* Slide indicators */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
         {images.map((_, index) => (
