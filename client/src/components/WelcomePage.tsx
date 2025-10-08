@@ -2,7 +2,7 @@ import { useLocation } from 'wouter';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, User, Download, FileText, UtensilsCrossed, ShoppingBag, Package } from 'lucide-react';
+import { ChevronRight, User, Download, FileText, UtensilsCrossed, ShoppingBag, Package, Eye } from 'lucide-react';
 import Logo from './Logo';
 import SEOHead from './SEOHead';
 import ImageSlideshow from './ImageSlideshow';
@@ -246,15 +246,16 @@ export default function WelcomePage() {
                       asChild
                       size="lg"
                       className="text-base font-medium"
-                      data-testid="button-download-menu"
+                      data-testid="button-view-menu"
                     >
                       <a 
-                        href={menuPdf} 
-                        download="Menu-Gadang-Barubah-2025.pdf"
-                        data-testid="link-download-menu"
+                        href={menuPdf}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-testid="link-view-menu"
                       >
-                        <Download className="mr-2 h-5 w-5" />
-                        Download Menu PDF
+                        <Eye className="mr-2 h-5 w-5" />
+                        Lihat Menu
                       </a>
                     </Button>
                   </div>
