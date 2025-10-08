@@ -130,7 +130,7 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
           variant="outline"
           size="icon"
           onClick={goToNext}
-          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-20"
+          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-20 ml-[20px] mr-[20px] mt-[0px] mb-[0px] pt-[0px] pb-[0px]"
           data-testid="button-next-slide"
           aria-label="Next slide"
         >
