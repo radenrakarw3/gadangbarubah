@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -48,6 +48,8 @@ export default function AdminMembers() {
   const [editingMember, setEditingMember] = useState<AdminMemberData | null>(null);
   const [deleteMemberId, setDeleteMemberId] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
   const { toast } = useToast();
 
   const { data: membersData, isLoading } = useQuery<{ success: boolean; data: AdminMemberData[] }>({
@@ -285,6 +287,25 @@ export default function AdminMembers() {
     member.kodePos.includes(searchQuery)
   );
 
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredMembers.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedMembers = filteredMembers.slice(startIndex, endIndex);
+
+  // Clamp currentPage when totalPages changes (e.g., after deletion or filtering)
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  // Reset to page 1 when search changes
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -361,7 +382,7 @@ export default function AdminMembers() {
               <Input
                 placeholder="Cari member (nama, WhatsApp, kode pos)..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-9"
                 data-testid="input-search-members"
               />
@@ -448,12 +469,20 @@ export default function AdminMembers() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold">
                     {searchQuery ? `Hasil pencarian: ${filteredMembers.length}` : `${filteredMembers.length} Member`}
+                    {filteredMembers.length > ITEMS_PER_PAGE && (
+                      <span className="text-sm text-muted-foreground ml-2">
+                        (Halaman {currentPage} dari {totalPages})
+                      </span>
+                    )}
                   </h2>
                   {searchQuery && (
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      onClick={() => setSearchQuery('')}
+                      onClick={() => {
+                        setSearchQuery('');
+                        setCurrentPage(1);
+                      }}
                       data-testid="button-clear-search"
                     >
                       Hapus Filter
@@ -461,7 +490,7 @@ export default function AdminMembers() {
                   )}
                 </div>
 
-                {filteredMembers.map((member: AdminMemberData) => (
+                {paginatedMembers.map((member: AdminMemberData) => (
                   <Card key={member.id} className="hover-elevate" data-testid={`card-member-${member.id}`}>
                     <CardContent className="p-4">
                       <div className="flex items-center gap-4">
@@ -539,6 +568,62 @@ export default function AdminMembers() {
                     </CardContent>
                   </Card>
                 ))}
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                    <div className="text-sm text-muted-foreground">
+                      Menampilkan {startIndex + 1}-{Math.min(endIndex, filteredMembers.length)} dari {filteredMembers.length} member
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        data-testid="button-prev-page"
+                      >
+                        Sebelumnya
+                      </Button>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                          .filter(page => {
+                            // Show first page, last page, current page, and pages around current
+                            return page === 1 || 
+                                   page === totalPages || 
+                                   Math.abs(page - currentPage) <= 1;
+                          })
+                          .map((page, index, arr) => {
+                            // Add ellipsis if there's a gap
+                            const showEllipsisBefore = index > 0 && page - arr[index - 1] > 1;
+                            return (
+                              <div key={page} className="flex items-center gap-1">
+                                {showEllipsisBefore && <span className="px-2 text-muted-foreground">...</span>}
+                                <Button
+                                  variant={currentPage === page ? "default" : "outline"}
+                                  size="sm"
+                                  onClick={() => setCurrentPage(page)}
+                                  className="min-w-9"
+                                  data-testid={`button-page-${page}`}
+                                >
+                                  {page}
+                                </Button>
+                              </div>
+                            );
+                          })}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        data-testid="button-next-page"
+                      >
+                        Selanjutnya
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
