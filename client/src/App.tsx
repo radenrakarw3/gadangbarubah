@@ -20,6 +20,7 @@ import AdminVouchers from "@/pages/AdminVouchers";
 import AdminPromos from "@/pages/AdminPromos";
 import AdminMembers from "@/pages/AdminMembers";
 import AdminBills from "@/pages/AdminBills";
+import AdminCampaigns from "@/pages/AdminCampaigns";
 import KasirDashboard from "@/pages/KasirDashboard";
 import LoginAdmin from "@/components/LoginAdmin";
 import LoginKasir from "@/components/LoginKasir";
@@ -105,6 +106,10 @@ function ProtectedAdminBills() {
   return <ProtectedRoute role="admin" component={AdminBills} loginComponent={LoginAdmin} />;
 }
 
+function ProtectedAdminCampaigns() {
+  return <ProtectedRoute role="admin" component={AdminCampaigns} loginComponent={LoginAdmin} />;
+}
+
 
 function Router() {
   const [location] = useLocation();
@@ -131,6 +136,7 @@ function Router() {
       <Route path="/admin" component={ProtectedAdminRoute} />
       <Route path="/admin/vouchers" component={ProtectedAdminVouchers} />
       <Route path="/admin/promos" component={ProtectedAdminPromos} />
+      <Route path="/admin/campaigns" component={ProtectedAdminCampaigns} />
       <Route path="/admin/members" component={ProtectedAdminMembers} />
       <Route path="/admin/bills" component={ProtectedAdminBills} />
       <Route path="/kasir" component={ProtectedKasirRoute} />

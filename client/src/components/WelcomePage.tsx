@@ -7,6 +7,7 @@ import Logo from './Logo';
 import SEOHead from './SEOHead';
 import AboutSlideshow from './AboutSlideshow';
 import PromotionalPopup from './PromotionalPopup';
+import CampaignPopup from './CampaignPopup';
 import StickyNav from './StickyNav';
 import image1 from '@assets/DSC07140_1758564407964.jpg';
 import image2 from '@assets/DSC02436_1758564588903.jpg';
@@ -709,6 +710,9 @@ export default function WelcomePage() {
         isVisible={showPromoPopup} 
         onClose={handleClosePopup}
       />
+
+      {/* Campaign Popup - Admin controlled */}
+      <CampaignPopup />
     </div>
   );
 }

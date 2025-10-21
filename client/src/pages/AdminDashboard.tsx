@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Plus, Gift, Megaphone, Users, Receipt, LogOut } from 'lucide-react';
+import { ArrowLeft, Plus, Gift, Megaphone, Users, Receipt, LogOut, Monitor } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
@@ -57,6 +57,14 @@ export default function AdminDashboard() {
       icon: Megaphone,
       route: '/admin/promos',
       color: 'bg-green-500',
+    },
+    {
+      id: 'campaigns',
+      title: 'Kelola Popup',
+      description: 'Upload dan kelola popup campaign untuk landing page',
+      icon: Monitor,
+      route: '/admin/campaigns',
+      color: 'bg-pink-500',
     },
     {
       id: 'members',

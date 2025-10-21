@@ -80,6 +80,19 @@ export const voucherClaims = pgTable("voucher_claims", {
   redeemedAt: timestamp("redeemed_at"),
 });
 
+// Popup campaigns for landing page
+export const campaigns = pgTable("campaigns", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  imagePath: text("image_path").notNull(), // Path to uploaded image
+  status: varchar("status", { length: 10 }).notNull().default("inactive"), // 'active' or 'inactive' - only 1 can be active
+  validFrom: timestamp("valid_from").notNull(),
+  validUntil: timestamp("valid_until").notNull(),
+  viewCount: integer("view_count").notNull().default(0), // Statistics: how many times displayed
+  createdBy: varchar("created_by").notNull().references(() => users.id), // Admin who created it
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -133,6 +146,12 @@ export const claimVoucherSchema = z.object({
   voucherId: z.string().uuid(),
 });
 
+export const insertCampaignSchema = z.object({
+  title: z.string().min(1, "Judul campaign harus diisi"),
+  validFrom: z.string().min(1, "Tanggal mulai harus diisi"),
+  validUntil: z.string().min(1, "Tanggal berakhir harus diisi"),
+});
+
 // Type exports
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginUser = z.infer<typeof loginUserSchema>;
@@ -150,3 +169,5 @@ export type InsertBill = z.infer<typeof insertBillSchema>;
 export type Bill = typeof bills.$inferSelect;
 export type VoucherClaim = typeof voucherClaims.$inferSelect;
 export type ClaimVoucherRequest = z.infer<typeof claimVoucherSchema>;
+export type InsertCampaign = z.infer<typeof insertCampaignSchema>;
+export type Campaign = typeof campaigns.$inferSelect;

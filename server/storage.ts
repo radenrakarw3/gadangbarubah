@@ -1,9 +1,9 @@
 import { 
-  users, members, memberPoints, vouchers, promos, bills, voucherClaims,
+  users, members, memberPoints, vouchers, promos, bills, voucherClaims, campaigns,
   type User, type InsertUser, type LoginUser, type Member, type InsertMember,
   type MemberPoints, type Voucher, type InsertVoucher,
   type Promo, type InsertPromo, type Bill, type InsertBill,
-  type VoucherClaim, type ClaimVoucherRequest
+  type VoucherClaim, type ClaimVoucherRequest, type Campaign, type InsertCampaign
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, gte, lte, sql } from "drizzle-orm";
@@ -74,6 +74,14 @@ export interface IStorage {
     voucherClaims: Array<VoucherClaim & { voucherTitle: string }>;
     recentBills: Bill[];
   }>;
+  
+  // Campaign methods (Admin) - Popup for landing page
+  createCampaign(campaign: InsertCampaign, imagePath: string, createdBy: string): Promise<Campaign>;
+  getCampaigns(): Promise<Campaign[]>;
+  getActiveCampaign(): Promise<Campaign | undefined>;
+  updateCampaignStatus(id: string, status: 'active' | 'inactive'): Promise<Campaign>;
+  deleteCampaign(id: string): Promise<void>;
+  incrementCampaignViewCount(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -703,6 +711,82 @@ export class DatabaseStorage implements IStorage {
       voucherClaims: claims as Array<VoucherClaim & { voucherTitle: string }>,
       recentBills: recentBills
     };
+  }
+
+  // Campaign methods - Popup for landing page
+  async createCampaign(campaign: InsertCampaign, imagePath: string, createdBy: string): Promise<Campaign> {
+    const [newCampaign] = await db
+      .insert(campaigns)
+      .values({
+        title: campaign.title,
+        imagePath,
+        validFrom: new Date(campaign.validFrom),
+        validUntil: new Date(campaign.validUntil),
+        status: 'inactive', // Always start as inactive
+        createdBy,
+      })
+      .returning();
+    
+    return newCampaign;
+  }
+
+  async getCampaigns(): Promise<Campaign[]> {
+    const result = await db
+      .select()
+      .from(campaigns)
+      .orderBy(desc(campaigns.createdAt));
+    
+    return result;
+  }
+
+  async getActiveCampaign(): Promise<Campaign | undefined> {
+    const now = new Date();
+    const [campaign] = await db
+      .select()
+      .from(campaigns)
+      .where(
+        and(
+          eq(campaigns.status, 'active'),
+          lte(campaigns.validFrom, now),
+          gte(campaigns.validUntil, now)
+        )
+      )
+      .limit(1);
+    
+    return campaign || undefined;
+  }
+
+  async updateCampaignStatus(id: string, status: 'active' | 'inactive'): Promise<Campaign> {
+    // If setting to active, first set all others to inactive (only 1 active allowed)
+    if (status === 'active') {
+      await db
+        .update(campaigns)
+        .set({ status: 'inactive' })
+        .where(eq(campaigns.status, 'active'));
+    }
+
+    const [updated] = await db
+      .update(campaigns)
+      .set({ status })
+      .where(eq(campaigns.id, id))
+      .returning();
+    
+    if (!updated) {
+      throw new Error('Campaign tidak ditemukan');
+    }
+    
+    return updated;
+  }
+
+  async deleteCampaign(id: string): Promise<void> {
+    await db.delete(campaigns).where(eq(campaigns.id, id));
+  }
+
+  async incrementCampaignViewCount(id: string): Promise<void> {
+    await db
+      .update(campaigns)
+      .set({ viewCount: sql`${campaigns.viewCount} + 1` })
+      .where(eq(campaigns.id, id));
   }
 }
 

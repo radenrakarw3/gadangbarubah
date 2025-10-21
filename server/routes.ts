@@ -3,10 +3,12 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
   insertMemberSchema, loginMemberSchema, loginUserSchema, insertVoucherSchema, 
-  insertPromoSchema, insertBillSchema, claimVoucherSchema 
+  insertPromoSchema, insertBillSchema, claimVoucherSchema, insertCampaignSchema
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { memberEndpointSecurity } from "./security";
+import { upload, validateImageDimensions } from "./upload-middleware";
+import fs from "fs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Rate limiting for member login - prevent brute force attacks
@@ -778,6 +780,172 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ 
         success: false, 
         message: error.message || "Gagal menebus voucher" 
+      });
+    }
+  });
+
+  // Campaign Routes - Popup untuk Landing Page
+  
+  // Create campaign with image upload (Admin only)
+  app.post("/api/admin/campaigns", memberEndpointSecurity, upload.single('image'), async (req, res) => {
+    try {
+      if (!req.session.userId || req.session.role !== 'admin') {
+        if (req.file) fs.unlinkSync(req.file.path);
+        return res.status(403).json({ 
+          success: false, 
+          message: "Hanya admin yang dapat membuat campaign" 
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "File gambar harus diupload" 
+        });
+      }
+
+      // Validate image dimensions (600x600px)
+      const validation = validateImageDimensions(req.file.path);
+      if (!validation.valid) {
+        return res.status(400).json({ 
+          success: false, 
+          message: validation.error 
+        });
+      }
+
+      const validatedData = insertCampaignSchema.parse(req.body);
+      const imagePath = `/uploads/campaigns/${req.file.filename}`;
+      
+      const campaign = await storage.createCampaign(validatedData, imagePath, req.session.userId);
+      
+      res.json({ 
+        success: true, 
+        message: "Campaign berhasil dibuat",
+        campaign 
+      });
+    } catch (error: any) {
+      if (req.file) fs.unlinkSync(req.file.path);
+      console.error('Create campaign error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.errors ? "Data tidak valid" : error.message || "Gagal membuat campaign" 
+      });
+    }
+  });
+
+  // Get all campaigns (Admin only)
+  app.get("/api/admin/campaigns", memberEndpointSecurity, async (req, res) => {
+    try {
+      if (!req.session.userId || req.session.role !== 'admin') {
+        return res.status(403).json({ 
+          success: false, 
+          message: "Hanya admin yang dapat melihat campaigns" 
+        });
+      }
+
+      const campaigns = await storage.getCampaigns();
+      res.json({ success: true, campaigns });
+    } catch (error: any) {
+      console.error('Get campaigns error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: "Gagal mengambil data campaigns" 
+      });
+    }
+  });
+
+  // Get active campaign (Public - for landing page)
+  app.get("/api/campaigns/active", async (req, res) => {
+    try {
+      const campaign = await storage.getActiveCampaign();
+      
+      if (campaign) {
+        // Increment view count
+        await storage.incrementCampaignViewCount(campaign.id);
+      }
+      
+      res.json({ 
+        success: true, 
+        campaign: campaign || null 
+      });
+    } catch (error: any) {
+      console.error('Get active campaign error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: "Gagal mengambil campaign aktif" 
+      });
+    }
+  });
+
+  // Update campaign status (Admin only)
+  app.patch("/api/admin/campaigns/:id/status", memberEndpointSecurity, async (req, res) => {
+    try {
+      if (!req.session.userId || req.session.role !== 'admin') {
+        return res.status(403).json({ 
+          success: false, 
+          message: "Hanya admin yang dapat mengubah status campaign" 
+        });
+      }
+
+      const { status } = req.body;
+      if (status !== 'active' && status !== 'inactive') {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Status harus 'active' atau 'inactive'" 
+        });
+      }
+
+      const campaign = await storage.updateCampaignStatus(req.params.id, status);
+      
+      res.json({ 
+        success: true, 
+        message: status === 'active' 
+          ? 'Campaign diaktifkan. Campaign lain otomatis dinonaktifkan.' 
+          : 'Campaign dinonaktifkan',
+        campaign 
+      });
+    } catch (error: any) {
+      console.error('Update campaign status error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.message || "Gagal mengubah status campaign" 
+      });
+    }
+  });
+
+  // Delete campaign (Admin only)
+  app.delete("/api/admin/campaigns/:id", memberEndpointSecurity, async (req, res) => {
+    try {
+      if (!req.session.userId || req.session.role !== 'admin') {
+        return res.status(403).json({ 
+          success: false, 
+          message: "Hanya admin yang dapat menghapus campaign" 
+        });
+      }
+
+      // Get campaign first to delete image file
+      const campaigns = await storage.getCampaigns();
+      const campaign = campaigns.find(c => c.id === req.params.id);
+      
+      if (campaign) {
+        // Delete image file from disk
+        const imagePath = `public${campaign.imagePath}`;
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+
+      await storage.deleteCampaign(req.params.id);
+      
+      res.json({ 
+        success: true, 
+        message: "Campaign berhasil dihapus" 
+      });
+    } catch (error: any) {
+      console.error('Delete campaign error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.message || "Gagal menghapus campaign" 
       });
     }
   });
