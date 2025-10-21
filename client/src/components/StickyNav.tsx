@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import logoImage from '@assets/padang gadang barubah logo_1758561601552.webp';
 
 export default function StickyNav() {
   const [isVisible, setIsVisible] = useState(false);
@@ -45,10 +46,16 @@ export default function StickyNav() {
             {/* Logo/Brand */}
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="text-lg font-serif font-medium text-primary hover:text-primary/80 transition-colors"
+              className="flex items-center hover:opacity-80 transition-opacity"
               data-testid="button-nav-home"
             >
-              Gadang Barubah
+              <img
+                src={logoImage}
+                alt="Logo Gadang Barubah"
+                className="h-10 w-10 object-contain"
+                loading="lazy"
+                data-testid="logo-nav"
+              />
             </button>
 
             {/* Desktop Navigation */}
