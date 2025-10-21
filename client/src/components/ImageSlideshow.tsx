@@ -61,7 +61,7 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
   return (
     <div className="relative w-full mx-auto">
       <div className="relative overflow-hidden rounded-lg shadow-lg bg-black/5">
-        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}> {/* 16:9 aspect ratio */}
+        <div className="relative w-full pb-[75%] sm:pb-[66.67%] md:pb-[56.25%]"> {/* Mobile: 4:3, Tablet: 3:2, Desktop: 16:9 */}
           {images.map((image, index) => {
             const isVisible = index === currentIndex;
             const shouldLoad = index === 0 || loadedImages.has(index) || isVisible;
@@ -119,7 +119,7 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
           variant="outline"
           size="icon"
           onClick={goToPrevious}
-          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-20"
+          className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-20"
           data-testid="button-prev-slide"
           aria-label="Previous slide"
         >
@@ -130,7 +130,7 @@ export default function ImageSlideshow({ images, interval = 5000 }: ImageSlidesh
           variant="outline"
           size="icon"
           onClick={goToNext}
-          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-20 ml-[20px] mr-[20px] mt-[0px] mb-[0px] pt-[0px] pb-[0px]"
+          className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 border-white/30 backdrop-blur-md text-white hover:text-white shadow-xl transition-all duration-300 hover:scale-110 z-20"
           data-testid="button-next-slide"
           aria-label="Next slide"
         >

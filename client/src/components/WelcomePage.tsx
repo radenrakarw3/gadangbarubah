@@ -2,11 +2,13 @@ import { useLocation } from 'wouter';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, User, Download, FileText, UtensilsCrossed, ShoppingBag, Package, Eye } from 'lucide-react';
+import { ChevronRight, User, Download, FileText, UtensilsCrossed, ShoppingBag, Package, Eye, MessageCircle, Gift, Star, Users as UsersIcon } from 'lucide-react';
 import Logo from './Logo';
 import SEOHead from './SEOHead';
 import ImageSlideshow from './ImageSlideshow';
 import PromotionalPopup from './PromotionalPopup';
+import StickyNav from './StickyNav';
+import FloatingWhatsApp from './FloatingWhatsApp';
 import image1 from '@assets/DSC07140_1758564407964.jpg';
 import image2 from '@assets/DSC02436_1758564588903.jpg';
 import image3 from '@assets/DSC02371_1758564588950.jpg';
@@ -106,6 +108,12 @@ export default function WelcomePage() {
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
       <SEOHead pageKey="home" />
       
+      {/* Sticky Navigation */}
+      <StickyNav />
+      
+      {/* Floating WhatsApp Button */}
+      <FloatingWhatsApp />
+      
       {/* Logo at top */}
       <div className="text-center pt-8 pb-4">
         <Logo />
@@ -114,14 +122,92 @@ export default function WelcomePage() {
       {/* Main content */}
       <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Welcome Section */}
+          {/* Hero Section with CTA */}
           <div className="text-center mb-12">
             <div className="mb-8">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-medium text-primary mb-8 tracking-wide">
-                Selamat Datang di Gadang Barubah - Rumah Makan Padang Indonesia
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-medium text-primary mb-6 tracking-wide">
+                Selamat Datang di Gadang Barubah
               </h1>
+              <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Rumah Makan Padang dengan Cita Rasa Autentik Minangkabau
+              </p>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
+              
+              {/* Hero CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+                <Button
+                  asChild
+                  size="lg"
+                  className="w-full sm:w-auto text-base font-medium shadow-md hover:shadow-lg"
+                  data-testid="button-hero-menu"
+                >
+                  <a 
+                    href={menuPdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Eye className="mr-2 h-5 w-5" />
+                    Lihat Menu
+                  </a>
+                </Button>
+                
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto text-base font-medium border-2"
+                  data-testid="button-hero-order"
+                >
+                  <a
+                    href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah!%20Saya%20ingin%20memesan%20makanan."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MessageCircle className="mr-2 h-5 w-5" />
+                    Pesan Sekarang
+                  </a>
+                </Button>
+                
+                <Button
+                  onClick={() => navigate('/member/login')}
+                  size="lg"
+                  variant="ghost"
+                  className="w-full sm:w-auto text-base font-medium border border-border/50"
+                  data-testid="button-hero-member"
+                >
+                  <User className="mr-2 h-5 w-5" />
+                  Daftar Member
+                </Button>
+              </div>
             </div>
+          </div>
+          
+          {/* Stats/Trust Section */}
+          <div className="mb-12">
+            <Card className="border-border/30 shadow-sm bg-gradient-to-br from-background to-muted/10">
+              <CardContent className="p-6 sm:p-8">
+                <div className="grid grid-cols-3 gap-4 sm:gap-8 text-center">
+                  <div>
+                    <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">500+</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">Member Setia</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">50+</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">Menu Masakan</div>
+                  </div>
+                  <div>
+                    <div className="flex justify-center items-center mb-2">
+                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-primary fill-primary" />
+                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-primary fill-primary" />
+                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-primary fill-primary" />
+                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-primary fill-primary" />
+                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-primary fill-primary" />
+                    </div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">Rating Pelanggan</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
           
           {/* Restaurant Images Slideshow */}
@@ -226,8 +312,8 @@ export default function WelcomePage() {
             </Card>
           </div>
           
-          {/* Menu Download Section */}
-          <div className="mb-10">
+          {/* Menu Section */}
+          <div id="menu-section" className="mb-10 scroll-mt-24">
             <Card className="border-border/50 shadow-sm bg-gradient-to-br from-background to-muted/20">
               <CardContent className="p-8 sm:p-12 text-center">
                 <div className="max-w-3xl mx-auto space-y-6">
@@ -236,9 +322,9 @@ export default function WelcomePage() {
                       <FileText className="w-8 h-8 text-primary" />
                     </div>
                   </div>
-                  <h3 className="text-3xl font-serif font-medium text-foreground mb-6">Download Menu Lengkap</h3>
+                  <h3 className="text-3xl font-serif font-medium text-foreground mb-6">Menu Lengkap Kami</h3>
                   <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                    Jelajahi koleksi lengkap hidangan autentik Padang kami. Unduh menu digital untuk melihat 
+                    Jelajahi koleksi lengkap hidangan autentik Padang kami. Lihat menu digital untuk melihat 
                     semua pilihan masakan Minang tradisional dengan harga terbaru.
                   </p>
                   <div className="flex justify-center">
@@ -267,13 +353,13 @@ export default function WelcomePage() {
             </Card>
           </div>
           
-          {/* Featured Menu Section */}
-          <div className="mb-10">
+          {/* Services Section */}
+          <div id="services-section" className="mb-10 scroll-mt-24">
             <div className="text-center mb-8">
-              <h3 className="text-3xl font-serif font-medium text-foreground mb-4">Gadang Barubah Bisa Kirim Buat Kamu</h3>
+              <h3 className="text-3xl font-serif font-medium text-foreground mb-4">Layanan Catering & Takeaway</h3>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-4"></div>
               <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                Pesan sekarang dan nikmati kelezatan masakan Padang favorit langsung di rumah Anda
+                Pesan sekarang dan nikmati kelezatan masakan Padang favorit langsung di lokasi Anda
               </p>
             </div>
             
@@ -460,6 +546,86 @@ export default function WelcomePage() {
             </div>
           </div>
           
+          {/* Membership Benefits Section */}
+          <div id="membership-section" className="mb-10 scroll-mt-24">
+            <div className="text-center mb-8">
+              <h3 className="text-3xl font-serif font-medium text-foreground mb-4">Keuntungan Jadi Member</h3>
+              <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-4"></div>
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                Nikmati berbagai keuntungan eksklusif dan reward points setiap kali Anda makan di Gadang Barubah
+              </p>
+            </div>
+            
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+              {/* Benefit 1 */}
+              <Card className="border-border/30 shadow-sm hover-elevate transition-all duration-300">
+                <CardContent className="p-6 text-center">
+                  <div className="flex justify-center mb-4">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                      <Gift className="w-6 h-6 text-primary" />
+                    </div>
+                  </div>
+                  <h4 className="font-semibold text-foreground mb-2">Poin Rewards</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Dapatkan poin setiap transaksi dan tukar dengan voucher makan gratis
+                  </p>
+                </CardContent>
+              </Card>
+              
+              {/* Benefit 2 */}
+              <Card className="border-border/30 shadow-sm hover-elevate transition-all duration-300">
+                <CardContent className="p-6 text-center">
+                  <div className="flex justify-center mb-4">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                      <Star className="w-6 h-6 text-primary" />
+                    </div>
+                  </div>
+                  <h4 className="font-semibold text-foreground mb-2">Promo Eksklusif</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Akses promo dan diskon khusus member yang tidak tersedia untuk umum
+                  </p>
+                </CardContent>
+              </Card>
+              
+              {/* Benefit 3 */}
+              <Card className="border-border/30 shadow-sm hover-elevate transition-all duration-300">
+                <CardContent className="p-6 text-center">
+                  <div className="flex justify-center mb-4">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                      <UsersIcon className="w-6 h-6 text-primary" />
+                    </div>
+                  </div>
+                  <h4 className="font-semibold text-foreground mb-2">Prioritas Layanan</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Nikmati layanan prioritas dan proses pesanan yang lebih cepat
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button
+                onClick={() => navigate('/member/login')}
+                size="lg"
+                className="w-full sm:w-auto text-base font-medium"
+                data-testid="button-membership-join"
+              >
+                <User className="mr-2 h-5 w-5" />
+                Daftar Jadi Member
+              </Button>
+              
+              <Button
+                onClick={() => navigate('/member/login')}
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto text-base font-medium"
+                data-testid="button-membership-login"
+              >
+                Login Member
+              </Button>
+            </div>
+          </div>
+          
           {/* Animated Uni Mascot with Speech Bubble */}
           <AnimatedUni />
 
@@ -475,23 +641,45 @@ export default function WelcomePage() {
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
             
-            {/* Login Member Button */}
-            <div className="flex justify-center">
-              <Button
-                onClick={() => navigate('/member/login')}
-                variant="outline"
-                size="sm"
-                className="text-sm font-medium border-primary/30 text-primary hover:bg-primary/5"
-                data-testid="button-member-login"
-              >
-                <User className="mr-2 h-4 w-4" />
-                Login Member
-              </Button>
-            </div>
-            
             <p className="text-sm text-muted-foreground/80">
               Temui Uni, asisten virtual kami yang siap membantu
             </p>
+          </div>
+          
+          {/* Contact Section */}
+          <div id="contact-section" className="mt-12 scroll-mt-24">
+            <Card className="border-border/50 shadow-sm bg-gradient-to-br from-background to-muted/20">
+              <CardContent className="p-8 sm:p-12 text-center">
+                <div className="max-w-2xl mx-auto space-y-6">
+                  <h3 className="text-2xl font-serif font-medium text-foreground mb-4">Hubungi Kami</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Ada pertanyaan atau ingin melakukan pemesanan? Hubungi kami sekarang!
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+                    <Button
+                      asChild
+                      size="lg"
+                      className="w-full sm:w-auto text-base font-medium bg-[#25D366] hover:bg-[#20BA5A] text-white"
+                      data-testid="button-contact-whatsapp"
+                    >
+                      <a
+                        href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah!%20Saya%20ingin%20bertanya."
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <MessageCircle className="mr-2 h-5 w-5" />
+                        Chat via WhatsApp
+                      </a>
+                    </Button>
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground mt-4">
+                    WhatsApp: +62 895-0976-6739
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>
