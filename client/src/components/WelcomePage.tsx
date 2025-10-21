@@ -6,7 +6,6 @@ import { ChevronRight, User, Download, FileText, UtensilsCrossed, ShoppingBag, P
 import Logo from './Logo';
 import SEOHead from './SEOHead';
 import AboutSlideshow from './AboutSlideshow';
-import PromotionalPopup from './PromotionalPopup';
 import CampaignPopup from './CampaignPopup';
 import StickyNav from './StickyNav';
 import image1 from '@assets/DSC07140_1758564407964.jpg';
@@ -22,7 +21,6 @@ import menuPdf from '@assets/Menu Gadang Digital 5 September 2025_1758627992252.
 import nasiTumpengImage from '@assets/Nasi Tumpeng_1758628102631.png';
 import nasiBoxImage from '@assets/Nasi Box_1758628102653.jpg';
 import rendangKiloanImage from '@assets/DSC02799_1758628102653.jpg';
-import { AnimatedUni } from './AnimatedUni';
 import { trackContactMethod, trackServiceView } from '@/lib/analytics';
 
 const services = [
@@ -65,8 +63,6 @@ const services = [
 
 export default function WelcomePage() {
   const [, navigate] = useLocation();
-  const [showPromoPopup, setShowPromoPopup] = useState(false);
-  const [hasShownPopup, setHasShownPopup] = useState(false);
 
   const handleServiceClick = (service: typeof services[0]) => {
     // Services that redirect to WhatsApp
@@ -93,40 +89,6 @@ export default function WelcomePage() {
       navigate(service.path);
     }
   };
-
-  // Scroll detection to show popup at middle of page with performance optimization
-  useEffect(() => {
-    if (hasShownPopup) return;
-
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          const windowHeight = window.innerHeight;
-          const documentHeight = document.documentElement.scrollHeight;
-          const scrollPercentage = scrollTop / (documentHeight - windowHeight);
-
-          // Show popup when user scrolls to 50% of the page
-          if (scrollPercentage >= 0.5 && !hasShownPopup) {
-            setShowPromoPopup(true);
-            setHasShownPopup(true);
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasShownPopup]);
-
-  const handleClosePopup = () => {
-    setShowPromoPopup(false);
-  };
-
 
   const slideshowImages = [
     {
@@ -650,9 +612,6 @@ export default function WelcomePage() {
             </div>
           </div>
           
-          {/* Animated Uni Mascot with Speech Bubble */}
-          <AnimatedUni />
-          
           {/* Contact Section */}
           <div id="contact-section" className="mt-12 scroll-mt-24">
             <Card className="border-border/50 shadow-sm bg-gradient-to-br from-background to-muted/20">
@@ -704,12 +663,6 @@ export default function WelcomePage() {
           </div>
         </div>
       </footer>
-
-      {/* Promotional Popup */}
-      <PromotionalPopup 
-        isVisible={showPromoPopup} 
-        onClose={handleClosePopup}
-      />
 
       {/* Campaign Popup - Admin controlled */}
       <CampaignPopup />
