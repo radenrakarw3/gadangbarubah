@@ -71,7 +71,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (result.error) {
         return res.status(401).json({ 
           success: false, 
-          message: result.error 
+          message: result.error,
+          locked: result.locked,
+          lockTimeRemaining: result.lockTimeRemaining,
+          attemptsRemaining: result.attemptsRemaining
         });
       }
 

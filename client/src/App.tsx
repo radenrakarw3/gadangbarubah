@@ -32,9 +32,28 @@ function ProtectedAdminRoute() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const adminAuth = localStorage.getItem('adminAuth');
-    setIsAuthenticated(adminAuth === 'true');
-    setIsLoading(false);
+    // Check session with backend
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/auth/session', {
+          credentials: 'include',
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setIsAuthenticated(data.authenticated && data.user?.role === 'admin');
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Session check failed:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
   }, []);
 
   const handleLogin = () => {
@@ -56,9 +75,28 @@ function ProtectedKasirRoute() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const kasirAuth = localStorage.getItem('kasirAuth');
-    setIsAuthenticated(kasirAuth === 'true');
-    setIsLoading(false);
+    // Check session with backend
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/auth/session', {
+          credentials: 'include',
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setIsAuthenticated(data.authenticated && data.user?.role === 'kasir');
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Session check failed:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
   }, []);
 
   const handleLogin = () => {

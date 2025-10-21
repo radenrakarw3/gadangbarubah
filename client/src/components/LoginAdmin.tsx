@@ -4,39 +4,74 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Shield } from 'lucide-react';
-
-const ADMIN_PIN = '181818';
+import { Shield, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface LoginAdminProps {
   onLogin: () => void;
 }
 
 export default function LoginAdmin({ onLogin }: LoginAdminProps) {
-  const [pin, setPin] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (pin !== ADMIN_PIN) {
-      toast({
-        title: "PIN salah",
-        description: "PIN yang dimasukkan tidak benar",
-        variant: "destructive",
-      });
-      return;
-    }
-    
+    setErrorMessage('');
     setIsLoading(true);
     
-    // Simulate loading
-    setTimeout(() => {
-      localStorage.setItem('adminAuth', 'true');
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          username,
+          password,
+          role: 'admin'
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        
+        // Handle different error types
+        if (error.locked) {
+          const minutes = Math.ceil(error.lockTimeRemaining / 60000);
+          setErrorMessage(`Akun terkunci. Coba lagi dalam ${minutes} menit.`);
+        } else if (error.attemptsRemaining !== undefined) {
+          setErrorMessage(`Login gagal. ${error.attemptsRemaining} percobaan tersisa.`);
+        } else {
+          setErrorMessage(error.message || 'Username atau password salah');
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+      
+      if (data.user.role !== 'admin') {
+        setErrorMessage('Akses ditolak. Akun ini bukan admin.');
+        setIsLoading(false);
+        return;
+      }
+
+      toast({
+        title: "Login berhasil",
+        description: `Selamat datang, ${data.user.username}`,
+      });
+      
       onLogin();
+    } catch (error) {
+      console.error('Login error:', error);
+      setErrorMessage('Terjadi kesalahan. Silakan coba lagi.');
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   return (
@@ -48,28 +83,50 @@ export default function LoginAdmin({ onLogin }: LoginAdminProps) {
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>
-            Masukkan PIN admin untuk mengakses dashboard
+            Masukkan username dan password untuk mengakses dashboard admin
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {errorMessage && (
+              <Alert variant="destructive" data-testid="alert-login-error">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            )}
+            
             <div className="space-y-2">
-              <Label htmlFor="pin">PIN Admin</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="pin"
-                type="password"
-                placeholder="Masukkan PIN 6 digit"
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                maxLength={6}
-                className="text-center text-lg tracking-widest"
-                data-testid="input-admin-pin"
+                id="username"
+                type="text"
+                placeholder="Masukkan username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+                data-testid="input-admin-username"
+                required
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Masukkan password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                data-testid="input-admin-password"
+                required
+              />
+            </div>
+
             <Button 
               type="submit" 
               className="w-full" 
-              disabled={pin.length !== 6 || isLoading}
+              disabled={!username || !password || isLoading}
               data-testid="button-admin-login"
             >
               {isLoading ? 'Memverifikasi...' : 'Masuk ke Admin'}

@@ -102,7 +102,13 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async loginUser(username: string, password: string): Promise<{ user: Omit<User, 'password'>; error?: string } | null> {
+  async loginUser(username: string, password: string): Promise<{ 
+    user: Omit<User, 'password'>; 
+    error?: string;
+    locked?: boolean;
+    lockTimeRemaining?: number;
+    attemptsRemaining?: number;
+  } | null> {
     const [user] = await db
       .select()
       .from(users)
@@ -114,8 +120,14 @@ export class DatabaseStorage implements IStorage {
 
     // Check if account is locked
     if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
-      const minutesLeft = Math.ceil((new Date(user.lockedUntil).getTime() - Date.now()) / (1000 * 60));
-      return { user: this.sanitizeUser(user), error: `Akun dikunci. Coba lagi dalam ${minutesLeft} menit.` };
+      const lockTimeRemaining = new Date(user.lockedUntil).getTime() - Date.now();
+      const minutesLeft = Math.ceil(lockTimeRemaining / (1000 * 60));
+      return { 
+        user: this.sanitizeUser(user), 
+        error: `Akun dikunci. Coba lagi dalam ${minutesLeft} menit.`,
+        locked: true,
+        lockTimeRemaining
+      };
     }
 
     // Verify password
@@ -126,10 +138,19 @@ export class DatabaseStorage implements IStorage {
       const newFailedAttempts = user.failedAttempts + 1;
       
       if (newFailedAttempts >= 5) {
-        return { user: this.sanitizeUser(user), error: 'Terlalu banyak percobaan gagal. Akun dikunci selama 15 menit.' };
+        return { 
+          user: this.sanitizeUser(user), 
+          error: 'Terlalu banyak percobaan gagal. Akun dikunci selama 15 menit.',
+          locked: true,
+          lockTimeRemaining: 15 * 60 * 1000 // 15 minutes in ms
+        };
       }
       
-      return { user: this.sanitizeUser(user), error: `Password salah. Sisa percobaan: ${5 - newFailedAttempts}` };
+      return { 
+        user: this.sanitizeUser(user), 
+        error: `Password salah. Sisa percobaan: ${5 - newFailedAttempts}`,
+        attemptsRemaining: 5 - newFailedAttempts
+      };
     }
 
     // Reset failed attempts on successful login
