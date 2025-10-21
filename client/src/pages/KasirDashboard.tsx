@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { ArrowLeft, Receipt, User, Calculator, CheckCircle, Loader2, Ticket } from 'lucide-react';
+import { ArrowLeft, Receipt, User, Calculator, CheckCircle, Loader2, Ticket, LogOut } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import MemberSummaryPanel from '@/components/MemberSummaryPanel';
@@ -31,6 +31,7 @@ export default function KasirDashboard() {
   const [calculatedPoints, setCalculatedPoints] = useState(0);
   const [activeTab, setActiveTab] = useState<'bills' | 'vouchers'>('bills');
   const [debouncedWhatsApp, setDebouncedWhatsApp] = useState('');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<BillFormData>({
@@ -165,6 +166,34 @@ export default function KasirDashboard() {
     processBillMutation.mutate(data);
   };
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Logout berhasil",
+          description: "Anda telah keluar dari sistem",
+        });
+        navigate('/');
+      } else {
+        throw new Error('Logout gagal');
+      }
+    } catch (error) {
+      toast({
+        title: "Logout gagal",
+        description: "Terjadi kesalahan saat logout",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -182,6 +211,7 @@ export default function KasirDashboard() {
                 size="icon"
                 onClick={() => navigate('/')}
                 data-testid="button-back"
+                title="Kembali ke Home"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
@@ -194,6 +224,16 @@ export default function KasirDashboard() {
                   </Badge>
                 </div>
               </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                data-testid="button-logout"
+                title="Logout"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
             </div>
           </div>
 

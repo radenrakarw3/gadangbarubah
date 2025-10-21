@@ -3,12 +3,43 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Plus, Gift, Megaphone, Users, Receipt } from 'lucide-react';
+import { ArrowLeft, Plus, Gift, Megaphone, Users, Receipt, LogOut } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AdminDashboard() {
   const [, navigate] = useLocation();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Logout berhasil",
+          description: "Anda telah keluar dari sistem",
+        });
+        navigate('/');
+      } else {
+        throw new Error('Logout gagal');
+      }
+    } catch (error) {
+      toast({
+        title: "Logout gagal",
+        description: "Terjadi kesalahan saat logout",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   const adminFeatures = [
     {
@@ -62,6 +93,7 @@ export default function AdminDashboard() {
                 size="icon"
                 onClick={() => navigate('/')}
                 data-testid="button-back"
+                title="Kembali ke Home"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
@@ -74,6 +106,16 @@ export default function AdminDashboard() {
                   </Badge>
                 </div>
               </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                data-testid="button-logout"
+                title="Logout"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
             </div>
           </div>
 
