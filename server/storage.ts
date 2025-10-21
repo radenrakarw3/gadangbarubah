@@ -66,6 +66,14 @@ export interface IStorage {
   
   // Kasir methods - Voucher claims management
   getAllVoucherClaims(): Promise<Array<VoucherClaim & { voucherTitle: string; memberName: string; memberWhatsApp: string }>>;
+  
+  // Consolidated member dashboard data (optimized single query)
+  getMemberDashboard(memberId: string): Promise<{
+    member: Omit<Member, 'pinHash'>;
+    points: number;
+    voucherClaims: Array<VoucherClaim & { voucherTitle: string }>;
+    recentBills: Bill[];
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -613,6 +621,67 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(voucherClaims.claimedAt));
     
     return result as Array<VoucherClaim & { voucherTitle: string; memberName: string; memberWhatsApp: string }>;
+  }
+
+  // Consolidated member dashboard - single optimized call
+  async getMemberDashboard(memberId: string): Promise<{
+    member: Omit<Member, 'pinHash'>;
+    points: number;
+    voucherClaims: Array<VoucherClaim & { voucherTitle: string }>;
+    recentBills: Bill[];
+  }> {
+    // Execute all queries in parallel for maximum performance
+    const [member, memberPointsRecord, claims, recentBills] = await Promise.all([
+      // Get member info (without pinHash)
+      db.select({
+        id: members.id,
+        namaLengkap: members.namaLengkap,
+        jenisKelamin: members.jenisKelamin,
+        noWhatsApp: members.noWhatsApp,
+        tanggalLahir: members.tanggalLahir,
+        kodePos: members.kodePos,
+        failedAttempts: members.failedAttempts,
+        lockedUntil: members.lockedUntil,
+      }).from(members).where(eq(members.id, memberId)).limit(1),
+      
+      // Get member points
+      db.select().from(memberPoints).where(eq(memberPoints.memberId, memberId)).limit(1),
+      
+      // Get voucher claims with voucher titles (last 20)
+      db.select({
+        id: voucherClaims.id,
+        voucherId: voucherClaims.voucherId,
+        memberId: voucherClaims.memberId,
+        pointsUsed: voucherClaims.pointsUsed,
+        status: voucherClaims.status,
+        claimedAt: voucherClaims.claimedAt,
+        redeemedAt: voucherClaims.redeemedAt,
+        voucherTitle: vouchers.title,
+      })
+      .from(voucherClaims)
+      .leftJoin(vouchers, eq(voucherClaims.voucherId, vouchers.id))
+      .where(eq(voucherClaims.memberId, memberId))
+      .orderBy(desc(voucherClaims.claimedAt))
+      .limit(20),
+      
+      // Get recent bills (last 10)
+      db.select()
+        .from(bills)
+        .where(eq(bills.memberId, memberId))
+        .orderBy(desc(bills.createdAt))
+        .limit(10)
+    ]);
+
+    if (!member[0]) {
+      throw new Error('Member tidak ditemukan');
+    }
+
+    return {
+      member: member[0],
+      points: memberPointsRecord[0]?.totalPoints ?? 0,
+      voucherClaims: claims as Array<VoucherClaim & { voucherTitle: string }>,
+      recentBills: recentBills
+    };
   }
 }
 

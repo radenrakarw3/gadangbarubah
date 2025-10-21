@@ -238,6 +238,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Consolidated Member Dashboard - Single optimized API call
+  app.get("/api/members/:memberId/dashboard", memberEndpointSecurity, async (req, res) => {
+    try {
+      const { memberId } = req.params;
+      
+      const dashboard = await storage.getMemberDashboard(memberId);
+      
+      res.json({
+        success: true,
+        data: dashboard
+      });
+    } catch (error: any) {
+      console.error('Get member dashboard error:', error);
+      
+      if (error.message === 'Member tidak ditemukan') {
+        return res.status(404).json({ 
+          success: false, 
+          message: error.message 
+        });
+      }
+      
+      res.status(500).json({ 
+        success: false, 
+        message: "Gagal mengambil data dashboard" 
+      });
+    }
+  });
+
   // Member Dashboard Routes
   app.get("/api/members/:memberId/profile", memberEndpointSecurity, async (req, res) => {
     try {
