@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight, User, Download, FileText, UtensilsCrossed, ShoppingBag, Package, Eye, MessageCircle, Gift, Star, Users as UsersIcon, Store, Truck, Handshake, Crown, ArrowRight } from 'lucide-react';
 import Logo from './Logo';
 import SEOHead from './SEOHead';
-import ImageSlideshow from './ImageSlideshow';
+import AboutSlideshow from './AboutSlideshow';
 import PromotionalPopup from './PromotionalPopup';
 import StickyNav from './StickyNav';
 import FloatingWhatsApp from './FloatingWhatsApp';
@@ -322,106 +322,21 @@ export default function WelcomePage() {
             </div>
           </div>
           
-          {/* Restaurant Images Slideshow */}
+          {/* About Us Story Section with Integrated Slideshow */}
           <div className="mb-10">
-            <ImageSlideshow images={slideshowImages} interval={5000} />
-          </div>
-          
-          {/* About Us Story Section */}
-          <div className="mb-10 space-y-16">
-            {/* Story Header */}
-            <div className="text-center">
-              <h2 className="text-4xl font-serif font-medium text-foreground mb-4">Tentang Kami – Gadang Barubah</h2>
-              <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
-              <p className="text-lg text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto">
-                Rumah makan Padang yang menghadirkan nasi padang autentik dan masakan Minang tradisional. Pilihan untuk pecinta kuliner Padang dengan cita rasa istimewa dan pelayanan di seluruh Indonesia.
-              </p>
-            </div>
-
-            {/* Story Section 1 - Heritage & Innovation */}
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6">
-                <h3 className="text-2xl font-serif font-medium text-foreground">Semangat Besar untuk Berinovasi</h3>
-                <div className="space-y-4 text-muted-foreground leading-relaxed">
-                  <p>
-                    Gadang Barubah adalah pilihan terdepan untuk pecinta kuliner Padang di Indonesia. Nama "Gadang Barubah" melambangkan semangat besar untuk terus berinovasi, tanpa meninggalkan akar tradisi yang kaya. 
-                    Di sini, setiap sajian nasi padang dan masakan Minang bukan sekadar makanan, melainkan sebuah perjalanan rasa yang menghadirkan resep turun-temurun khas Padang dengan standar kualitas tertinggi.
-                  </p>
-                  <p>
-                    Dari rendang daging yang mendunia, gulai kambing penuh rempah, hingga aneka lauk pauk segar khas Padang—disajikan dengan sentuhan kekinian yang 
-                    menggugah selera. Harmoni tradisi dan inovasi hadir dalam setiap hidangan nasi padang, membawa cita rasa autentik masakan Minang yang tak lekang oleh waktu.
-                  </p>
-                </div>
-              </div>
-              <div className="relative overflow-hidden rounded-xl shadow-2xl">
-                <div className="aspect-[4/3]">
-                  <img 
-                    src={restaurantExterior} 
-                    alt="Eksterior mewah rumah makan Padang Gadang Barubah Indonesia (gadangbarubahindonesia.id)" 
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                    width="640"
-                    height="480"
-                    data-testid="img-exterior"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Story Section 2 - Philosophy & Experience */}
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="lg:order-2 space-y-6">
-                <h3 className="text-2xl font-serif font-medium text-foreground">Bahasa Universal yang Menyatukan</h3>
-                <div className="space-y-4 text-muted-foreground leading-relaxed">
-                  <p>
-                    Kami percaya, kuliner adalah bahasa universal yang mampu menyatukan. Karena itu, Gadang Barubah (gadangbarubahindonesia.id) berkomitmen 
-                    menghadirkan pengalaman bersantap yang hangat, ramah, dan berkesan, baik untuk keluarga, sahabat, maupun kolega.
-                  </p>
-                  <p>
-                    Biarkan aroma rempah rendang dan gulai serta cita rasa autentik nasi padang membawa Anda seolah berkunjung langsung ke ranah Minang, sekaligus 
-                    merasakan kenyamanan ruang modern yang kami hadirkan di tengah Cikarang. Setiap momen makan bersama menjadi istimewa dalam suasana 
-                    rumah makan Padang yang dirancang khusus untuk menciptakan kebersamaan.
-                  </p>
-                </div>
-              </div>
-              <div className="lg:order-1 relative overflow-hidden rounded-xl shadow-2xl">
-                <div className="aspect-[4/3]">
-                  <img 
-                    src={restaurantNight} 
-                    alt="Suasana malam hangat di rumah makan Padang Gadang Barubah dengan pencahayaan ambient" 
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                    width="640"
-                    height="480"
-                    data-testid="img-night"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Story Conclusion */}
-            <Card className="border-border/50 shadow-sm bg-gradient-to-br from-background to-muted/20">
-              <CardContent className="p-8 sm:p-12 text-center">
-                <div className="max-w-4xl mx-auto space-y-6">
-                  <h3 className="text-3xl font-serif font-medium text-foreground mb-6">Destinasi Kuliner Warisan Indonesia</h3>
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    Gadang Barubah bukan hanya tempat makan, melainkan sebuah destinasi kuliner yang mengajak Anda menjelajahi 
-                    kekayaan warisan Indonesia. Setiap hidangan menceritakan kisah budaya yang terjaga, dengan rasa yang autentik 
-                    dan pelayanan yang penuh kehangatan.
-                  </p>
-                  <p className="text-base text-muted-foreground leading-relaxed">
-                    Di tengah hiruk pikuk kehidupan modern, kami hadirkan ruang di mana tradisi bertemu dengan kenyamanan. 
-                    Tempat di mana setiap gigitan membawa kenangan, dan setiap kunjungan menjadi bagian dari perjalanan 
-                    kuliner yang tak terlupakan bersama keluarga dan orang tersayang.
-                  </p>
-                  <div className="pt-4">
-                    <div className="inline-block w-16 h-px bg-primary"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <AboutSlideshow 
+              images={slideshowImages}
+              content={{
+                title: "Tentang Kami – Gadang Barubah",
+                paragraphs: [
+                  "Rumah makan Padang yang menghadirkan nasi padang autentik dan masakan Minang tradisional. Gadang Barubah adalah pilihan terdepan untuk pecinta kuliner Padang di Indonesia. Nama \"Gadang Barubah\" melambangkan semangat besar untuk terus berinovasi, tanpa meninggalkan akar tradisi yang kaya.",
+                  "Di sini, setiap sajian nasi padang dan masakan Minang bukan sekadar makanan, melainkan sebuah perjalanan rasa yang menghadirkan resep turun-temurun khas Padang dengan standar kualitas tertinggi. Dari rendang daging yang mendunia, gulai kambing penuh rempah, hingga aneka lauk pauk segar khas Padang—disajikan dengan sentuhan kekinian yang menggugah selera.",
+                  "Kami percaya, kuliner adalah bahasa universal yang mampu menyatukan. Karena itu, Gadang Barubah berkomitmen menghadirkan pengalaman bersantap yang hangat, ramah, dan berkesan, baik untuk keluarga, sahabat, maupun kolega. Biarkan aroma rempah rendang dan gulai serta cita rasa autentik nasi padang membawa Anda seolah berkunjung langsung ke ranah Minang.",
+                  "Gadang Barubah bukan hanya tempat makan, melainkan sebuah destinasi kuliner yang mengajak Anda menjelajahi kekayaan warisan Indonesia. Setiap hidangan menceritakan kisah budaya yang terjaga, dengan rasa yang autentik dan pelayanan yang penuh kehangatan. Di tengah hiruk pikuk kehidupan modern, kami hadirkan ruang di mana tradisi bertemu dengan kenyamanan."
+                ]
+              }}
+              interval={5000}
+            />
           </div>
           
           {/* Menu Section */}
