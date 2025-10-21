@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
-  insertMemberSchema, loginMemberSchema, insertVoucherSchema, 
+  insertMemberSchema, loginMemberSchema, loginUserSchema, insertVoucherSchema, 
   insertPromoSchema, insertBillSchema, claimVoucherSchema 
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
@@ -54,16 +54,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Member Login with enhanced security
+  // Admin/Kasir Login with role-based auth and rate limiting
+  app.post("/api/auth/login", loginRateLimit, async (req, res) => {
+    try {
+      const validatedData = loginUserSchema.parse(req.body);
+      
+      const result = await storage.loginUser(validatedData.username, validatedData.password);
+      
+      if (!result) {
+        return res.status(401).json({ 
+          success: false, 
+          message: "Username atau password salah" 
+        });
+      }
+
+      if (result.error) {
+        return res.status(401).json({ 
+          success: false, 
+          message: result.error 
+        });
+      }
+      
+      res.json({ 
+        success: true, 
+        message: "Login berhasil!",
+        user: { 
+          id: result.user.id, 
+          username: result.user.username, 
+          role: result.user.role
+        } 
+      });
+    } catch (error: any) {
+      console.error('User login error:', error);
+      res.status(400).json({ 
+        success: false, 
+        message: error.errors ? "Data tidak valid" : "Gagal login" 
+      });
+    }
+  });
+
+  // Member Login with enhanced security and rate limiting
   app.post("/api/members/login", loginRateLimit, memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = loginMemberSchema.parse(req.body);
       
-      const member = await storage.loginMember(validatedData.noWhatsApp, validatedData.pin);
-      if (!member) {
+      const result = await storage.loginMember(validatedData.noWhatsApp, validatedData.pin);
+      
+      if (!result) {
         return res.status(401).json({ 
           success: false, 
           message: "Nomor WhatsApp atau PIN salah" 
+        });
+      }
+
+      if (result.error) {
+        return res.status(401).json({ 
+          success: false, 
+          message: result.error 
         });
       }
       
@@ -71,15 +118,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true, 
         message: "Login berhasil!",
         member: { 
-          id: member.id, 
-          namaLengkap: member.namaLengkap, 
-          noWhatsApp: member.noWhatsApp,
-          tanggalLahir: member.tanggalLahir,
-          kodePos: member.kodePos
+          id: result.member.id, 
+          namaLengkap: result.member.namaLengkap, 
+          noWhatsApp: result.member.noWhatsApp,
+          tanggalLahir: result.member.tanggalLahir,
+          kodePos: result.member.kodePos
         } 
       });
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('Member login error:', error);
       res.status(400).json({ 
         success: false, 
         message: error.errors ? "Data tidak valid" : "Gagal login" 

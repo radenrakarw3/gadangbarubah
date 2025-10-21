@@ -7,6 +7,10 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  role: varchar("role", { length: 20 }).notNull().default("kasir"), // 'admin' or 'kasir'
+  failedAttempts: integer("failed_attempts").notNull().default(0),
+  lockedUntil: timestamp("locked_until"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const members = pgTable("members", {
@@ -17,6 +21,9 @@ export const members = pgTable("members", {
   tanggalLahir: date("tanggal_lahir").notNull(),
   kodePos: varchar("kode_pos", { length: 10 }).notNull(),
   pinHash: text("pin_hash").notNull(),
+  failedAttempts: integer("failed_attempts").notNull().default(0),
+  lockedUntil: timestamp("locked_until"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Member points balance - one record per member
@@ -76,6 +83,12 @@ export const voucherClaims = pgTable("voucher_claims", {
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+  role: true,
+});
+
+export const loginUserSchema = z.object({
+  username: z.string().min(3, "Username minimal 3 karakter"),
+  password: z.string().min(6, "Password minimal 6 karakter"),
 });
 
 export const insertMemberSchema = createInsertSchema(members).omit({
@@ -122,6 +135,7 @@ export const claimVoucherSchema = z.object({
 
 // Type exports
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type LoginUser = z.infer<typeof loginUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertMember = z.infer<typeof insertMemberSchema>;
 export type Member = typeof members.$inferSelect;

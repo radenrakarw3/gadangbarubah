@@ -1,6 +1,6 @@
 import { 
   users, members, memberPoints, vouchers, promos, bills, voucherClaims,
-  type User, type InsertUser, type Member, type InsertMember,
+  type User, type InsertUser, type LoginUser, type Member, type InsertMember,
   type MemberPoints, type Voucher, type InsertVoucher,
   type Promo, type InsertPromo, type Bill, type InsertBill,
   type VoucherClaim, type ClaimVoucherRequest
@@ -16,12 +16,17 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  loginUser(username: string, password: string): Promise<{ user: Omit<User, 'password'>; error?: string } | null>;
+  resetFailedAttempts(userId: string): Promise<void>;
+  incrementFailedAttempts(userId: string): Promise<void>;
   
   // Member methods
   getMember(id: string): Promise<Member | undefined>;
   getMemberByWhatsApp(noWhatsApp: string): Promise<Member | undefined>;
   createMember(member: InsertMember & { pin: string }): Promise<Member>;
-  loginMember(noWhatsApp: string, pin: string): Promise<Member | undefined>;
+  loginMember(noWhatsApp: string, pin: string): Promise<{ member: Member; error?: string } | null>;
+  resetMemberFailedAttempts(memberId: string): Promise<void>;
+  incrementMemberFailedAttempts(memberId: string): Promise<void>;
   updateMember(id: string, member: Partial<Omit<InsertMember, 'pin'>>): Promise<Member>;
   deleteMember(id: string): Promise<void>;
   
@@ -75,11 +80,88 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Hash the password before storing
+    const saltRounds = 12;
+    const password = await bcrypt.hash(insertUser.password, saltRounds);
+    
     const [user] = await db
       .insert(users)
-      .values(insertUser)
+      .values({
+        ...insertUser,
+        password,
+      })
       .returning();
     return user;
+  }
+
+  async loginUser(username: string, password: string): Promise<{ user: Omit<User, 'password'>; error?: string } | null> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
+    
+    if (!user) {
+      return null;
+    }
+
+    // Check if account is locked
+    if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
+      const minutesLeft = Math.ceil((new Date(user.lockedUntil).getTime() - Date.now()) / (1000 * 60));
+      return { user: this.sanitizeUser(user), error: `Akun dikunci. Coba lagi dalam ${minutesLeft} menit.` };
+    }
+
+    // Verify password
+    const isValid = await bcrypt.compare(password, user.password);
+    
+    if (!isValid) {
+      await this.incrementFailedAttempts(user.id);
+      const newFailedAttempts = user.failedAttempts + 1;
+      
+      if (newFailedAttempts >= 5) {
+        return { user: this.sanitizeUser(user), error: 'Terlalu banyak percobaan gagal. Akun dikunci selama 15 menit.' };
+      }
+      
+      return { user: this.sanitizeUser(user), error: `Password salah. Sisa percobaan: ${5 - newFailedAttempts}` };
+    }
+
+    // Reset failed attempts on successful login
+    if (user.failedAttempts > 0 || user.lockedUntil) {
+      await this.resetFailedAttempts(user.id);
+    }
+
+    return { user: this.sanitizeUser(user) };
+  }
+
+  async resetFailedAttempts(userId: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ failedAttempts: 0, lockedUntil: null })
+      .where(eq(users.id, userId));
+  }
+
+  async incrementFailedAttempts(userId: string): Promise<void> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    
+    if (!user) return;
+
+    const newFailedAttempts = user.failedAttempts + 1;
+    const updates: Partial<User> = { failedAttempts: newFailedAttempts };
+
+    // Lock account for 15 minutes after 5 failed attempts
+    if (newFailedAttempts >= 5) {
+      const lockUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+      updates.lockedUntil = lockUntil;
+    }
+
+    await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, userId));
+  }
+
+  private sanitizeUser(user: User): Omit<User, 'password'> {
+    const { password, ...sanitized } = user;
+    return sanitized;
   }
 
   // Member methods
@@ -109,16 +191,69 @@ export class DatabaseStorage implements IStorage {
     return member;
   }
 
-  async loginMember(noWhatsApp: string, pin: string): Promise<Member | undefined> {
+  async loginMember(noWhatsApp: string, pin: string): Promise<{ member: Member; error?: string } | null> {
     const [member] = await db
       .select()
       .from(members)
       .where(eq(members.noWhatsApp, noWhatsApp));
     
-    if (member && await bcrypt.compare(pin, member.pinHash)) {
-      return member;
+    if (!member) {
+      return null;
     }
-    return undefined;
+
+    // Check if account is locked
+    if (member.lockedUntil && new Date(member.lockedUntil) > new Date()) {
+      const minutesLeft = Math.ceil((new Date(member.lockedUntil).getTime() - Date.now()) / (1000 * 60));
+      return { member, error: `Akun dikunci. Coba lagi dalam ${minutesLeft} menit.` };
+    }
+
+    // Verify PIN
+    const isValid = await bcrypt.compare(pin, member.pinHash);
+    
+    if (!isValid) {
+      await this.incrementMemberFailedAttempts(member.id);
+      const newFailedAttempts = member.failedAttempts + 1;
+      
+      if (newFailedAttempts >= 5) {
+        return { member, error: 'Terlalu banyak percobaan gagal. Akun dikunci selama 15 menit.' };
+      }
+      
+      return { member, error: `PIN salah. Sisa percobaan: ${5 - newFailedAttempts}` };
+    }
+
+    // Reset failed attempts on successful login
+    if (member.failedAttempts > 0 || member.lockedUntil) {
+      await this.resetMemberFailedAttempts(member.id);
+    }
+
+    return { member };
+  }
+
+  async resetMemberFailedAttempts(memberId: string): Promise<void> {
+    await db
+      .update(members)
+      .set({ failedAttempts: 0, lockedUntil: null })
+      .where(eq(members.id, memberId));
+  }
+
+  async incrementMemberFailedAttempts(memberId: string): Promise<void> {
+    const [member] = await db.select().from(members).where(eq(members.id, memberId));
+    
+    if (!member) return;
+
+    const newFailedAttempts = member.failedAttempts + 1;
+    const updates: Partial<Member> = { failedAttempts: newFailedAttempts };
+
+    // Lock account for 15 minutes after 5 failed attempts
+    if (newFailedAttempts >= 5) {
+      const lockUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+      updates.lockedUntil = lockUntil;
+    }
+
+    await db
+      .update(members)
+      .set(updates)
+      .where(eq(members.id, memberId));
   }
 
   async updateMember(id: string, updateData: Partial<Omit<InsertMember, 'pin'>>): Promise<Member> {
