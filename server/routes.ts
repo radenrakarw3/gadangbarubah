@@ -75,19 +75,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Set session data on successful login
-      req.session.userId = result.user.id;
-      req.session.username = result.user.username;
-      req.session.role = result.user.role;
-      
-      res.json({ 
-        success: true, 
-        message: "Login berhasil!",
-        user: { 
-          id: result.user.id, 
-          username: result.user.username, 
-          role: result.user.role
-        } 
+      // Regenerate session to prevent session fixation attacks
+      req.session.regenerate((err) => {
+        if (err) {
+          return res.status(500).json({ 
+            success: false, 
+            message: "Gagal membuat session" 
+          });
+        }
+
+        // Clear any stale role-specific fields and set new session data
+        req.session.userId = result.user.id;
+        req.session.username = result.user.username;
+        req.session.role = result.user.role;
+        delete req.session.memberId; // Clear member session if exists
+        
+        req.session.save((err) => {
+          if (err) {
+            return res.status(500).json({ 
+              success: false, 
+              message: "Gagal menyimpan session" 
+            });
+          }
+
+          res.json({ 
+            success: true, 
+            message: "Login berhasil!",
+            user: { 
+              id: result.user.id, 
+              username: result.user.username, 
+              role: result.user.role
+            } 
+          });
+        });
       });
     } catch (error: any) {
       console.error('User login error:', error);
@@ -156,20 +176,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Set session data on successful login
-      req.session.memberId = result.member.id;
-      req.session.role = 'member';
-      
-      res.json({ 
-        success: true, 
-        message: "Login berhasil!",
-        member: { 
-          id: result.member.id, 
-          namaLengkap: result.member.namaLengkap, 
-          noWhatsApp: result.member.noWhatsApp,
-          tanggalLahir: result.member.tanggalLahir,
-          kodePos: result.member.kodePos
-        } 
+      // Regenerate session to prevent session fixation attacks
+      req.session.regenerate((err) => {
+        if (err) {
+          return res.status(500).json({ 
+            success: false, 
+            message: "Gagal membuat session" 
+          });
+        }
+
+        // Clear any stale role-specific fields and set new session data
+        req.session.memberId = result.member.id;
+        req.session.role = 'member';
+        delete req.session.userId; // Clear admin/kasir session if exists
+        delete req.session.username; // Clear admin/kasir username if exists
+        
+        req.session.save((err) => {
+          if (err) {
+            return res.status(500).json({ 
+              success: false, 
+              message: "Gagal menyimpan session" 
+            });
+          }
+
+          res.json({ 
+            success: true, 
+            message: "Login berhasil!",
+            member: { 
+              id: result.member.id, 
+              namaLengkap: result.member.namaLengkap, 
+              noWhatsApp: result.member.noWhatsApp,
+              tanggalLahir: result.member.tanggalLahir,
+              kodePos: result.member.kodePos
+            } 
+          });
+        });
       });
     } catch (error: any) {
       console.error('Member login error:', error);

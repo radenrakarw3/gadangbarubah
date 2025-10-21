@@ -60,13 +60,23 @@ app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 const PgSession = connectPgSimple(session);
 const sessionPool = new Pool({ connectionString: process.env.DATABASE_URL });
 
+// Require SESSION_SECRET - fail fast if not set in any non-development environment
+if (!process.env.SESSION_SECRET) {
+  if (app.get("env") !== "development") {
+    throw new Error("SESSION_SECRET environment variable must be set. Generate a secure random secret.");
+  }
+  log("WARNING: Using development session secret. Generate and set SESSION_SECRET for production!");
+}
+
+const sessionSecret = process.env.SESSION_SECRET || 'dev-only-insecure-secret';
+
 app.use(
   session({
     store: new PgSession({
       pool: sessionPool,
       createTableIfMissing: true,
     }),
-    secret: process.env.SESSION_SECRET || 'gadang-barubah-secret-key-change-in-production',
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
