@@ -8,7 +8,6 @@ import SEOHead from './SEOHead';
 import AboutSlideshow from './AboutSlideshow';
 import PromotionalPopup from './PromotionalPopup';
 import StickyNav from './StickyNav';
-import FloatingWhatsApp from './FloatingWhatsApp';
 import image1 from '@assets/DSC07140_1758564407964.jpg';
 import image2 from '@assets/DSC02436_1758564588903.jpg';
 import image3 from '@assets/DSC02371_1758564588950.jpg';
@@ -172,9 +171,6 @@ export default function WelcomePage() {
       
       {/* Sticky Navigation */}
       <StickyNav />
-      
-      {/* Floating WhatsApp Button */}
-      <FloatingWhatsApp />
       
       {/* Logo at top */}
       <div className="text-center pt-8 pb-4">
