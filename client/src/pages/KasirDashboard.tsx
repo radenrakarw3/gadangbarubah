@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { ArrowLeft, Receipt, User, Calculator, CheckCircle, Loader2, Ticket } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
+import MemberSummaryPanel from '@/components/MemberSummaryPanel';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useForm } from 'react-hook-form';
@@ -29,6 +30,7 @@ export default function KasirDashboard() {
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [calculatedPoints, setCalculatedPoints] = useState(0);
   const [activeTab, setActiveTab] = useState<'bills' | 'vouchers'>('bills');
+  const [debouncedWhatsApp, setDebouncedWhatsApp] = useState('');
   const { toast } = useToast();
 
   const form = useForm<BillFormData>({
@@ -42,6 +44,15 @@ export default function KasirDashboard() {
   const noWhatsApp = form.watch('noWhatsApp');
   const billAmount = form.watch('billAmount') as any;
 
+  // Debounce WhatsApp search (500ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedWhatsApp(noWhatsApp || '');
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [noWhatsApp]);
+
   // Calculate points whenever bill amount changes (1 point per 1000 rupiah)
   useEffect(() => {
     const amount = typeof billAmount === 'string' ? parseInt(billAmount) : billAmount;
@@ -49,12 +60,12 @@ export default function KasirDashboard() {
     setCalculatedPoints(points);
   }, [billAmount]);
 
-  // Fetch member details when noWhatsApp changes
-  const { data: memberData, isLoading: memberLoading } = useQuery({
-    queryKey: ['/api/members/whatsapp', noWhatsApp, 'profile'],
+  // Fetch member details using debounced search (500ms delay)
+  const { data: memberData, isLoading: memberLoading, error: memberError } = useQuery({
+    queryKey: ['/api/members/whatsapp', debouncedWhatsApp, 'profile'],
     queryFn: async () => {
-      if (!noWhatsApp) return null;
-      const response = await fetch(`/api/members/whatsapp/${noWhatsApp}/profile`);
+      if (!debouncedWhatsApp) return null;
+      const response = await fetch(`/api/members/whatsapp/${debouncedWhatsApp}/profile`);
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('Member tidak ditemukan');
@@ -64,7 +75,7 @@ export default function KasirDashboard() {
       const result = await response.json();
       return result.data;
     },
-    enabled: !!noWhatsApp && noWhatsApp.length >= 10,
+    enabled: !!debouncedWhatsApp && debouncedWhatsApp.length >= 10,
     retry: false,
   });
 
@@ -104,8 +115,8 @@ export default function KasirDashboard() {
         title: "Bill berhasil diproses!",
         description: `Member mendapat ${calculatedPoints} points dari bill Rp ${amount ? amount.toLocaleString() : '0'}`,
       });
-      // Invalidate member profile to update points
-      queryClient.invalidateQueries({ queryKey: ['/api/members/whatsapp', noWhatsApp, 'profile'] });
+      // Invalidate member profile to update points (use debounced key)
+      queryClient.invalidateQueries({ queryKey: ['/api/members/whatsapp', debouncedWhatsApp, 'profile'] });
       // Reset form
       form.reset();
       setSelectedMember(null);
@@ -239,35 +250,28 @@ export default function KasirDashboard() {
                     />
 
                     {/* Member Info Display */}
-                    {noWhatsApp && noWhatsApp.length >= 10 && (
-                      <div className="p-3 bg-muted rounded-lg">
+                    {debouncedWhatsApp && debouncedWhatsApp.length >= 10 && (
+                      <div>
                         {memberLoading ? (
-                          <div className="flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                          <div className="flex items-center justify-center py-4">
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
                             <span className="text-sm text-muted-foreground">Mencari member...</span>
                           </div>
+                        ) : memberError ? (
+                          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                            <p className="text-sm text-destructive">Member tidak ditemukan</p>
+                          </div>
                         ) : memberData ? (
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <User className="h-4 w-4 text-primary" />
-                              <span className="font-medium" data-testid="text-member-name">
-                                {memberData.namaLengkap}
-                              </span>
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              <p>WhatsApp: {memberData.noWhatsApp}</p>
-                              <p data-testid="text-current-points">
-                                Points saat ini: <span className="font-medium text-primary">
-                                  {memberData.totalPoints.toLocaleString()}
-                                </span>
-                              </p>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-sm text-destructive">
-                            Member tidak ditemukan
-                          </div>
-                        )}
+                          <MemberSummaryPanel
+                            member={{
+                              id: memberData.id,
+                              namaLengkap: memberData.namaLengkap,
+                              noWhatsApp: memberData.noWhatsApp
+                            }}
+                            points={memberData.totalPoints}
+                            compact
+                          />
+                        ) : null}
                       </div>
                     )}
 
@@ -362,9 +366,9 @@ export default function KasirDashboard() {
                         <Loader2 className="h-6 w-6 animate-spin mr-2" />
                         <span>Memuat data voucher claims...</span>
                       </div>
-                    ) : voucherClaimsData?.data && voucherClaimsData.data.length > 0 ? (
+                    ) : (voucherClaimsData as any)?.data && (voucherClaimsData as any).data.length > 0 ? (
                       <div className="space-y-4">
-                        {voucherClaimsData.data.map((claim: any) => (
+                        {(voucherClaimsData as any).data.map((claim: any) => (
                           <div key={claim.id} className="p-4 border rounded-lg space-y-2">
                             <div className="flex items-center justify-between">
                               <div>
