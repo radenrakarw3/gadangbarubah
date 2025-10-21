@@ -2,7 +2,7 @@ import { useLocation } from 'wouter';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, User, Download, FileText, UtensilsCrossed, ShoppingBag, Package, Eye, MessageCircle, Gift, Star, Users as UsersIcon } from 'lucide-react';
+import { ChevronRight, User, Download, FileText, UtensilsCrossed, ShoppingBag, Package, Eye, MessageCircle, Gift, Star, Users as UsersIcon, Store, Truck, Handshake, Crown, ArrowRight } from 'lucide-react';
 import Logo from './Logo';
 import SEOHead from './SEOHead';
 import ImageSlideshow from './ImageSlideshow';
@@ -23,11 +23,76 @@ import nasiTumpengImage from '@assets/Nasi Tumpeng_1758628102631.png';
 import nasiBoxImage from '@assets/Nasi Box_1758628102653.jpg';
 import rendangKiloanImage from '@assets/DSC02799_1758628102653.jpg';
 import { AnimatedUni } from './AnimatedUni';
+import { trackContactMethod, trackServiceView } from '@/lib/analytics';
+
+const services = [
+  {
+    id: 'outlet',
+    name: 'Outlet Location',
+    icon: Store,
+    description: 'Kunjungi rumah makan Padang kami di Pollux Mall Cikarang dengan suasana mewah, VIP room eksklusif, dan pengalaman kuliner nasi padang yang tak terlupakan.',
+    path: '/services/outlet'
+  },
+  {
+    id: 'delivery',
+    name: 'Delivery Service',
+    icon: Truck,
+    description: 'Nikmati kelezatan nasi padang, rendang, dan gulai berkualitas restoran langsung di rumah Anda dengan layanan antar yang menjaga cita rasa autentik.',
+    path: '/services/delivery'
+  },
+  {
+    id: 'partnership',
+    name: 'Business Partnership',
+    icon: Handshake,
+    description: 'Bergabunglah dalam ekosistem kuliner Padang kami dengan program kemitraan rumah makan yang memberikan keuntungan berkelanjutan.',
+    path: '/services/partnership'
+  },
+  {
+    id: 'membership',
+    name: 'VIP Membership',
+    icon: Crown,
+    description: 'Dapatkan akses eksklusif ke benefit istimewa, reservasi prioritas untuk nasi padang, dan pengalaman kuliner Minang yang dipersonalisasi.',
+    path: '/services/membership'
+  },
+  {
+    id: 'catering',
+    name: 'Event Catering',
+    icon: UtensilsCrossed,
+    description: 'Wujudkan acara istimewa Anda dengan layanan katering nasi padang dan masakan Minang yang menciptakan momen tak terlupakan.',
+    path: '/services/catering'
+  }
+];
 
 export default function WelcomePage() {
   const [, navigate] = useLocation();
   const [showPromoPopup, setShowPromoPopup] = useState(false);
   const [hasShownPopup, setHasShownPopup] = useState(false);
+
+  const handleServiceClick = (service: typeof services[0]) => {
+    // Services that redirect to WhatsApp
+    const whatsAppServices = ['delivery', 'partnership', 'catering'];
+    const whatsAppNumber = '6289509766739';
+    
+    if (whatsAppServices.includes(service.id)) {
+      trackContactMethod('whatsapp', 'services_hub', {
+        service_type: service.id as any,
+        restaurant_action: service.id === 'delivery' ? 'delivery' : 'whatsapp',
+        outlet_name: 'Gadang Barubah',
+        event_label: `whatsapp_${service.id}`
+      });
+      
+      const message = encodeURIComponent(`Halo, saya tertarik dengan layanan ${service.name} dari Gadang Barubah. Mohon informasi lebih lanjut.`);
+      const whatsAppUrl = `https://api.whatsapp.com/send?phone=${whatsAppNumber}&text=${message}`;
+      window.open(whatsAppUrl, '_blank');
+    } else {
+      trackServiceView(service.id === 'membership' ? 'vip_membership' : 'outlet', {
+        event_label: `navigate_${service.id}`,
+        custom_parameter_1: 'services_hub_navigation'
+      });
+      
+      navigate(service.path);
+    }
+  };
 
   // Scroll detection to show popup at middle of page with performance optimization
   useEffect(() => {
@@ -62,9 +127,6 @@ export default function WelcomePage() {
     setShowPromoPopup(false);
   };
 
-  const handleContinue = () => {
-    navigate('/uni');
-  };
 
   const slideshowImages = [
     {
@@ -210,6 +272,56 @@ export default function WelcomePage() {
             </Card>
           </div>
           
+          {/* Services Grid Section */}
+          <div id="services-section" className="mb-16 scroll-mt-24">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
+                Layanan Eksklusif Kami
+              </h2>
+              <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-4"></div>
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                Jelajahi berbagai layanan premium yang kami tawarkan untuk pengalaman kuliner yang sempurna
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+              {services.map((service) => {
+                const IconComponent = service.icon;
+                
+                return (
+                  <Card 
+                    key={service.id} 
+                    className="group cursor-pointer hover:shadow-xl transition-all duration-500 border-border/30 hover:border-primary/30 bg-gradient-to-br from-background to-muted/10 hover-elevate"
+                    onClick={() => handleServiceClick(service)}
+                    data-testid={`card-service-${service.id}`}
+                  >
+                    <CardContent className="p-6 sm:p-8">
+                      <div className="flex items-start space-x-4 sm:space-x-6">
+                        <div className="flex-shrink-0">
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center border border-primary/20 group-hover:from-primary/20 group-hover:to-primary/10 transition-all duration-300">
+                            <IconComponent className="h-7 w-7 sm:h-8 sm:w-8 text-primary" />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-serif text-lg sm:text-xl font-medium text-foreground mb-2 sm:mb-3 group-hover:text-primary transition-colors duration-300">
+                            {service.name}
+                          </h3>
+                          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4 sm:mb-6">
+                            {service.description}
+                          </p>
+                          <div className="flex items-center text-primary font-medium text-sm group-hover:translate-x-2 transition-transform duration-300">
+                            <span>Lihat Detail</span>
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+          
           {/* Restaurant Images Slideshow */}
           <div className="mb-10">
             <ImageSlideshow images={slideshowImages} interval={5000} />
@@ -353,8 +465,8 @@ export default function WelcomePage() {
             </Card>
           </div>
           
-          {/* Services Section */}
-          <div id="services-section" className="mb-10 scroll-mt-24">
+          {/* Catering & Takeaway Section */}
+          <div id="catering-section" className="mb-10 scroll-mt-24">
             <div className="text-center mb-8">
               <h3 className="text-3xl font-serif font-medium text-foreground mb-4">Layanan Catering & Takeaway</h3>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-4"></div>
@@ -628,23 +740,6 @@ export default function WelcomePage() {
           
           {/* Animated Uni Mascot with Speech Bubble */}
           <AnimatedUni />
-
-          {/* Continue Button */}
-          <div className="text-center space-y-4">
-            <Button
-              onClick={handleContinue}
-              size="lg"
-              className="px-8 py-4 text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300 shadow-sm hover:shadow-md"
-              data-testid="button-continue"
-            >
-              Jelajahi Layanan Kami
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-            
-            <p className="text-sm text-muted-foreground/80">
-              Temui Uni, asisten virtual kami yang siap membantu
-            </p>
-          </div>
           
           {/* Contact Section */}
           <div id="contact-section" className="mt-12 scroll-mt-24">

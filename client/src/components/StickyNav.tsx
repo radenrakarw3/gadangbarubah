@@ -27,8 +27,8 @@ export default function StickyNav() {
   };
 
   const navItems = [
-    { id: 'menu-section', label: 'Menu' },
     { id: 'services-section', label: 'Layanan' },
+    { id: 'menu-section', label: 'Menu' },
     { id: 'membership-section', label: 'Member' },
     { id: 'contact-section', label: 'Kontak' }
   ];

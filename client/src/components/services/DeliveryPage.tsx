@@ -23,7 +23,7 @@ export default function DeliveryPage() {
       <div className="px-4 pt-8 pb-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Button
-            onClick={() => navigate('/uni')}
+            onClick={() => navigate('/')}
             variant="ghost"
             size="sm"
             className="hover:bg-accent/10 text-muted-foreground hover:text-foreground"

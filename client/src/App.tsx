@@ -7,10 +7,10 @@ import { HelmetProvider } from "react-helmet-async";
 import { initializeAnalytics, trackPageView } from "@/lib/analytics";
 import { useEffect, useState } from "react";
 import WelcomePage from "@/components/WelcomePage";
-import UniPage from "@/components/UniPage";
 import OutletPage from "@/components/services/OutletPage";
 import DeliveryPage from "@/components/services/DeliveryPage";
 import PartnershipPage from "@/components/services/PartnershipPage";
+import MembershipPage from "@/components/services/MembershipPage";
 import CateringPage from "@/components/services/CateringPage";
 import MemberLogin from "@/pages/MemberLogin";
 import MemberRegister from "@/pages/MemberRegister";
@@ -89,11 +89,10 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={WelcomePage} />
-      <Route path="/uni" component={UniPage} />
       <Route path="/services/outlet" component={OutletPage} />
       <Route path="/services/delivery" component={DeliveryPage} />
       <Route path="/services/partnership" component={PartnershipPage} />
-      <Route path="/services/membership" component={MemberLogin} />
+      <Route path="/services/membership" component={MembershipPage} />
       <Route path="/services/catering" component={CateringPage} />
       <Route path="/member/login" component={MemberLogin} />
       <Route path="/member/register" component={MemberRegister} />
