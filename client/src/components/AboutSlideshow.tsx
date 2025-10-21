@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 interface AboutSlideshowProps {
   images: Array<{
@@ -17,24 +17,47 @@ export default function AboutSlideshow({ images, content, interval = 5000 }: Abo
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([0]));
   const [imageOrientations, setImageOrientations] = useState<Map<number, 'portrait' | 'landscape'>>(new Map());
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  
+  // Use refs for touch tracking to avoid re-renders during swipe
+  const touchStartRef = useRef<number | null>(null);
+  const touchEndRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const minSwipeDistance = 50;
 
-  // Detect image orientation
+  // Create stable image source array for dependency
+  const imageSources = useMemo(() => images.map(img => img.src), [images]);
+
+  // Detect image orientation (update per-image as they load)
   useEffect(() => {
+    let mounted = true;
+
     images.forEach((image, index) => {
       const img = new Image();
+      
       img.onload = () => {
+        if (!mounted) return;
         const orientation = img.naturalWidth < img.naturalHeight ? 'portrait' : 'landscape';
+        
+        // Update immediately per-image (not batched)
         setImageOrientations(prev => new Map(prev).set(index, orientation));
         setLoadedImages(prev => new Set(prev).add(index));
       };
+
+      img.onerror = () => {
+        if (!mounted) return;
+        // Default to landscape on error to avoid blocking
+        setImageOrientations(prev => new Map(prev).set(index, 'landscape'));
+        setLoadedImages(prev => new Set(prev).add(index));
+      };
+      
       img.src = image.src;
     });
-  }, [images]);
+
+    return () => {
+      mounted = false;
+    };
+  }, [imageSources]); // Depend on stable image sources array
 
   // Preload adjacent images
   const preloadAdjacentImages = useCallback((index: number) => {
@@ -45,6 +68,9 @@ export default function AboutSlideshow({ images, content, interval = 5000 }: Abo
       if (!loadedImages.has(idx)) {
         const img = new Image();
         img.onload = () => {
+          setLoadedImages(prev => new Set(prev).add(idx));
+        };
+        img.onerror = () => {
           setLoadedImages(prev => new Set(prev).add(idx));
         };
         img.src = images[idx].src;
@@ -67,20 +93,20 @@ export default function AboutSlideshow({ images, content, interval = 5000 }: Abo
     return () => clearInterval(timer);
   }, [images.length, interval]);
 
-  // Touch event handlers for swipe
+  // Touch event handlers for swipe - using refs for smooth gestures
   const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+    touchEndRef.current = null;
+    touchStartRef.current = e.targetTouches[0].clientX;
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    touchEndRef.current = e.targetTouches[0].clientX;
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    if (!touchStartRef.current || !touchEndRef.current) return;
     
-    const distance = touchStart - touchEnd;
+    const distance = touchStartRef.current - touchEndRef.current;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
     
@@ -93,6 +119,10 @@ export default function AboutSlideshow({ images, content, interval = 5000 }: Abo
         prevIndex === 0 ? images.length - 1 : prevIndex - 1
       );
     }
+
+    // Reset refs
+    touchStartRef.current = null;
+    touchEndRef.current = null;
   };
 
   const currentImage = images[currentIndex];
@@ -135,7 +165,6 @@ export default function AboutSlideshow({ images, content, interval = 5000 }: Abo
                         alt={image.alt}
                         className="absolute inset-0 w-full h-full object-cover"
                         loading={index === 0 ? "eager" : "lazy"}
-                        fetchPriority={index === 0 ? "high" : "low"}
                         decoding={index === 0 ? "sync" : "async"}
                         data-testid={`img-about-slide-${index}`}
                       />
@@ -206,7 +235,6 @@ export default function AboutSlideshow({ images, content, interval = 5000 }: Abo
                         alt={image.alt}
                         className="absolute inset-0 w-full h-full object-cover"
                         loading={index === 0 ? "eager" : "lazy"}
-                        fetchPriority={index === 0 ? "high" : "low"}
                         decoding={index === 0 ? "sync" : "async"}
                         data-testid={`img-about-slide-${index}`}
                       />
