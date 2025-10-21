@@ -316,7 +316,8 @@ export class DatabaseStorage implements IStorage {
     // Delete the member
     const result = await db.delete(members).where(eq(members.id, id));
     
-    if (result.rowCount === 0) {
+    // Verify deletion was successful
+    if (!result.rowCount) {
       throw new Error('Member tidak ditemukan');
     }
   }
@@ -412,7 +413,12 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Delete the voucher
-    await db.delete(vouchers).where(eq(vouchers.id, id));
+    const result = await db.delete(vouchers).where(eq(vouchers.id, id));
+    
+    // Verify deletion was successful
+    if (!result.rowCount) {
+      throw new Error('Gagal menghapus voucher');
+    }
   }
 
   // Promo methods (Admin)
@@ -473,7 +479,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db.delete(promos).where(eq(promos.id, id));
     
     // Verify deletion was successful
-    if (result.rowCount === 0) {
+    if (!result.rowCount) {
       throw new Error('Gagal menghapus promo');
     }
   }
@@ -779,7 +785,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCampaign(id: string): Promise<void> {
-    await db.delete(campaigns).where(eq(campaigns.id, id));
+    const result = await db.delete(campaigns).where(eq(campaigns.id, id));
+    
+    // Verify deletion was successful
+    if (!result.rowCount) {
+      throw new Error('Campaign tidak ditemukan');
+    }
   }
 
   async incrementCampaignViewCount(id: string): Promise<void> {
