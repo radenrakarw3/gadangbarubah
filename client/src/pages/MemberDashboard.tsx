@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, User, Ticket, Gift, Phone, Loader2, LogOut } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
+import MemberSummaryPanel from '@/components/MemberSummaryPanel';
 import { pageSEOConfigs } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import { apiRequest, queryClient } from '@/lib/queryClient';
@@ -156,36 +157,14 @@ export default function MemberDashboard() {
 
     return (
       <div className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Profil Saya
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Nama Lengkap</p>
-              <p className="text-lg font-medium">{memberProfile.namaLengkap}</p>
-            </div>
-            
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Nomor WhatsApp</p>
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-muted-foreground" />
-                <p className="text-lg">{memberProfile.noWhatsApp}</p>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Total Points</p>
-              <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-4 border border-primary/20">
-                <p className="text-3xl font-bold text-primary">{memberProfile.totalPoints.toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground">Points tersedia</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <MemberSummaryPanel 
+          member={{
+            id: memberProfile.id,
+            namaLengkap: memberProfile.namaLengkap,
+            noWhatsApp: memberProfile.noWhatsApp
+          }}
+          points={memberProfile.totalPoints}
+        />
       </div>
     );
   };
