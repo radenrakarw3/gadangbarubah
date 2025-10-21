@@ -37,9 +37,17 @@ Preferred communication style: Simple, everyday language.
 - **Migration System**: Drizzle Kit for database schema migrations and management
 
 ### Authentication and Authorization
-- **User Schema**: Basic username/password authentication system
-- **Session Management**: Connect-pg-simple for PostgreSQL session storage
-- **Security**: Express middleware for request logging and error handling
+- **User Schema**: Role-based authentication system (admin/kasir/member)
+- **Password Security**: Bcrypt hashing with 12 salt rounds for all credentials
+- **Session Management**: PostgreSQL-backed sessions with connect-pg-simple
+- **Account Protection**: 
+  - Rate limiting (5 login attempts per 15 minutes)
+  - Account lockout (15 minutes after 5 failed attempts)
+  - Session regeneration to prevent fixation attacks
+- **Protected Routes**: Role-based access control for all admin and kasir routes
+- **Default Credentials**:
+  - Admin: username `admin` / password `Admin@2025`
+  - Kasir: username `kasir` / password `Kasir@2025`
 
 ### Development and Build System
 - **Bundler**: Vite with React plugin for fast HMR and optimized production builds
