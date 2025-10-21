@@ -26,14 +26,22 @@ import LoginKasir from "@/components/LoginKasir";
 import ScrollToTop from "@/components/ScrollToTop";
 import NotFound from "@/pages/not-found";
 
-// Protected Admin Route Component
-function ProtectedAdminRoute() {
+// Generic Protected Route Component
+interface ProtectedRouteProps {
+  role: 'admin' | 'kasir';
+  component: React.ComponentType;
+  loginComponent: React.ComponentType<{ onLogin: () => void }>;
+}
+
+function ProtectedRoute({ role, component: Component, loginComponent: LoginComponent }: ProtectedRouteProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [recheckTrigger, setRecheckTrigger] = useState(0);
 
   useEffect(() => {
     // Check session with backend
     const checkSession = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch('/api/auth/session', {
           credentials: 'include',
@@ -41,7 +49,7 @@ function ProtectedAdminRoute() {
         
         if (response.ok) {
           const data = await response.json();
-          setIsAuthenticated(data.authenticated && data.user?.role === 'admin');
+          setIsAuthenticated(data.authenticated && data.user?.role === role);
         } else {
           setIsAuthenticated(false);
         }
@@ -54,62 +62,47 @@ function ProtectedAdminRoute() {
     };
 
     checkSession();
-  }, []);
+  }, [role, recheckTrigger]);
 
   const handleLogin = () => {
-    setIsAuthenticated(true);
+    // Re-verify session after login to ensure role matches
+    setRecheckTrigger(prev => prev + 1);
   };
 
   if (isLoading) return <div>Loading...</div>;
 
   if (!isAuthenticated) {
-    return <LoginAdmin onLogin={handleLogin} />;
+    return <LoginComponent onLogin={handleLogin} />;
   }
 
-  return <AdminDashboard />;
+  return <Component />;
+}
+
+// Protected Admin Route Component
+function ProtectedAdminRoute() {
+  return <ProtectedRoute role="admin" component={AdminDashboard} loginComponent={LoginAdmin} />;
 }
 
 // Protected Kasir Route Component
 function ProtectedKasirRoute() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  return <ProtectedRoute role="kasir" component={KasirDashboard} loginComponent={LoginKasir} />;
+}
 
-  useEffect(() => {
-    // Check session with backend
-    const checkSession = async () => {
-      try {
-        const response = await fetch('/api/auth/session', {
-          credentials: 'include',
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setIsAuthenticated(data.authenticated && data.user?.role === 'kasir');
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error('Session check failed:', error);
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+// Protected Admin Sub-Routes
+function ProtectedAdminVouchers() {
+  return <ProtectedRoute role="admin" component={AdminVouchers} loginComponent={LoginAdmin} />;
+}
 
-    checkSession();
-  }, []);
+function ProtectedAdminPromos() {
+  return <ProtectedRoute role="admin" component={AdminPromos} loginComponent={LoginAdmin} />;
+}
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
+function ProtectedAdminMembers() {
+  return <ProtectedRoute role="admin" component={AdminMembers} loginComponent={LoginAdmin} />;
+}
 
-  if (isLoading) return <div>Loading...</div>;
-
-  if (!isAuthenticated) {
-    return <LoginKasir onLogin={handleLogin} />;
-  }
-
-  return <KasirDashboard />;
+function ProtectedAdminBills() {
+  return <ProtectedRoute role="admin" component={AdminBills} loginComponent={LoginAdmin} />;
 }
 
 
@@ -136,10 +129,10 @@ function Router() {
       <Route path="/member/register" component={MemberRegister} />
       <Route path="/member/dashboard" component={MemberDashboard} />
       <Route path="/admin" component={ProtectedAdminRoute} />
-      <Route path="/admin/vouchers" component={AdminVouchers} />
-      <Route path="/admin/promos" component={AdminPromos} />
-      <Route path="/admin/members" component={AdminMembers} />
-      <Route path="/admin/bills" component={AdminBills} />
+      <Route path="/admin/vouchers" component={ProtectedAdminVouchers} />
+      <Route path="/admin/promos" component={ProtectedAdminPromos} />
+      <Route path="/admin/members" component={ProtectedAdminMembers} />
+      <Route path="/admin/bills" component={ProtectedAdminBills} />
       <Route path="/kasir" component={ProtectedKasirRoute} />
       <Route component={NotFound} />
     </Switch>
