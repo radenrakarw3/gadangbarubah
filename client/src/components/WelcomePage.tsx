@@ -217,14 +217,15 @@ export default function WelcomePage() {
                     <div className="text-xs sm:text-sm text-muted-foreground">Menu Masakan</div>
                   </div>
                   <div>
-                    <div className="flex justify-center items-center mb-2">
-                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-primary fill-primary" />
-                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-primary fill-primary" />
-                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-primary fill-primary" />
-                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-primary fill-primary" />
-                      <Star className="w-5 h-5 sm:w-6 sm:h-6 text-primary fill-primary" />
+                    <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">4.9</div>
+                    <div className="flex justify-center items-center gap-0.5 mb-1">
+                      <Star className="w-4 h-4 sm:w-5 sm:h-5 text-primary fill-primary" />
+                      <Star className="w-4 h-4 sm:w-5 sm:h-5 text-primary fill-primary" />
+                      <Star className="w-4 h-4 sm:w-5 sm:h-5 text-primary fill-primary" />
+                      <Star className="w-4 h-4 sm:w-5 sm:h-5 text-primary fill-primary" />
+                      <Star className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                     </div>
-                    <div className="text-xs sm:text-sm text-muted-foreground">Rating Pelanggan</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">4.322 reviews</div>
                   </div>
                 </div>
               </CardContent>
