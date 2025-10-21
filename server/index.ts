@@ -1,5 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import helmet from "helmet";
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import fs from "fs";
 import path from "path";
 import { registerRoutes } from "./routes";
@@ -7,6 +9,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { strictRateLimit, antiSpamSlowDown, botDetection, geoSecurity, honeypot, requestValidator } from "./security";
 import { securityLoggingMiddleware, costMonitoringMiddleware } from "./monitoring";
 import { getSEOConfigByPath, generateSEOTags } from "../shared/seo";
+import { Pool } from "@neondatabase/serverless";
 
 const app = express();
 
@@ -52,6 +55,29 @@ app.use(helmet({
 
 app.use(express.json({ limit: '10mb' })); // Limit payload size
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+
+// Session configuration with PostgreSQL store
+const PgSession = connectPgSimple(session);
+const sessionPool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+app.use(
+  session({
+    store: new PgSession({
+      pool: sessionPool,
+      createTableIfMissing: true,
+    }),
+    secret: process.env.SESSION_SECRET || 'gadang-barubah-secret-key-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      httpOnly: true, // Prevent XSS attacks
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax', // CSRF protection
+    },
+    name: 'sessionId', // Don't use default 'connect.sid'
+  })
+);
 
 app.use((req, res, next) => {
   const start = Date.now();

@@ -74,6 +74,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: result.error 
         });
       }
+
+      // Set session data on successful login
+      req.session.userId = result.user.id;
+      req.session.username = result.user.username;
+      req.session.role = result.user.role;
       
       res.json({ 
         success: true, 
@@ -89,6 +94,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ 
         success: false, 
         message: error.errors ? "Data tidak valid" : "Gagal login" 
+      });
+    }
+  });
+
+  // Admin/Kasir Logout
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ 
+          success: false, 
+          message: "Gagal logout" 
+        });
+      }
+      res.clearCookie('sessionId');
+      res.json({ 
+        success: true, 
+        message: "Logout berhasil" 
+      });
+    });
+  });
+
+  // Check session status
+  app.get("/api/auth/session", (req, res) => {
+    if (req.session.userId && req.session.role) {
+      res.json({
+        success: true,
+        authenticated: true,
+        user: {
+          id: req.session.userId,
+          username: req.session.username,
+          role: req.session.role
+        }
+      });
+    } else {
+      res.json({
+        success: true,
+        authenticated: false
       });
     }
   });
@@ -113,6 +155,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: result.error 
         });
       }
+
+      // Set session data on successful login
+      req.session.memberId = result.member.id;
+      req.session.role = 'member';
       
       res.json({ 
         success: true, 
@@ -132,6 +178,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: error.errors ? "Data tidak valid" : "Gagal login" 
       });
     }
+  });
+
+  // Member Logout
+  app.post("/api/members/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ 
+          success: false, 
+          message: "Gagal logout" 
+        });
+      }
+      res.clearCookie('sessionId');
+      res.json({ 
+        success: true, 
+        message: "Logout berhasil" 
+      });
+    });
   });
 
   // Member Dashboard Routes
