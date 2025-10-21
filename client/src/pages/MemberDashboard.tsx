@@ -31,14 +31,14 @@ export default function MemberDashboard() {
     }
   }, [navigate]);
   
-  // Fetch member profile data
-  const { data: memberProfile, isLoading: profileLoading, error: profileError } = useQuery({
-    queryKey: ['/api/members', memberId, 'profile'],
+  // Fetch consolidated member dashboard data (optimized single query)
+  const { data: dashboardData, isLoading: profileLoading, error: profileError } = useQuery({
+    queryKey: ['/api/members', memberId, 'dashboard'],
     queryFn: async () => {
       if (!memberId) throw new Error('No member ID');
-      const response = await fetch(`/api/members/${memberId}/profile`);
+      const response = await fetch(`/api/members/${memberId}/dashboard`);
       if (!response.ok) {
-        throw new Error('Failed to fetch profile');
+        throw new Error('Failed to fetch dashboard');
       }
       const result = await response.json();
       return result.data;
@@ -46,6 +46,14 @@ export default function MemberDashboard() {
     enabled: !!memberId,
     retry: 1,
   });
+
+  // Extract member profile from dashboard data
+  const memberProfile = dashboardData ? {
+    id: dashboardData.member.id,
+    namaLengkap: dashboardData.member.namaLengkap,
+    noWhatsApp: dashboardData.member.noWhatsApp,
+    totalPoints: dashboardData.points
+  } : null;
   
   // Fetch active vouchers
   const { data: activeVouchers, isLoading: vouchersLoading } = useQuery({
@@ -99,9 +107,9 @@ export default function MemberDashboard() {
         title: "Voucher berhasil diklaim!",
         description: "Voucher telah ditambahkan ke akun Anda.",
       });
-      // Invalidate and refetch member profile to update points
+      // Invalidate and refetch consolidated dashboard to update points and voucher claims
       if (memberId) {
-        queryClient.invalidateQueries({ queryKey: ['/api/members', memberId, 'profile'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/members', memberId, 'dashboard'] });
         // Optionally invalidate vouchers list to update availability
         queryClient.invalidateQueries({ queryKey: ['/api/vouchers/active'] });
       }
@@ -183,11 +191,21 @@ export default function MemberDashboard() {
   };
 
   const renderVouchersSection = () => {
-    if (vouchersLoading) {
+    // Wait for both vouchers and profile data before rendering
+    if (vouchersLoading || profileLoading) {
       return (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
           <span className="ml-2 text-muted-foreground">Memuat voucher...</span>
+        </div>
+      );
+    }
+
+    // Don't render if profile is not loaded (needed for points comparison)
+    if (!memberProfile) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">Gagal memuat data profil</p>
         </div>
       );
     }
