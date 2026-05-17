@@ -15,6 +15,7 @@ import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { apiFetch } from '@/lib/api';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -63,7 +64,7 @@ export default function AdminVouchers() {
   const { data: vouchers, isLoading, error } = useQuery({
     queryKey: ['/api/admin/vouchers'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/vouchers');
+      const response = await apiFetch('/api/admin/vouchers');
       if (!response.ok) {
         throw new Error('Failed to fetch vouchers');
       }
@@ -75,7 +76,7 @@ export default function AdminVouchers() {
   // Create voucher mutation
   const createVoucherMutation = useMutation({
     mutationFn: async (data: VoucherFormData) => {
-      const response = await fetch('/api/admin/vouchers', {
+      const response = await apiFetch('/api/admin/vouchers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +113,7 @@ export default function AdminVouchers() {
   // Update voucher mutation
   const updateVoucherMutation = useMutation({
     mutationFn: async (data: VoucherFormData & { id: string }) => {
-      const response = await fetch(`/api/admin/vouchers/${data.id}`, {
+      const response = await apiFetch(`/api/admin/vouchers/${data.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +154,7 @@ export default function AdminVouchers() {
   // Delete voucher mutation
   const deleteVoucherMutation = useMutation({
     mutationFn: async (voucherId: string) => {
-      const response = await fetch(`/api/admin/vouchers/${voucherId}`, {
+      const response = await apiFetch(`/api/admin/vouchers/${voucherId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

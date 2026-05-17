@@ -7,9 +7,9 @@ import { ArrowLeft, User, Ticket, Gift, Phone, Loader2, LogOut } from 'lucide-re
 import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import MemberSummaryPanel from '@/components/MemberSummaryPanel';
-import { pageSEOConfigs } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { apiFetch } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 type TabType = 'profile' | 'vouchers' | 'promo';
@@ -20,24 +20,20 @@ export default function MemberDashboard() {
   const [memberId, setMemberId] = useState<string | null>(null);
   const { toast } = useToast();
   
-  // Get logged-in member ID from localStorage
   useEffect(() => {
     const memberData = localStorage.getItem('memberData');
     if (memberData) {
       const member = JSON.parse(memberData);
       setMemberId(member.id);
-    } else {
-      // No logged in member, redirect to login
-      navigate('/member/login');
     }
-  }, [navigate]);
+  }, []);
   
   // Fetch consolidated member dashboard data (optimized single query)
   const { data: dashboardData, isLoading: profileLoading, error: profileError } = useQuery({
     queryKey: ['/api/members', memberId, 'dashboard'],
     queryFn: async () => {
       if (!memberId) throw new Error('No member ID');
-      const response = await fetch(`/api/members/${memberId}/dashboard`);
+      const response = await apiFetch(`/api/members/${memberId}/dashboard`);
       if (!response.ok) {
         throw new Error('Failed to fetch dashboard');
       }
@@ -60,7 +56,7 @@ export default function MemberDashboard() {
   const { data: activeVouchers, isLoading: vouchersLoading } = useQuery({
     queryKey: ['/api/vouchers/active'],
     queryFn: async () => {
-      const response = await fetch('/api/vouchers/active');
+      const response = await apiFetch('/api/vouchers/active');
       if (!response.ok) {
         throw new Error('Failed to fetch vouchers');
       }
@@ -74,7 +70,7 @@ export default function MemberDashboard() {
   const { data: activePromos, isLoading: promosLoading } = useQuery({
     queryKey: ['/api/promos/active'],
     queryFn: async () => {
-      const response = await fetch('/api/promos/active');
+      const response = await apiFetch('/api/promos/active');
       if (!response.ok) {
         throw new Error('Failed to fetch promos');
       }
@@ -87,15 +83,12 @@ export default function MemberDashboard() {
   // Voucher claiming mutation
   const claimVoucherMutation = useMutation({
     mutationFn: async (voucherId: string) => {
-      const response = await fetch('/api/vouchers/claim', {
+      const response = await apiFetch('/api/vouchers/claim', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          voucherId,
-          memberId 
-        }),
+        body: JSON.stringify({ voucherId }),
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -128,7 +121,12 @@ export default function MemberDashboard() {
     claimVoucherMutation.mutate(voucherId);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await apiFetch('/api/members/logout', { method: 'POST' });
+    } catch {
+      // Tetap bersihkan state lokal meski request gagal
+    }
     localStorage.removeItem('memberData');
     toast({
       title: "Logout berhasil",

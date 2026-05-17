@@ -70,6 +70,13 @@ export const pageSEOConfigs = {
     keywords: "catering gadang barubah, katering padang, catering pernikahan padang, catering event makanan padang, layanan katering, menu catering padang",
     path: "/services/catering"
   }),
+
+  membership: createSEOConfig({
+    title: "VIP Membership Gadang Barubah - Program Member Eksklusif",
+    description: "Bergabung program membership Gadang Barubah: Silver, Gold, dan Platinum. Nikmati diskon, poin reward, delivery gratis, dan benefit eksklusif lainnya.",
+    keywords: "membership gadang barubah, vip member padang, program member restoran, diskon nasi padang, reward poin gadang barubah",
+    path: "/services/membership"
+  }),
   
   memberLogin: createSEOConfig({
     title: "Login Member VIP Gadang Barubah - Akses Eksklusif Istimewa",
@@ -87,11 +94,12 @@ export const pageSEOConfigs = {
     noIndex: true
   }),
   
-  comingSoon: createSEOConfig({
-    title: "Coming Soon - Fitur Baru Gadang Barubah",
-    description: "Fitur baru Gadang Barubah segera hadir! Pantai terus update terbaru dari rumah makan Padang favorit Anda.",
-    keywords: "coming soon gadang barubah, fitur baru, update gadang barubah, segera hadir",
-    path: "/member/dashboard"
+  memberDashboard: createSEOConfig({
+    title: "Dashboard Member VIP - Gadang Barubah",
+    description: "Kelola profil member, poin reward, klaim voucher, dan promo eksklusif Gadang Barubah.",
+    keywords: "dashboard member gadang barubah, poin reward, voucher member, akun vip",
+    path: "/member/dashboard",
+    noIndex: true
   }),
   
   notFound: createSEOConfig({
@@ -114,9 +122,10 @@ export function getSEOConfigByPath(path: string) {
   if (normalizedPath === '/services/delivery') return pageSEOConfigs.delivery;
   if (normalizedPath === '/services/partnership') return pageSEOConfigs.partnership;
   if (normalizedPath === '/services/catering') return pageSEOConfigs.catering;
-  if (normalizedPath === '/member/login' || normalizedPath === '/services/membership') return pageSEOConfigs.memberLogin;
+  if (normalizedPath === '/services/membership') return pageSEOConfigs.membership;
+  if (normalizedPath === '/member/login') return pageSEOConfigs.memberLogin;
   if (normalizedPath === '/member/register') return pageSEOConfigs.memberRegister;
-  if (normalizedPath === '/member/dashboard') return pageSEOConfigs.comingSoon;
+  if (normalizedPath === '/member/dashboard') return pageSEOConfigs.memberDashboard;
   
   // Default fallback
   return pageSEOConfigs.notFound;

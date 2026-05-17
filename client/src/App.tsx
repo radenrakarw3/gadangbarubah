@@ -7,6 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { initializeAnalytics, trackPageView } from "@/lib/analytics";
 import { useEffect, useState } from "react";
 import WelcomePage from "@/components/WelcomePage";
+import UniPage from "@/components/UniPage";
 import OutletPage from "@/components/services/OutletPage";
 import DeliveryPage from "@/components/services/DeliveryPage";
 import PartnershipPage from "@/components/services/PartnershipPage";
@@ -21,6 +22,7 @@ import AdminPromos from "@/pages/AdminPromos";
 import AdminMembers from "@/pages/AdminMembers";
 import AdminBills from "@/pages/AdminBills";
 import AdminCampaigns from "@/pages/AdminCampaigns";
+import AdminUsers from "@/pages/AdminUsers";
 import KasirDashboard from "@/pages/KasirDashboard";
 import LoginAdmin from "@/components/LoginAdmin";
 import LoginKasir from "@/components/LoginKasir";
@@ -50,7 +52,10 @@ function ProtectedRoute({ role, component: Component, loginComponent: LoginCompo
         
         if (response.ok) {
           const data = await response.json();
-          setIsAuthenticated(data.authenticated && data.user?.role === role);
+          setIsAuthenticated(
+            data.authenticated &&
+              (data.user?.role === role || data.role === role),
+          );
         } else {
           setIsAuthenticated(false);
         }
@@ -110,6 +115,63 @@ function ProtectedAdminCampaigns() {
   return <ProtectedRoute role="admin" component={AdminCampaigns} loginComponent={LoginAdmin} />;
 }
 
+function ProtectedAdminUsers() {
+  return <ProtectedRoute role="admin" component={AdminUsers} loginComponent={LoginAdmin} />;
+}
+
+function ProtectedMemberRoute() {
+  const [, navigate] = useLocation();
+  const [isReady, setIsReady] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkMemberSession = async () => {
+      try {
+        const response = await fetch("/api/auth/session", {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.authenticated && data.role === "member" && data.member?.id) {
+            localStorage.setItem("memberData", JSON.stringify(data.member));
+            setIsAuthenticated(true);
+            return;
+          }
+        }
+
+        const stored = localStorage.getItem("memberData");
+        setIsAuthenticated(!!stored);
+      } catch {
+        setIsAuthenticated(!!localStorage.getItem("memberData"));
+      } finally {
+        setIsReady(true);
+      }
+    };
+
+    checkMemberSession();
+  }, []);
+
+  useEffect(() => {
+    if (isReady && !isAuthenticated) {
+      navigate("/member/login");
+    }
+  }, [isReady, isAuthenticated, navigate]);
+
+  if (!isReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground">
+        Memuat...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return <MemberDashboard />;
+}
 
 function Router() {
   const [location] = useLocation();
@@ -125,6 +187,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={WelcomePage} />
+      <Route path="/uni" component={UniPage} />
       <Route path="/services/outlet" component={OutletPage} />
       <Route path="/services/delivery" component={DeliveryPage} />
       <Route path="/services/partnership" component={PartnershipPage} />
@@ -132,13 +195,14 @@ function Router() {
       <Route path="/services/catering" component={CateringPage} />
       <Route path="/member/login" component={MemberLogin} />
       <Route path="/member/register" component={MemberRegister} />
-      <Route path="/member/dashboard" component={MemberDashboard} />
+      <Route path="/member/dashboard" component={ProtectedMemberRoute} />
       <Route path="/admin" component={ProtectedAdminRoute} />
       <Route path="/admin/vouchers" component={ProtectedAdminVouchers} />
       <Route path="/admin/promos" component={ProtectedAdminPromos} />
       <Route path="/admin/campaigns" component={ProtectedAdminCampaigns} />
       <Route path="/admin/members" component={ProtectedAdminMembers} />
       <Route path="/admin/bills" component={ProtectedAdminBills} />
+      <Route path="/admin/users" component={ProtectedAdminUsers} />
       <Route path="/kasir" component={ProtectedKasirRoute} />
       <Route component={NotFound} />
     </Switch>

@@ -14,6 +14,7 @@ import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
+import { apiFetch } from '@/lib/api';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -73,7 +74,7 @@ export default function AdminMembers() {
   // Update member mutation
   const updateMemberMutation = useMutation({
     mutationFn: async (data: MemberEditFormData & { id: string }) => {
-      const response = await fetch(`/api/admin/members/${data.id}`, {
+      const response = await apiFetch(`/api/admin/members/${data.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +114,7 @@ export default function AdminMembers() {
   // Delete member mutation
   const deleteMemberMutation = useMutation({
     mutationFn: async (memberId: string) => {
-      const response = await fetch(`/api/admin/members/${memberId}`, {
+      const response = await apiFetch(`/api/admin/members/${memberId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

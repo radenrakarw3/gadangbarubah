@@ -5,7 +5,7 @@ import {
   type Promo, type InsertPromo, type Bill, type InsertBill,
   type VoucherClaim, type ClaimVoucherRequest, type Campaign, type InsertCampaign
 } from "@shared/schema";
-import { db } from "./db";
+import { requireDb } from "./db";
 import { eq, and, desc, asc, gte, lte, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -82,16 +82,28 @@ export interface IStorage {
   updateCampaignStatus(id: string, status: 'active' | 'inactive'): Promise<Campaign>;
   deleteCampaign(id: string): Promise<void>;
   incrementCampaignViewCount(id: string): Promise<void>;
+
+  getAdminStats(): Promise<{
+    totalMembers: number;
+    activeVouchers: number;
+    activePromos: number;
+    totalBills: number;
+    pendingVoucherClaims: number;
+    staffCount: number;
+    hasActiveCampaign: boolean;
+  }>;
+  getStaffUsers(): Promise<Array<Omit<User, "password">>>;
+  deleteStaffUser(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const [user] = await requireDb().select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await requireDb().select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
 
@@ -100,7 +112,7 @@ export class DatabaseStorage implements IStorage {
     const saltRounds = 12;
     const password = await bcrypt.hash(insertUser.password, saltRounds);
     
-    const [user] = await db
+    const [user] = await requireDb()
       .insert(users)
       .values({
         ...insertUser,
@@ -117,7 +129,7 @@ export class DatabaseStorage implements IStorage {
     lockTimeRemaining?: number;
     attemptsRemaining?: number;
   } | null> {
-    const [user] = await db
+    const [user] = await requireDb()
       .select()
       .from(users)
       .where(eq(users.username, username));
@@ -170,14 +182,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async resetFailedAttempts(userId: string): Promise<void> {
-    await db
+    await requireDb()
       .update(users)
       .set({ failedAttempts: 0, lockedUntil: null })
       .where(eq(users.id, userId));
   }
 
   async incrementFailedAttempts(userId: string): Promise<void> {
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    const [user] = await requireDb().select().from(users).where(eq(users.id, userId));
     
     if (!user) return;
 
@@ -190,7 +202,7 @@ export class DatabaseStorage implements IStorage {
       updates.lockedUntil = lockUntil;
     }
 
-    await db
+    await requireDb()
       .update(users)
       .set(updates)
       .where(eq(users.id, userId));
@@ -203,12 +215,12 @@ export class DatabaseStorage implements IStorage {
 
   // Member methods
   async getMember(id: string): Promise<Member | undefined> {
-    const [member] = await db.select().from(members).where(eq(members.id, id));
+    const [member] = await requireDb().select().from(members).where(eq(members.id, id));
     return member || undefined;
   }
 
   async getMemberByWhatsApp(noWhatsApp: string): Promise<Member | undefined> {
-    const [member] = await db.select().from(members).where(eq(members.noWhatsApp, noWhatsApp));
+    const [member] = await requireDb().select().from(members).where(eq(members.noWhatsApp, noWhatsApp));
     return member || undefined;
   }
 
@@ -218,7 +230,7 @@ export class DatabaseStorage implements IStorage {
     const pinHash = await bcrypt.hash(insertMember.pin, saltRounds);
     
     const { pin, ...memberData } = insertMember;
-    const [member] = await db
+    const [member] = await requireDb()
       .insert(members)
       .values({
         ...memberData,
@@ -229,7 +241,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async loginMember(noWhatsApp: string, pin: string): Promise<{ member: Member; error?: string } | null> {
-    const [member] = await db
+    const [member] = await requireDb()
       .select()
       .from(members)
       .where(eq(members.noWhatsApp, noWhatsApp));
@@ -267,14 +279,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async resetMemberFailedAttempts(memberId: string): Promise<void> {
-    await db
+    await requireDb()
       .update(members)
       .set({ failedAttempts: 0, lockedUntil: null })
       .where(eq(members.id, memberId));
   }
 
   async incrementMemberFailedAttempts(memberId: string): Promise<void> {
-    const [member] = await db.select().from(members).where(eq(members.id, memberId));
+    const [member] = await requireDb().select().from(members).where(eq(members.id, memberId));
     
     if (!member) return;
 
@@ -287,14 +299,14 @@ export class DatabaseStorage implements IStorage {
       updates.lockedUntil = lockUntil;
     }
 
-    await db
+    await requireDb()
       .update(members)
       .set(updates)
       .where(eq(members.id, memberId));
   }
 
   async updateMember(id: string, updateData: Partial<Omit<InsertMember, 'pin'>>): Promise<Member> {
-    const [updatedMember] = await db
+    const [updatedMember] = await requireDb()
       .update(members)
       .set(updateData)
       .where(eq(members.id, id))
@@ -309,12 +321,12 @@ export class DatabaseStorage implements IStorage {
 
   async deleteMember(id: string): Promise<void> {
     // Delete related records first (foreign key constraints)
-    await db.delete(memberPoints).where(eq(memberPoints.memberId, id));
-    await db.delete(bills).where(eq(bills.memberId, id));
-    await db.delete(voucherClaims).where(eq(voucherClaims.memberId, id));
+    await requireDb().delete(memberPoints).where(eq(memberPoints.memberId, id));
+    await requireDb().delete(bills).where(eq(bills.memberId, id));
+    await requireDb().delete(voucherClaims).where(eq(voucherClaims.memberId, id));
     
     // Delete the member
-    const result = await db.delete(members).where(eq(members.id, id));
+    const result = await requireDb().delete(members).where(eq(members.id, id));
     
     // Verify deletion was successful
     if (!result.rowCount) {
@@ -324,12 +336,12 @@ export class DatabaseStorage implements IStorage {
 
   // Member points methods
   async getMemberPoints(memberId: string): Promise<MemberPoints | undefined> {
-    const [points] = await db.select().from(memberPoints).where(eq(memberPoints.memberId, memberId));
+    const [points] = await requireDb().select().from(memberPoints).where(eq(memberPoints.memberId, memberId));
     return points || undefined;
   }
 
   async initializeMemberPoints(memberId: string): Promise<MemberPoints> {
-    const [points] = await db
+    const [points] = await requireDb()
       .insert(memberPoints)
       .values({ memberId, totalPoints: 0 })
       .onConflictDoNothing()
@@ -344,7 +356,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateMemberPoints(memberId: string, totalPoints: number): Promise<MemberPoints> {
-    const [points] = await db
+    const [points] = await requireDb()
       .update(memberPoints)
       .set({ totalPoints, updatedAt: new Date() })
       .where(eq(memberPoints.memberId, memberId))
@@ -354,20 +366,28 @@ export class DatabaseStorage implements IStorage {
 
   // Voucher methods (Admin)
   async createVoucher(voucher: InsertVoucher, createdBy: string): Promise<Voucher> {
-    const [newVoucher] = await db
+    const [newVoucher] = await requireDb()
       .insert(vouchers)
-      .values({ ...voucher, createdBy })
+      .values({
+        title: voucher.title,
+        description: voucher.description,
+        pointsCost: voucher.pointsCost,
+        validFrom: new Date(voucher.validFrom),
+        validUntil: new Date(voucher.validUntil),
+        isActive: voucher.isActive ?? true,
+        createdBy,
+      })
       .returning();
     return newVoucher;
   }
 
   async getVouchers(): Promise<Voucher[]> {
-    return await db.select().from(vouchers).orderBy(desc(vouchers.createdAt));
+    return await requireDb().select().from(vouchers).orderBy(desc(vouchers.createdAt));
   }
 
   async getActiveVouchers(): Promise<Voucher[]> {
     const now = new Date();
-    return await db
+    return await requireDb()
       .select()
       .from(vouchers)
       .where(
@@ -381,14 +401,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getVoucher(id: string): Promise<Voucher | undefined> {
-    const [voucher] = await db.select().from(vouchers).where(eq(vouchers.id, id));
+    const [voucher] = await requireDb().select().from(vouchers).where(eq(vouchers.id, id));
     return voucher || undefined;
   }
 
   async updateVoucher(id: string, voucherData: Partial<InsertVoucher>): Promise<Voucher> {
-    const [updatedVoucher] = await db
+    const { validFrom, validUntil, ...rest } = voucherData;
+    const [updatedVoucher] = await requireDb()
       .update(vouchers)
-      .set(voucherData)
+      .set({
+        ...rest,
+        ...(validFrom !== undefined && { validFrom: new Date(validFrom) }),
+        ...(validUntil !== undefined && { validUntil: new Date(validUntil) }),
+      })
       .where(eq(vouchers.id, id))
       .returning();
       
@@ -407,13 +432,13 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Check if voucher has any claims before deleting
-    const claims = await db.select().from(voucherClaims).where(eq(voucherClaims.voucherId, id));
+    const claims = await requireDb().select().from(voucherClaims).where(eq(voucherClaims.voucherId, id));
     if (claims.length > 0) {
       throw new Error('Tidak dapat menghapus voucher yang sudah diklaim oleh member');
     }
 
     // Delete the voucher
-    const result = await db.delete(vouchers).where(eq(vouchers.id, id));
+    const result = await requireDb().delete(vouchers).where(eq(vouchers.id, id));
     
     // Verify deletion was successful
     if (!result.rowCount) {
@@ -423,20 +448,27 @@ export class DatabaseStorage implements IStorage {
 
   // Promo methods (Admin)
   async createPromo(promo: InsertPromo, createdBy: string): Promise<Promo> {
-    const [newPromo] = await db
+    const [newPromo] = await requireDb()
       .insert(promos)
-      .values({ ...promo, createdBy })
+      .values({
+        title: promo.title,
+        description: promo.description,
+        validFrom: new Date(promo.validFrom),
+        validUntil: new Date(promo.validUntil),
+        isActive: promo.isActive ?? true,
+        createdBy,
+      })
       .returning();
     return newPromo;
   }
 
   async getPromos(): Promise<Promo[]> {
-    return await db.select().from(promos).orderBy(desc(promos.createdAt));
+    return await requireDb().select().from(promos).orderBy(desc(promos.createdAt));
   }
 
   async getActivePromos(): Promise<Promo[]> {
     const now = new Date();
-    return await db
+    return await requireDb()
       .select()
       .from(promos)
       .where(
@@ -450,14 +482,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPromo(id: string): Promise<Promo | undefined> {
-    const [promo] = await db.select().from(promos).where(eq(promos.id, id));
+    const [promo] = await requireDb().select().from(promos).where(eq(promos.id, id));
     return promo || undefined;
   }
 
   async updatePromo(id: string, promoData: Partial<InsertPromo>): Promise<Promo> {
-    const [updatedPromo] = await db
+    const { validFrom, validUntil, ...rest } = promoData;
+    const [updatedPromo] = await requireDb()
       .update(promos)
-      .set(promoData)
+      .set({
+        ...rest,
+        ...(validFrom !== undefined && { validFrom: new Date(validFrom) }),
+        ...(validUntil !== undefined && { validUntil: new Date(validUntil) }),
+      })
       .where(eq(promos.id, id))
       .returning();
       
@@ -476,7 +513,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Delete the promo (promos don't have related data like voucher claims)
-    const result = await db.delete(promos).where(eq(promos.id, id));
+    const result = await requireDb().delete(promos).where(eq(promos.id, id));
     
     // Verify deletion was successful
     if (!result.rowCount) {
@@ -486,7 +523,7 @@ export class DatabaseStorage implements IStorage {
 
   // Bill methods (Kasir) - Transactional point awarding
   async createBillAndAwardPoints(bill: InsertBill, processedBy: string): Promise<Bill> {
-    return await db.transaction(async (tx) => {
+    return await requireDb().transaction(async (tx) => {
       // Calculate points: 1 point per 1000 rupiah
       const pointsAwarded = Math.floor(bill.totalAmount / 1000);
       
@@ -516,12 +553,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMemberBills(memberId: string): Promise<Bill[]> {
-    return await db.select().from(bills).where(eq(bills.memberId, memberId)).orderBy(desc(bills.createdAt));
+    return await requireDb().select().from(bills).where(eq(bills.memberId, memberId)).orderBy(desc(bills.createdAt));
   }
 
   // Voucher claim methods - Transactional voucher claiming
   async claimVoucher(memberId: string, voucherId: string): Promise<VoucherClaim> {
-    return await db.transaction(async (tx) => {
+    return await requireDb().transaction(async (tx) => {
       // Get voucher details
       const [voucher] = await tx.select().from(vouchers).where(eq(vouchers.id, voucherId));
       if (!voucher) {
@@ -565,11 +602,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMemberVoucherClaims(memberId: string): Promise<VoucherClaim[]> {
-    return await db.select().from(voucherClaims).where(eq(voucherClaims.memberId, memberId)).orderBy(desc(voucherClaims.claimedAt));
+    return await requireDb().select().from(voucherClaims).where(eq(voucherClaims.memberId, memberId)).orderBy(desc(voucherClaims.claimedAt));
   }
 
   async redeemVoucherClaim(claimId: string): Promise<VoucherClaim> {
-    const [claim] = await db
+    const [claim] = await requireDb()
       .update(voucherClaims)
       .set({ status: "redeemed", redeemedAt: new Date() })
       .where(
@@ -589,7 +626,7 @@ export class DatabaseStorage implements IStorage {
 
   // Admin methods - Data member dan riwayat transaksi
   async getAllMembers(): Promise<Array<Omit<Member, 'pinHash'> & { totalPoints: number; billsCount: number }>> {
-    const result = await db
+    const result = await requireDb()
       .select({
         id: members.id,
         namaLengkap: members.namaLengkap,
@@ -617,7 +654,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllBills(): Promise<Array<Bill & { memberName: string; memberWhatsApp: string }>> {
-    const result = await db
+    const result = await requireDb()
       .select({
         id: bills.id,
         memberId: bills.memberId,
@@ -637,7 +674,7 @@ export class DatabaseStorage implements IStorage {
 
   // Kasir methods - Voucher claims management
   async getAllVoucherClaims(): Promise<Array<VoucherClaim & { voucherTitle: string; memberName: string; memberWhatsApp: string }>> {
-    const result = await db
+    const result = await requireDb()
       .select({
         id: voucherClaims.id,
         voucherId: voucherClaims.voucherId,
@@ -668,7 +705,7 @@ export class DatabaseStorage implements IStorage {
     // Execute all queries in parallel for maximum performance
     const [member, memberPointsRecord, claims, recentBills] = await Promise.all([
       // Get member info (without pinHash)
-      db.select({
+      requireDb().select({
         id: members.id,
         namaLengkap: members.namaLengkap,
         jenisKelamin: members.jenisKelamin,
@@ -677,13 +714,14 @@ export class DatabaseStorage implements IStorage {
         kodePos: members.kodePos,
         failedAttempts: members.failedAttempts,
         lockedUntil: members.lockedUntil,
+        createdAt: members.createdAt,
       }).from(members).where(eq(members.id, memberId)).limit(1),
       
       // Get member points
-      db.select().from(memberPoints).where(eq(memberPoints.memberId, memberId)).limit(1),
+      requireDb().select().from(memberPoints).where(eq(memberPoints.memberId, memberId)).limit(1),
       
       // Get voucher claims with voucher titles (last 20)
-      db.select({
+      requireDb().select({
         id: voucherClaims.id,
         voucherId: voucherClaims.voucherId,
         memberId: voucherClaims.memberId,
@@ -700,7 +738,7 @@ export class DatabaseStorage implements IStorage {
       .limit(20),
       
       // Get recent bills (last 10)
-      db.select()
+      requireDb().select()
         .from(bills)
         .where(eq(bills.memberId, memberId))
         .orderBy(desc(bills.createdAt))
@@ -721,7 +759,7 @@ export class DatabaseStorage implements IStorage {
 
   // Campaign methods - Popup for landing page
   async createCampaign(campaign: InsertCampaign, imagePath: string, createdBy: string): Promise<Campaign> {
-    const [newCampaign] = await db
+    const [newCampaign] = await requireDb()
       .insert(campaigns)
       .values({
         title: campaign.title,
@@ -737,7 +775,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCampaigns(): Promise<Campaign[]> {
-    const result = await db
+    const result = await requireDb()
       .select()
       .from(campaigns)
       .orderBy(desc(campaigns.createdAt));
@@ -747,7 +785,7 @@ export class DatabaseStorage implements IStorage {
 
   async getActiveCampaign(): Promise<Campaign | undefined> {
     const now = new Date();
-    const [campaign] = await db
+    const [campaign] = await requireDb()
       .select()
       .from(campaigns)
       .where(
@@ -765,13 +803,13 @@ export class DatabaseStorage implements IStorage {
   async updateCampaignStatus(id: string, status: 'active' | 'inactive'): Promise<Campaign> {
     // If setting to active, first set all others to inactive (only 1 active allowed)
     if (status === 'active') {
-      await db
+      await requireDb()
         .update(campaigns)
         .set({ status: 'inactive' })
         .where(eq(campaigns.status, 'active'));
     }
 
-    const [updated] = await db
+    const [updated] = await requireDb()
       .update(campaigns)
       .set({ status })
       .where(eq(campaigns.id, id))
@@ -785,7 +823,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCampaign(id: string): Promise<void> {
-    const result = await db.delete(campaigns).where(eq(campaigns.id, id));
+    const result = await requireDb().delete(campaigns).where(eq(campaigns.id, id));
     
     // Verify deletion was successful
     if (!result.rowCount) {
@@ -794,10 +832,84 @@ export class DatabaseStorage implements IStorage {
   }
 
   async incrementCampaignViewCount(id: string): Promise<void> {
-    await db
+    await requireDb()
       .update(campaigns)
       .set({ viewCount: sql`${campaigns.viewCount} + 1` })
       .where(eq(campaigns.id, id));
+  }
+
+  async getAdminStats() {
+    const [[memberRow], [billRow], [claimRow], [staffRow]] = await Promise.all([
+      requireDb().select({ count: sql<number>`count(*)::int` }).from(members),
+      requireDb().select({ count: sql<number>`count(*)::int` }).from(bills),
+      requireDb()
+        .select({ count: sql<number>`count(*)::int` })
+        .from(voucherClaims)
+        .where(eq(voucherClaims.status, "claimed")),
+      requireDb().select({ count: sql<number>`count(*)::int` }).from(users),
+    ]);
+
+    const [activeVouchers, activePromos, activeCampaign] = await Promise.all([
+      this.getActiveVouchers(),
+      this.getActivePromos(),
+      this.getActiveCampaign(),
+    ]);
+
+    return {
+      totalMembers: memberRow?.count ?? 0,
+      activeVouchers: activeVouchers.length,
+      activePromos: activePromos.length,
+      totalBills: billRow?.count ?? 0,
+      pendingVoucherClaims: claimRow?.count ?? 0,
+      staffCount: staffRow?.count ?? 0,
+      hasActiveCampaign: !!activeCampaign,
+    };
+  }
+
+  async getStaffUsers(): Promise<Array<Omit<User, "password">>> {
+    const rows = await requireDb()
+      .select({
+        id: users.id,
+        username: users.username,
+        role: users.role,
+        failedAttempts: users.failedAttempts,
+        lockedUntil: users.lockedUntil,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .orderBy(desc(users.createdAt));
+
+    return rows;
+  }
+
+  async deleteStaffUser(id: string): Promise<void> {
+    const user = await this.getUser(id);
+    if (!user) {
+      throw new Error("User tidak ditemukan");
+    }
+
+    if (user.role === "admin") {
+      const [adminCount] = await requireDb()
+        .select({ count: sql<number>`count(*)::int` })
+        .from(users)
+        .where(eq(users.role, "admin"));
+      if ((adminCount?.count ?? 0) <= 1) {
+        throw new Error("Tidak dapat menghapus admin terakhir");
+      }
+    }
+
+    const [billUsage] = await requireDb()
+      .select({ count: sql<number>`count(*)::int` })
+      .from(bills)
+      .where(eq(bills.processedBy, id));
+    if ((billUsage?.count ?? 0) > 0) {
+      throw new Error("User memiliki riwayat transaksi dan tidak dapat dihapus");
+    }
+
+    const result = await requireDb().delete(users).where(eq(users.id, id));
+    if (!result.rowCount) {
+      throw new Error("Gagal menghapus user");
+    }
   }
 }
 

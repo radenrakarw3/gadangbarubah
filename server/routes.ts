@@ -2,13 +2,41 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
-  insertMemberSchema, loginMemberSchema, loginUserSchema, insertVoucherSchema, 
-  insertPromoSchema, insertBillSchema, claimVoucherSchema, insertCampaignSchema
+  insertMemberSchema, loginMemberSchema, loginUserSchema, insertUserSchema,
+  insertVoucherSchema, insertPromoSchema, insertBillSchema, claimVoucherSchema,
+  insertCampaignSchema,
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { memberEndpointSecurity } from "./security";
+import {
+  requireAdmin,
+  requireAdminOrKasir,
+  requireMember,
+} from "./auth-middleware";
+import type { Request, Response, NextFunction } from "express";
 import { upload, validateImageDimensions } from "./upload-middleware";
 import fs from "fs";
+
+function requireMemberSelf(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  if (!req.session.memberId) {
+    return res.status(401).json({
+      success: false,
+      message: "Silakan login sebagai member terlebih dahulu",
+    });
+  }
+  const paramId = req.params.memberId;
+  if (paramId && req.session.memberId !== paramId) {
+    return res.status(403).json({
+      success: false,
+      message: "Akses ditolak",
+    });
+  }
+  next();
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Rate limiting for member login - prevent brute force attacks
@@ -38,14 +66,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const newMember = await storage.createMember(validatedData);
-      res.json({ 
-        success: true, 
-        message: "Registrasi berhasil! Silakan login dengan nomor WhatsApp dan PIN Anda.",
-        member: { 
-          id: newMember.id, 
-          namaLengkap: newMember.namaLengkap, 
-          noWhatsApp: newMember.noWhatsApp 
-        } 
+
+      req.session.regenerate((err) => {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            message: "Registrasi berhasil tetapi gagal membuat session. Silakan login.",
+          });
+        }
+
+        req.session.memberId = newMember.id;
+        req.session.role = "member";
+        delete req.session.userId;
+        delete req.session.username;
+
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            return res.status(500).json({
+              success: false,
+              message: "Registrasi berhasil tetapi gagal menyimpan session. Silakan login.",
+            });
+          }
+
+          res.json({
+            success: true,
+            message: "Registrasi berhasil!",
+            member: {
+              id: newMember.id,
+              namaLengkap: newMember.namaLengkap,
+              noWhatsApp: newMember.noWhatsApp,
+              tanggalLahir: newMember.tanggalLahir,
+              kodePos: newMember.kodePos,
+            },
+          });
+        });
       });
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -90,9 +144,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Clear any stale role-specific fields and set new session data
+        const role = result.user.role;
+        if (role !== "admin" && role !== "kasir") {
+          return res.status(500).json({
+            success: false,
+            message: "Role pengguna tidak valid",
+          });
+        }
         req.session.userId = result.user.id;
         req.session.username = result.user.username;
-        req.session.role = result.user.role;
+        req.session.role = role;
         delete req.session.memberId; // Clear member session if exists
         
         req.session.save((err) => {
@@ -140,24 +201,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Check session status
-  app.get("/api/auth/session", (req, res) => {
-    if (req.session.userId && req.session.role) {
-      res.json({
+  // Check session status (admin/kasir or member)
+  app.get("/api/auth/session", async (req, res) => {
+    if (req.session.memberId && req.session.role === "member") {
+      const member = await storage.getMember(req.session.memberId);
+      if (!member) {
+        return res.json({ success: true, authenticated: false });
+      }
+      const { pinHash: _, ...safeMember } = member;
+      return res.json({
         success: true,
         authenticated: true,
+        role: "member",
+        member: safeMember,
+      });
+    }
+
+    if (req.session.userId && req.session.role) {
+      return res.json({
+        success: true,
+        authenticated: true,
+        role: req.session.role,
         user: {
           id: req.session.userId,
           username: req.session.username,
-          role: req.session.role
-        }
-      });
-    } else {
-      res.json({
-        success: true,
-        authenticated: false
+          role: req.session.role,
+        },
       });
     }
+
+    res.json({
+      success: true,
+      authenticated: false,
+    });
   });
 
   // Member Login with enhanced security and rate limiting
@@ -244,10 +320,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Consolidated Member Dashboard - Single optimized API call
-  app.get("/api/members/:memberId/dashboard", memberEndpointSecurity, async (req, res) => {
+  app.get(
+    "/api/members/:memberId/dashboard",
+    requireMember,
+    requireMemberSelf,
+    memberEndpointSecurity,
+    async (req, res) => {
     try {
       const { memberId } = req.params;
-      
       const dashboard = await storage.getMemberDashboard(memberId);
       
       res.json({
@@ -269,10 +349,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Gagal mengambil data dashboard" 
       });
     }
-  });
+  },
+  );
 
   // Member Dashboard Routes
-  app.get("/api/members/:memberId/profile", memberEndpointSecurity, async (req, res) => {
+  app.get(
+    "/api/members/:memberId/profile",
+    requireMember,
+    requireMemberSelf,
+    memberEndpointSecurity,
+    async (req, res) => {
     try {
       const { memberId } = req.params;
       
@@ -309,9 +395,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get member profile by WhatsApp number (for kasir)
-  app.get("/api/members/whatsapp/:noWhatsApp/profile", memberEndpointSecurity, async (req, res) => {
+  app.get(
+    "/api/members/whatsapp/:noWhatsApp/profile",
+    requireAdminOrKasir,
+    memberEndpointSecurity,
+    async (req, res) => {
     try {
-      const { noWhatsApp } = req.params;
+      const noWhatsApp = decodeURIComponent(req.params.noWhatsApp);
       
       const member = await storage.getMemberByWhatsApp(noWhatsApp);
       if (!member) {
@@ -345,7 +435,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/members/:memberId/voucher-claims", memberEndpointSecurity, async (req, res) => {
+  app.get(
+    "/api/members/:memberId/voucher-claims",
+    requireMember,
+    requireMemberSelf,
+    memberEndpointSecurity,
+    async (req, res) => {
     try {
       const { memberId } = req.params;
       
@@ -364,7 +459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Voucher Routes
-  app.get("/api/vouchers/active", memberEndpointSecurity, async (req, res) => {
+  app.get("/api/vouchers/active", requireMember, memberEndpointSecurity, async (req, res) => {
     try {
       const activeVouchers = await storage.getActiveVouchers();
       res.json({
@@ -380,18 +475,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/vouchers/claim", memberEndpointSecurity, async (req, res) => {
+  app.post("/api/vouchers/claim", requireMember, memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = claimVoucherSchema.parse(req.body);
-      const { memberId } = req.body; // Should come from authenticated session in real app
-      
-      if (!memberId) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Member ID diperlukan" 
-        });
-      }
-      
+      const memberId = req.session.memberId!;
+
       const claim = await storage.claimVoucher(memberId, validatedData.voucherId);
       res.json({
         success: true,
@@ -408,7 +496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Promo Routes
-  app.get("/api/promos/active", memberEndpointSecurity, async (req, res) => {
+  app.get("/api/promos/active", requireMember, memberEndpointSecurity, async (req, res) => {
     try {
       const activePromos = await storage.getActivePromos();
       res.json({
@@ -425,19 +513,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin Routes - Create Vouchers and Promos
-  app.post("/api/admin/vouchers", memberEndpointSecurity, async (req, res) => {
+  app.post("/api/admin/vouchers", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = insertVoucherSchema.parse(req.body);
-      const adminId = "admin-uuid-123"; // Using default admin ID
-      
-      // Convert string dates to Date objects for storage
-      const voucherData = {
-        ...validatedData,
-        validFrom: new Date(validatedData.validFrom),
-        validUntil: new Date(validatedData.validUntil),
-      } as any; // Type assertion for date conversion
-      
-      const voucher = await storage.createVoucher(voucherData, adminId);
+      const voucher = await storage.createVoucher(validatedData, req.session.userId!);
       res.json({
         success: true,
         message: "Voucher berhasil dibuat!",
@@ -452,19 +531,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/promos", memberEndpointSecurity, async (req, res) => {
+  app.post("/api/admin/promos", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = insertPromoSchema.parse(req.body);
-      const adminId = "admin-uuid-123"; // Using default admin ID
-      
-      // Convert string dates to Date objects for storage
-      const promoData = {
-        ...validatedData,
-        validFrom: new Date(validatedData.validFrom),
-        validUntil: new Date(validatedData.validUntil),
-      } as any; // Type assertion for date conversion
-      
-      const promo = await storage.createPromo(promoData, adminId);
+      const promo = await storage.createPromo(validatedData, req.session.userId!);
       res.json({
         success: true,
         message: "Promo berhasil dibuat!",
@@ -479,7 +549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/vouchers", memberEndpointSecurity, async (req, res) => {
+  app.get("/api/admin/vouchers", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const vouchers = await storage.getVouchers();
       res.json({
@@ -496,19 +566,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update voucher endpoint
-  app.put("/api/admin/vouchers/:id", memberEndpointSecurity, async (req, res) => {
+  app.put("/api/admin/vouchers/:id", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const { id } = req.params;
       const validatedData = insertVoucherSchema.parse(req.body);
-      
-      // Convert string dates to Date objects for storage
-      const voucherData = {
-        ...validatedData,
-        validFrom: new Date(validatedData.validFrom),
-        validUntil: new Date(validatedData.validUntil),
-      } as any;
-      
-      const updatedVoucher = await storage.updateVoucher(id, voucherData);
+      const updatedVoucher = await storage.updateVoucher(id, validatedData);
       res.json({
         success: true,
         message: "Voucher berhasil diperbarui!",
@@ -524,7 +586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete voucher endpoint
-  app.delete("/api/admin/vouchers/:id", memberEndpointSecurity, async (req, res) => {
+  app.delete("/api/admin/vouchers/:id", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -542,7 +604,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/promos", memberEndpointSecurity, async (req, res) => {
+  app.get("/api/admin/promos", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const promos = await storage.getPromos();
       res.json({
@@ -559,19 +621,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update promo endpoint
-  app.put("/api/admin/promos/:id", memberEndpointSecurity, async (req, res) => {
+  app.put("/api/admin/promos/:id", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const { id } = req.params;
       const validatedData = insertPromoSchema.parse(req.body);
-      
-      // Convert string dates to Date objects for storage
-      const promoData = {
-        ...validatedData,
-        validFrom: new Date(validatedData.validFrom),
-        validUntil: new Date(validatedData.validUntil),
-      } as any;
-      
-      const updatedPromo = await storage.updatePromo(id, promoData);
+
+      const updatedPromo = await storage.updatePromo(id, validatedData);
       res.json({
         success: true,
         message: "Promo berhasil diperbarui!",
@@ -587,7 +642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete promo endpoint
-  app.delete("/api/admin/promos/:id", memberEndpointSecurity, async (req, res) => {
+  app.delete("/api/admin/promos/:id", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -606,7 +661,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin endpoints for data member dan riwayat transaksi
-  app.get("/api/admin/members", memberEndpointSecurity, async (req, res) => {
+  app.get("/api/admin/members", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const members = await storage.getAllMembers();
       res.json({
@@ -623,7 +678,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update member endpoint
-  app.put("/api/admin/members/:id", memberEndpointSecurity, async (req, res) => {
+  app.put("/api/admin/members/:id", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const { id } = req.params;
       const { namaLengkap, jenisKelamin, noWhatsApp, tanggalLahir, kodePos } = req.body;
@@ -677,7 +732,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete member endpoint
-  app.delete("/api/admin/members/:id", memberEndpointSecurity, async (req, res) => {
+  app.delete("/api/admin/members/:id", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -704,7 +759,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/bills", memberEndpointSecurity, async (req, res) => {
+  app.get("/api/admin/stats", requireAdmin, memberEndpointSecurity, async (req, res) => {
+    try {
+      const stats = await storage.getAdminStats();
+      res.json({ success: true, data: stats });
+    } catch (error: any) {
+      console.error("Get admin stats error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Gagal mengambil ringkasan sistem",
+      });
+    }
+  });
+
+  app.get("/api/admin/users", requireAdmin, memberEndpointSecurity, async (req, res) => {
+    try {
+      const staff = await storage.getStaffUsers();
+      res.json({ success: true, data: staff });
+    } catch (error: any) {
+      console.error("Get staff users error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Gagal mengambil data user",
+      });
+    }
+  });
+
+  app.post("/api/admin/users", requireAdmin, memberEndpointSecurity, async (req, res) => {
+    try {
+      const validatedData = insertUserSchema.parse(req.body);
+      const existing = await storage.getUserByUsername(validatedData.username);
+      if (existing) {
+        return res.status(400).json({
+          success: false,
+          message: "Username sudah digunakan",
+        });
+      }
+
+      const user = await storage.createUser(validatedData);
+      const { password: _, ...safeUser } = user;
+      res.json({
+        success: true,
+        message: "User berhasil dibuat",
+        data: safeUser,
+      });
+    } catch (error: any) {
+      console.error("Create staff user error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.errors ? "Data tidak valid" : error.message || "Gagal membuat user",
+      });
+    }
+  });
+
+  app.delete("/api/admin/users/:id", requireAdmin, memberEndpointSecurity, async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (id === req.session.userId) {
+        return res.status(400).json({
+          success: false,
+          message: "Tidak dapat menghapus akun yang sedang login",
+        });
+      }
+
+      await storage.deleteStaffUser(id);
+      res.json({
+        success: true,
+        message: "User berhasil dihapus",
+      });
+    } catch (error: any) {
+      console.error("Delete staff user error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.message || "Gagal menghapus user",
+      });
+    }
+  });
+
+  app.get("/api/admin/bills", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const bills = await storage.getAllBills();
       res.json({
@@ -721,18 +853,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Kasir Routes - Create Bills and Award Points
-  app.post("/api/kasir/bills", memberEndpointSecurity, async (req, res) => {
+  app.post("/api/kasir/bills", requireAdminOrKasir, memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = insertBillSchema.parse(req.body);
-      const { kasirId } = req.body; // Should come from authenticated kasir session
-      
-      if (!kasirId) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Kasir ID diperlukan" 
-        });
-      }
-      
+      const kasirId = req.session.userId!;
+
       const bill = await storage.createBillAndAwardPoints(validatedData, kasirId);
       res.json({
         success: true,
@@ -749,7 +874,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all voucher claims for kasir
-  app.get("/api/kasir/voucher-claims", memberEndpointSecurity, async (req, res) => {
+  app.get("/api/kasir/voucher-claims", requireAdminOrKasir, memberEndpointSecurity, async (req, res) => {
     try {
       const claims = await storage.getAllVoucherClaims();
       res.json({
@@ -765,7 +890,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/kasir/voucher-claims/:claimId/redeem", memberEndpointSecurity, async (req, res) => {
+  app.post("/api/kasir/voucher-claims/:claimId/redeem", requireAdminOrKasir, memberEndpointSecurity, async (req, res) => {
     try {
       const { claimId } = req.params;
       
@@ -787,16 +912,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Campaign Routes - Popup untuk Landing Page
   
   // Create campaign with image upload (Admin only)
-  app.post("/api/admin/campaigns", memberEndpointSecurity, upload.single('image'), async (req, res) => {
+  app.post("/api/admin/campaigns", requireAdmin, memberEndpointSecurity, upload.single('image'), async (req, res) => {
     try {
-      if (!req.session.userId || req.session.role !== 'admin') {
-        if (req.file) fs.unlinkSync(req.file.path);
-        return res.status(403).json({ 
-          success: false, 
-          message: "Hanya admin yang dapat membuat campaign" 
-        });
-      }
-
       if (!req.file) {
         return res.status(400).json({ 
           success: false, 
@@ -816,7 +933,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertCampaignSchema.parse(req.body);
       const imagePath = `/uploads/campaigns/${req.file.filename}`;
       
-      const campaign = await storage.createCampaign(validatedData, imagePath, req.session.userId);
+      const campaign = await storage.createCampaign(validatedData, imagePath, req.session.userId!);
       
       res.json({ 
         success: true, 
@@ -834,15 +951,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all campaigns (Admin only)
-  app.get("/api/admin/campaigns", memberEndpointSecurity, async (req, res) => {
+  app.get("/api/admin/campaigns", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
-      if (!req.session.userId || req.session.role !== 'admin') {
-        return res.status(403).json({ 
-          success: false, 
-          message: "Hanya admin yang dapat melihat campaigns" 
-        });
-      }
-
       const campaigns = await storage.getCampaigns();
       res.json({ success: true, campaigns });
     } catch (error: any) {
@@ -878,15 +988,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update campaign status (Admin only)
-  app.patch("/api/admin/campaigns/:id/status", memberEndpointSecurity, async (req, res) => {
+  app.patch("/api/admin/campaigns/:id/status", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
-      if (!req.session.userId || req.session.role !== 'admin') {
-        return res.status(403).json({ 
-          success: false, 
-          message: "Hanya admin yang dapat mengubah status campaign" 
-        });
-      }
-
       const { status } = req.body;
       if (status !== 'active' && status !== 'inactive') {
         return res.status(400).json({ 
@@ -914,15 +1017,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete campaign (Admin only)
-  app.delete("/api/admin/campaigns/:id", memberEndpointSecurity, async (req, res) => {
+  app.delete("/api/admin/campaigns/:id", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
-      if (!req.session.userId || req.session.role !== 'admin') {
-        return res.status(403).json({ 
-          success: false, 
-          message: "Hanya admin yang dapat menghapus campaign" 
-        });
-      }
-
       // Get campaign first to delete image file
       const campaigns = await storage.getCampaigns();
       const campaign = campaigns.find(c => c.id === req.params.id);

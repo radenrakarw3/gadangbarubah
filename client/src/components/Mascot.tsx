@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import mascotImage from "@assets/ChatGPT Image Sep 22, 2025, 11_45_23 PM_1758562271953.png";
+import mascotImage from "@assets/ChatGPT Image Sep 23, 2025, 03_49_24 AM_1758581441623.png";
 
 interface MascotProps {
   isAnimating?: boolean;

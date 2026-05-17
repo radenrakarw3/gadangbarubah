@@ -1,0 +1,37 @@
+# Version of the agent configuration standard
+version = "1.0"
+
+[commands.typecheck]
+available_tools = ["Code Navigation", "filesystem", "git", "Terminal"]
+description = "Jalankan npm run check (TypeScript) dan laporkan semua error dengan file & baris."
+instructions = """
+You are running the `typecheck` workflow for the Gadang Barubah website project.
+
+## Steps
+
+1. Read `best_practices.md` and `AGENTS.md` in the project root for context.
+2. Run in the project root terminal:
+   ```bash
+   npm run check
+   ```
+3. If the command fails, parse every TypeScript error (file, line, message).
+4. Group errors by file. For each error:
+   - State severity (blocking for CI if `npm run check` fails)
+   - Suggest a concrete fix aligned with Drizzle/React patterns in best_practices.md
+5. If the command succeeds, confirm: "TypeScript check passed — no errors."
+6. Optionally note: `npm run build` may still succeed even when `check` fails (Vite does not run tsc).
+
+## Output format
+
+### Typecheck summary
+- Status: Pass | Fail
+- Error count: N
+
+### Errors by file
+For each file with errors, list bullet points: `path:line — message — suggested fix`
+
+Use QODO_SUGGESTION only for fixes that require code changes, with severity "High" for type errors that break `npm run check`.
+
+Do not modify files unless the user explicitly asks to apply fixes after the report.
+"""
+mcpServers = "{}"

@@ -1,4 +1,5 @@
-import { db } from "./db";
+import "dotenv/config";
+import { requireDb } from "./db";
 import { users } from "@shared/schema";
 import * as bcrypt from "bcrypt";
 
@@ -7,7 +8,7 @@ async function seed() {
 
   try {
     // Check if users already exist
-    const existingUsers = await db.select().from(users);
+    const existingUsers = await requireDb().select().from(users);
     
     if (existingUsers.length > 0) {
       console.log("⚠️  Users already exist. Skipping seed.");
@@ -19,7 +20,7 @@ async function seed() {
 
     // Create admin user
     const adminPassword = await bcrypt.hash("admin123", saltRounds);
-    const [admin] = await db.insert(users).values({
+    const [admin] = await requireDb().insert(users).values({
       username: "admin",
       password: adminPassword,
       role: "admin",
@@ -32,7 +33,7 @@ async function seed() {
 
     // Create kasir user
     const kasirPassword = await bcrypt.hash("kasir123", saltRounds);
-    const [kasir] = await db.insert(users).values({
+    const [kasir] = await requireDb().insert(users).values({
       username: "kasir",
       password: kasirPassword,
       role: "kasir",

@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import session from "express-session";
@@ -10,6 +11,7 @@ import { strictRateLimit, antiSpamSlowDown, botDetection, geoSecurity, honeypot,
 import { securityLoggingMiddleware, costMonitoringMiddleware } from "./monitoring";
 import { getSEOConfigByPath, generateSEOTags } from "../shared/seo";
 import { Pool } from "@neondatabase/serverless";
+import createMemoryStore from "memorystore";
 
 const app = express();
 
@@ -56,9 +58,9 @@ app.use(helmet({
 app.use(express.json({ limit: '10mb' })); // Limit payload size
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
-// Session configuration with PostgreSQL store
+// Session configuration — PostgreSQL in production/dev-with-db, memory in local dev without DB
 const PgSession = connectPgSimple(session);
-const sessionPool = new Pool({ connectionString: process.env.DATABASE_URL });
+const databaseUrl = process.env.DATABASE_URL?.trim();
 
 // Require SESSION_SECRET - fail fast if not set in any non-development environment
 if (!process.env.SESSION_SECRET) {
@@ -70,12 +72,24 @@ if (!process.env.SESSION_SECRET) {
 
 const sessionSecret = process.env.SESSION_SECRET || 'dev-only-insecure-secret';
 
+const sessionStore =
+  databaseUrl
+    ? new PgSession({
+        pool: new Pool({ connectionString: databaseUrl }),
+        createTableIfMissing: true,
+      })
+    : (() => {
+        if (app.get("env") === "production") {
+          throw new Error("DATABASE_URL must be set in production");
+        }
+        log("WARNING: DATABASE_URL tidak di-set — session memakai memory store (dev only)");
+        const MemoryStore = createMemoryStore(session);
+        return new MemoryStore({ checkPeriod: 86400000 });
+      })();
+
 app.use(
   session({
-    store: new PgSession({
-      pool: sessionPool,
-      createTableIfMissing: true,
-    }),
+    store: sessionStore,
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
@@ -199,16 +213,8 @@ app.get("*", async (req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  const port = parseInt(process.env.PORT || "3000", 10);
+  server.listen(port, "0.0.0.0", () => {
+    log(`serving on http://0.0.0.0:${port}`);
   });
 })();

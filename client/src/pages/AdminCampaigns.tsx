@@ -10,6 +10,7 @@ import { ArrowLeft, Upload, Trash2, ImageIcon, Eye, Power, PowerOff } from 'luci
 import { Helmet } from 'react-helmet-async';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient, apiRequest } from '@/lib/queryClient';
+import { apiFetch } from '@/lib/api';
 import { format } from 'date-fns';
 import type { Campaign } from '@shared/schema';
 
@@ -34,11 +35,9 @@ export default function AdminCampaigns() {
 
   const uploadMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const res = await fetch('/api/admin/campaigns', {
+      const res = await apiFetch('/api/admin/campaigns', {
         method: 'POST',
         body: data,
-        credentials: 'include',
-        // Don't set Content-Type - browser will set it with boundary for FormData
       });
       
       if (!res.ok) {
@@ -69,7 +68,7 @@ export default function AdminCampaigns() {
 
   const toggleStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: 'active' | 'inactive' }) => {
-      return apiRequest(`/api/admin/campaigns/${id}/status`, 'PATCH', { status });
+      return apiRequest('PATCH', `/api/admin/campaigns/${id}/status`, { status });
     },
     onSuccess: (data: any) => {
       toast({
@@ -89,7 +88,7 @@ export default function AdminCampaigns() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/admin/campaigns/${id}`, 'DELETE');
+      return apiRequest('DELETE', `/api/admin/campaigns/${id}`);
     },
     onSuccess: () => {
       toast({

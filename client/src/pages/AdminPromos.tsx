@@ -15,6 +15,7 @@ import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { apiFetch } from '@/lib/api';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -60,7 +61,7 @@ export default function AdminPromos() {
   const { data: promos, isLoading, error } = useQuery({
     queryKey: ['/api/admin/promos'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/promos');
+      const response = await apiFetch('/api/admin/promos');
       if (!response.ok) {
         throw new Error('Failed to fetch promos');
       }
@@ -72,7 +73,7 @@ export default function AdminPromos() {
   // Create promo mutation
   const createPromoMutation = useMutation({
     mutationFn: async (data: PromoFormData) => {
-      const response = await fetch('/api/admin/promos', {
+      const response = await apiFetch('/api/admin/promos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +111,7 @@ export default function AdminPromos() {
   // Update promo mutation
   const updatePromoMutation = useMutation({
     mutationFn: async (data: PromoFormData & { id: string }) => {
-      const response = await fetch(`/api/admin/promos/${data.id}`, {
+      const response = await apiFetch(`/api/admin/promos/${data.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +151,7 @@ export default function AdminPromos() {
   // Delete promo mutation
   const deletePromoMutation = useMutation({
     mutationFn: async (promoId: string) => {
-      const response = await fetch(`/api/admin/promos/${promoId}`, {
+      const response = await apiFetch(`/api/admin/promos/${promoId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

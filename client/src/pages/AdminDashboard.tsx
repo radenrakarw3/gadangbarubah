@@ -1,24 +1,51 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Plus, Gift, Megaphone, Users, Receipt, LogOut, Monitor } from 'lucide-react';
+import { ArrowLeft, Gift, Megaphone, Users, Receipt, LogOut, Monitor, UserCog, Loader2 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import Logo from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
+import { apiFetch } from '@/lib/api';
+
+type AdminStats = {
+  totalMembers: number;
+  activeVouchers: number;
+  activePromos: number;
+  totalBills: number;
+  pendingVoucherClaims: number;
+  staffCount: number;
+  hasActiveCampaign: boolean;
+};
 
 export default function AdminDashboard() {
   const [, navigate] = useLocation();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { toast } = useToast();
 
+  const { data: statsData, isLoading: statsLoading } = useQuery<{
+    success: boolean;
+    data: AdminStats;
+  }>({
+    queryKey: ['/api/admin/stats'],
+    queryFn: async () => {
+      const response = await apiFetch('/api/admin/stats');
+      if (!response.ok) {
+        throw new Error('Gagal memuat ringkasan');
+      }
+      return response.json();
+    },
+  });
+
+  const stats = statsData?.data;
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      const response = await fetch('/api/auth/logout', {
+      const response = await apiFetch('/api/auth/logout', {
         method: 'POST',
-        credentials: 'include',
       });
 
       if (response.ok) {
@@ -81,6 +108,14 @@ export default function AdminDashboard() {
       icon: Receipt,
       route: '/admin/bills',
       color: 'bg-orange-500',
+    },
+    {
+      id: 'users',
+      title: 'Kelola User',
+      description: 'Tambah atau hapus akun admin dan kasir',
+      icon: UserCog,
+      route: '/admin/users',
+      color: 'bg-slate-600',
     },
   ];
 
@@ -167,14 +202,52 @@ export default function AdminDashboard() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-primary" data-testid="text-total-members">0</p>
+                    <p className="text-2xl font-bold text-primary" data-testid="text-total-members">
+                        {statsLoading ? '—' : (stats?.totalMembers ?? 0)}
+                      </p>
                     <p className="text-sm text-muted-foreground">Total Member</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-primary" data-testid="text-active-vouchers">0</p>
+                    <p className="text-2xl font-bold text-primary" data-testid="text-active-vouchers">
+                        {statsLoading ? '—' : (stats?.activeVouchers ?? 0)}
+                      </p>
                     <p className="text-sm text-muted-foreground">Voucher Aktif</p>
                   </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-primary" data-testid="text-total-bills">
+                        {statsLoading ? '—' : (stats?.totalBills ?? 0)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Total Transaksi</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-primary" data-testid="text-pending-claims">
+                        {statsLoading ? '—' : (stats?.pendingVoucherClaims ?? 0)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Voucher Menunggu Tebus</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-primary" data-testid="text-active-promos">
+                        {statsLoading ? '—' : (stats?.activePromos ?? 0)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Promo Aktif</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-primary" data-testid="text-staff-count">
+                        {statsLoading ? '—' : (stats?.staffCount ?? 0)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">User Staff</p>
+                    </div>
                 </div>
+                {stats && !statsLoading && (
+                  <p className="text-xs text-center text-muted-foreground">
+                    Popup landing: {stats.hasActiveCampaign ? 'aktif' : 'tidak ada yang aktif'}
+                  </p>
+                )}
+                {statsLoading && (
+                  <div className="flex justify-center pt-2">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

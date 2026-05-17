@@ -14,6 +14,7 @@ import Logo from '@/components/Logo';
 import MemberSummaryPanel from '@/components/MemberSummaryPanel';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
+import { apiFetch } from '@/lib/api';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -66,7 +67,9 @@ export default function KasirDashboard() {
     queryKey: ['/api/members/whatsapp', debouncedWhatsApp, 'profile'],
     queryFn: async () => {
       if (!debouncedWhatsApp) return null;
-      const response = await fetch(`/api/members/whatsapp/${debouncedWhatsApp}/profile`);
+      const response = await apiFetch(
+        `/api/members/whatsapp/${encodeURIComponent(debouncedWhatsApp)}/profile`,
+      );
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('Member tidak ditemukan');
@@ -94,19 +97,22 @@ export default function KasirDashboard() {
         throw new Error('Data member tidak tersedia');
       }
       
-      const response = await fetch('/api/kasir/bills', {
+      const response = await apiFetch('/api/kasir/bills', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           memberId: memberData.id,
-          totalAmount: typeof data.billAmount === 'string' ? parseInt(data.billAmount) : data.billAmount,
-          kasirId: "kasir-1" // Should be from auth session in production
+          totalAmount:
+            typeof data.billAmount === 'string'
+              ? parseInt(data.billAmount)
+              : data.billAmount,
         }),
       });
       if (!response.ok) {
-        throw new Error('Gagal memproses bill');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Gagal memproses bill');
       }
       return response.json();
     },
@@ -135,11 +141,8 @@ export default function KasirDashboard() {
   // Redeem voucher mutation
   const redeemVoucherMutation = useMutation({
     mutationFn: async (claimId: string) => {
-      const response = await fetch(`/api/kasir/voucher-claims/${claimId}/redeem`, {
+      const response = await apiFetch(`/api/kasir/voucher-claims/${claimId}/redeem`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
       if (!response.ok) {
         throw new Error('Gagal menebus voucher');
@@ -169,9 +172,8 @@ export default function KasirDashboard() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      const response = await fetch('/api/auth/logout', {
+      const response = await apiFetch('/api/auth/logout', {
         method: 'POST',
-        credentials: 'include',
       });
 
       if (response.ok) {

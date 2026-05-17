@@ -4,3 +4,21 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# Replit / editor state (jangan di-commit)
+.local
+.config
+.replit
+
+# Qodo — commit .qodo/workflows & best_practices; jangan commit cache user
+.qodo/history
+
+# Logs & cache
+*.log
+npm-debug.log*
+.cache

@@ -1,0 +1,21 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "files.exclude": {
+    "**/.local": true
+  },
+  "codium.editorButton": true,
+  "codium.codeCompletion.enable": false,
+  "codium.git.showCommitNotification": true,
+  "codium.terminalAllowedCommands": [
+    "npm",
+    "npx",
+    "node",
+    "git",
+    "openssl"
+  ],
+  "codium.customInstructions.allMessages": "Proyek: Gadang Barubah (website restoran Padang). Stack: React 18 + Vite, Express + TypeScript, Drizzle ORM, Neon PostgreSQL. Deploy: Railway. DNS: Cloudflare. Baca best_practices.md dan AGENTS.md di root sebelum menyarankan kode. Jawab dalam Bahasa Indonesia untuk penjelasan ke user. Jangan gunakan Replit. Env: DATABASE_URL, SESSION_SECRET, PORT, NODE_ENV.",
+  "codium.commitMessage.format": "conventional: type(scope): description dalam Bahasa Indonesia atau English singkat"
+}

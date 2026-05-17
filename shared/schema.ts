@@ -97,6 +97,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   role: true,
+}).extend({
+  role: z.enum(["admin", "kasir"], {
+    errorMap: () => ({ message: "Role harus admin atau kasir" }),
+  }),
 });
 
 export const loginUserSchema = z.object({
