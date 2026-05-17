@@ -1,10 +1,8 @@
 [build]
-builder = "NIXPACKS"
-# Jangan npm ci di sini — sudah di nixpacks.toml (hindari EBUSY pada node_modules/.cache)
-buildCommand = "npm run build"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "npm run start"
 healthcheckPath = "/"
 healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
