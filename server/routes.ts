@@ -16,6 +16,7 @@ import {
 import type { Request, Response, NextFunction } from "express";
 import { upload, validateImageDimensions } from "./upload-middleware";
 import fs from "fs";
+import path from "path";
 
 function requireMemberSelf(
   req: Request,
@@ -1025,7 +1026,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (campaign) {
         // Delete image file from disk
-        const imagePath = `public${campaign.imagePath}`;
+        const imagePath = path.join(process.cwd(), campaign.imagePath.replace(/^\//, ""));
         if (fs.existsSync(imagePath)) {
           fs.unlinkSync(imagePath);
         }

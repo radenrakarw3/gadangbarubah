@@ -4,7 +4,7 @@ import fs from 'fs';
 import sizeOf from 'image-size';
 import type { Request } from 'express';
 
-const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'campaigns');
+const uploadsDir = path.join(process.cwd(), 'uploads', 'campaigns');
 
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });

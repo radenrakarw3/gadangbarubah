@@ -1,4 +1,4 @@
-import "dotenv/config";
+import { config as loadDotenv } from "dotenv";
 import express, { type Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import session from "express-session";
@@ -13,10 +13,22 @@ import { getSEOConfigByPath, generateSEOTags } from "../shared/seo";
 import { Pool } from "@neondatabase/serverless";
 import createMemoryStore from "memorystore";
 
+// Railway/Neon inject env vars — .env hanya untuk development lokal
+if (process.env.NODE_ENV !== "production") {
+  loadDotenv();
+}
+
 const app = express();
 
 // Enable trust proxy for accurate IP detection (important for rate limiting)
 app.set('trust proxy', 1);
+
+// Upload campaign (disk) — di luar dist/public agar path konsisten di production
+const uploadsRoot = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsRoot)) {
+  fs.mkdirSync(uploadsRoot, { recursive: true });
+}
+app.use("/uploads", express.static(uploadsRoot));
 
 // ULTRA PERMISSIVE HEADERS - NO BLOCKING WHATSOEVER
 app.use(helmet({
