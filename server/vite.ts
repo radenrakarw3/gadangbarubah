@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { pathToFileURL } from "url";
 import type { Server } from "http";
+import { isProduction } from "./env";
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -16,6 +17,10 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  if (isProduction()) {
+    throw new Error("setupVite tidak boleh dipanggil di production");
+  }
+
   // Load terpisah agar esbuild tidak membundel vite ke dist/index.js (production)
   const viteDevUrl = pathToFileURL(
     path.join(import.meta.dirname, "vite-dev.js"),

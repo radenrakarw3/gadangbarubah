@@ -17,6 +17,8 @@ ENV PORT=3000
 COPY package.json package-lock.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+# Vite hanya untuk dev lokal — jangan ikut image production
+RUN rm -f dist/vite-dev.js
 
 RUN mkdir -p uploads/campaigns
 

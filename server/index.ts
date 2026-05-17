@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { isDevelopment, isProduction } from "./env";
 import { strictRateLimit, antiSpamSlowDown, botDetection, geoSecurity, honeypot, requestValidator } from "./security";
 import { securityLoggingMiddleware, costMonitoringMiddleware } from "./monitoring";
 import { getSEOConfigByPath, generateSEOTags } from "../shared/seo";
@@ -14,11 +15,12 @@ import { Pool } from "@neondatabase/serverless";
 import createMemoryStore from "memorystore";
 
 // Railway/Neon inject env vars — .env hanya untuk development lokal
-if (process.env.NODE_ENV !== "production") {
+if (isDevelopment()) {
   loadDotenv();
 }
 
 const app = express();
+app.set("env", isProduction() ? "production" : "development");
 
 // Enable trust proxy for accurate IP detection (important for rate limiting)
 app.set('trust proxy', 1);
@@ -74,12 +76,13 @@ app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 const PgSession = connectPgSimple(session);
 const databaseUrl = process.env.DATABASE_URL?.trim();
 
-// Require SESSION_SECRET - fail fast if not set in any non-development environment
-if (!process.env.SESSION_SECRET) {
-  if (app.get("env") !== "development") {
-    throw new Error("SESSION_SECRET environment variable must be set. Generate a secure random secret.");
+if (!process.env.SESSION_SECRET?.trim()) {
+  if (isProduction()) {
+    throw new Error(
+      "SESSION_SECRET must be set di Railway Variables. Generate: openssl rand -base64 32",
+    );
   }
-  log("WARNING: Using development session secret. Generate and set SESSION_SECRET for production!");
+  log("WARNING: Using development session secret. Set SESSION_SECRET for production!");
 }
 
 const sessionSecret = process.env.SESSION_SECRET || 'dev-only-insecure-secret';
@@ -91,7 +94,7 @@ const sessionStore =
         createTableIfMissing: true,
       })
     : (() => {
-        if (app.get("env") === "production") {
+        if (isProduction()) {
           throw new Error("DATABASE_URL must be set in production");
         }
         log("WARNING: DATABASE_URL tidak di-set — session memakai memory store (dev only)");
@@ -219,7 +222,7 @@ app.get("*", async (req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  if (isDevelopment()) {
     await setupVite(app, server);
   } else {
     serveStatic(app);
