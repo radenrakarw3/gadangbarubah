@@ -1,6 +1,7 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm ci && npm run build"
+# Jangan npm ci di sini — sudah di nixpacks.toml (hindari EBUSY pada node_modules/.cache)
+buildCommand = "npm run build"
 
 [deploy]
 startCommand = "npm run start"
