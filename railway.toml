@@ -1,8 +1,10 @@
 [build]
-builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
+builder = "NIXPACKS"
+# Nixpacks sudah menjalankan npm ci di fase install — jangan ulangi di sini (hindari EBUSY pada node_modules/.cache)
+buildCommand = "npm run build"
 
 [deploy]
+startCommand = "npm run start"
 healthcheckPath = "/"
 healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
