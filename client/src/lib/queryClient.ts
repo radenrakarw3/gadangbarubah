@@ -7,6 +7,21 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+/** Ekstrak pesan error dari response API (format apiRequest) */
+export function parseApiError(err: unknown): string {
+  if (!(err instanceof Error)) return "Terjadi kesalahan. Coba lagi.";
+  const match = err.message.match(/^\d+:\s*([\s\S]+)$/);
+  if (match) {
+    try {
+      const json = JSON.parse(match[1]);
+      if (typeof json.message === "string") return json.message;
+    } catch {
+      /* bukan JSON */
+    }
+  }
+  return err.message;
+}
+
 export async function apiRequest(
   method: string,
   url: string,

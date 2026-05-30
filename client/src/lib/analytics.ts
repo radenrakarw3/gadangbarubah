@@ -14,7 +14,7 @@ declare global {
 // Restaurant-specific event parameters for business tracking
 interface RestaurantEventParams {
   restaurant_action?: 'call' | 'whatsapp' | 'delivery' | 'reservation' | 'membership' | 'outlet_view';
-  service_type?: 'outlet' | 'delivery' | 'catering' | 'partnership' | 'vip_membership';
+  service_type?: 'outlet' | 'delivery' | 'catering' | 'partnership' | 'reservation';
   outlet_name?: string;
   contact_method?: 'phone' | 'whatsapp' | 'form' | 'direct';
   menu_category?: string;
@@ -183,7 +183,7 @@ function getContentGroup(path: string): string {
   if (path.startsWith('/services/delivery')) return 'delivery_service';
   if (path.startsWith('/services/catering')) return 'catering_service';
   if (path.startsWith('/services/partnership')) return 'business_partnership';
-  if (path.startsWith('/member')) return 'membership';
+  if (path.startsWith('/reservasi')) return 'reservation';
   return 'other';
 }
 
@@ -231,6 +231,6 @@ function getServiceTypeFromPath(path: string): RestaurantEventParams['service_ty
   if (path.startsWith('/services/delivery')) return 'delivery';
   if (path.startsWith('/services/catering')) return 'catering';
   if (path.startsWith('/services/partnership')) return 'partnership';
-  if (path.startsWith('/member')) return 'vip_membership';
+  if (path.startsWith('/reservasi')) return 'reservation';
   return undefined;
 }

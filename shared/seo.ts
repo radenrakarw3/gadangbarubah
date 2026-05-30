@@ -37,9 +37,9 @@ export const pageSEOConfigs = {
   }),
   
   services: createSEOConfig({
-    title: "Layanan Unggulan Gadang Barubah - Outlet, Delivery, Catering & VIP Membership",
-    description: "Jelajahi layanan lengkap Gadang Barubah: lokasi outlet, delivery nasi padang, catering event, dan VIP membership. Pengalaman kuliner Minang di seluruh Indonesia.",
-    keywords: "layanan gadang barubah, delivery nasi padang, catering padang, vip membership padang, outlet padang unggulan, gadang barubah services, layanan restoran padang, alternatif delivery padang",
+    title: "Layanan Unggulan Gadang Barubah - Outlet, Delivery, Catering & Reservasi",
+    description: "Jelajahi layanan lengkap Gadang Barubah: lokasi outlet, delivery nasi padang, catering event, dan reservasi meja VIP. Pengalaman kuliner Minang di seluruh Indonesia.",
+    keywords: "layanan gadang barubah, delivery nasi padang, catering padang, reservasi meja padang, outlet padang unggulan, gadang barubah services, layanan restoran padang, alternatif delivery padang",
     path: "/uni"
   }),
   
@@ -68,47 +68,65 @@ export const pageSEOConfigs = {
     title: "Catering Event Gadang Barubah - Layanan Katering Padang",
     description: "Layanan catering Gadang Barubah untuk acara pernikahan, corporate event, dan gathering. Menu Padang autentik untuk acara istimewa Anda.",
     keywords: "catering gadang barubah, katering padang, catering pernikahan padang, catering event makanan padang, layanan katering, menu catering padang",
-    path: "/services/catering"
+    path: "/catering",
   }),
 
-  membership: createSEOConfig({
-    title: "VIP Membership Gadang Barubah - Program Member Eksklusif",
-    description: "Bergabung program membership Gadang Barubah: Silver, Gold, dan Platinum. Nikmati diskon, poin reward, delivery gratis, dan benefit eksklusif lainnya.",
-    keywords: "membership gadang barubah, vip member padang, program member restoran, diskon nasi padang, reward poin gadang barubah",
-    path: "/services/membership"
-  }),
-  
-  memberLogin: createSEOConfig({
-    title: "Login Member VIP Gadang Barubah - Akses Eksklusif Istimewa",
-    description: "Login ke akun VIP member Gadang Barubah untuk menikmati benefit eksklusif, diskon khusus, dan layanan prioritas untuk pengalaman kuliner yang istimewa.",
-    keywords: "login member gadang barubah, vip member, akun istimewa gadang barubah, member eksklusif, login vip restoran padang",
-    path: "/member/login",
-    noIndex: true
-  }),
-  
-  memberRegister: createSEOConfig({
-    title: "Daftar VIP Member Gadang Barubah - Bergabung Program Eksklusif",
-    description: "Daftar sebagai VIP member Gadang Barubah dan nikmati benefit eksklusif seperti diskon khusus, reservasi prioritas, dan menu spesial untuk member.",
-    keywords: "daftar member gadang barubah, registrasi vip member, membership gadang barubah, daftar member eksklusif, program vip restoran padang",
-    path: "/member/register",
-    noIndex: true
-  }),
-  
-  memberDashboard: createSEOConfig({
-    title: "Dashboard Member VIP - Gadang Barubah",
-    description: "Kelola profil member, poin reward, klaim voucher, dan promo eksklusif Gadang Barubah.",
-    keywords: "dashboard member gadang barubah, poin reward, voucher member, akun vip",
-    path: "/member/dashboard",
-    noIndex: true
-  }),
-  
   notFound: createSEOConfig({
     title: "Halaman Tidak Ditemukan - Gadang Barubah",
     description: "Halaman yang Anda cari tidak ditemukan. Kembali ke beranda untuk menjelajahi layanan dan hidangan Gadang Barubah.",
     keywords: "404, halaman tidak ditemukan, gadang barubah",
     path: "/404",
     noIndex: true
-  })
+  }),
+
+  about: createSEOConfig({
+    title: "About Us - Gadang Barubah Indonesia",
+    description: "Kenali cerita Gadang Barubah, rumah makan Padang autentik dengan outlet di Pollux Mall Cikarang dan layanan VIP room.",
+    keywords: "about gadang barubah, tentang gadang barubah, outlet padang cikarang, rumah makan padang",
+    path: "/about",
+  }),
+
+  menu: createSEOConfig({
+    title: "Menu Gadang Barubah - Signature Nasi Padang & Masakan Minang",
+    description: "Lihat menu signature Gadang Barubah: rendang, ayam pop, gulai, nasi tumpeng, dan menu digital lengkap dengan harga terbaru.",
+    keywords: "menu gadang barubah, menu nasi padang, rendang, ayam pop, menu digital padang",
+    path: "/menu",
+  }),
+
+  whatsOn: createSEOConfig({
+    title: "What's On - Berita & Artikel Gadang Barubah",
+    description: "Update terbaru, tips kuliner, dan artikel seputar Gadang Barubah Indonesia — catering, reservasi, dan outlet.",
+    keywords: "berita gadang barubah, artikel padang, what's on gadang barubah",
+    path: "/whats-on",
+  }),
+
+  faq: createSEOConfig({
+    title: "FAQ - Pertanyaan Umum Gadang Barubah",
+    description: "Jawaban pertanyaan umum seputar jam operasional, delivery, reservasi meja, dan catering Gadang Barubah.",
+    keywords: "faq gadang barubah, reservasi meja, jam buka gadang barubah",
+    path: "/faq",
+  }),
+
+  reservation: createSEOConfig({
+    title: "Reservasi Meja - Gadang Barubah Pollux Mall Cikarang",
+    description: "Pesan meja reguler atau VIP room di Gadang Barubah. Isi form reservasi online dan tim kami konfirmasi via WhatsApp.",
+    keywords: "reservasi gadang barubah, booking meja padang, vip room cikarang, reservasi restoran",
+    path: "/reservasi",
+  }),
+
+  terms: createSEOConfig({
+    title: "Terms and Conditions - Gadang Barubah Indonesia",
+    description: "Syarat dan ketentuan penggunaan website dan layanan reservasi Gadang Barubah Indonesia.",
+    path: "/terms",
+    noIndex: true,
+  }),
+
+  privacy: createSEOConfig({
+    title: "Privacy Policy - Gadang Barubah Indonesia",
+    description: "Kebijakan privasi Gadang Barubah Indonesia terkait data reservasi dan penggunaan website.",
+    path: "/privacy",
+    noIndex: true,
+  }),
 };
 
 export function getSEOConfigByPath(path: string) {
@@ -117,15 +135,19 @@ export function getSEOConfigByPath(path: string) {
   
   // Route mapping logic
   if (normalizedPath === '/') return pageSEOConfigs.home;
+  if (normalizedPath === '/about') return pageSEOConfigs.about;
+  if (normalizedPath === '/menu') return pageSEOConfigs.menu;
+  if (normalizedPath === '/whats-on' || normalizedPath.startsWith('/whats-on/')) return pageSEOConfigs.whatsOn;
+  if (normalizedPath === '/faq') return pageSEOConfigs.faq;
+  if (normalizedPath === '/terms') return pageSEOConfigs.terms;
+  if (normalizedPath === '/privacy') return pageSEOConfigs.privacy;
+  if (normalizedPath === '/catering') return pageSEOConfigs.catering;
+  if (normalizedPath === '/reservasi') return pageSEOConfigs.reservation;
   if (normalizedPath === '/uni') return pageSEOConfigs.services;
   if (normalizedPath === '/services/outlet') return pageSEOConfigs.outlet;
   if (normalizedPath === '/services/delivery') return pageSEOConfigs.delivery;
   if (normalizedPath === '/services/partnership') return pageSEOConfigs.partnership;
   if (normalizedPath === '/services/catering') return pageSEOConfigs.catering;
-  if (normalizedPath === '/services/membership') return pageSEOConfigs.membership;
-  if (normalizedPath === '/member/login') return pageSEOConfigs.memberLogin;
-  if (normalizedPath === '/member/register') return pageSEOConfigs.memberRegister;
-  if (normalizedPath === '/member/dashboard') return pageSEOConfigs.memberDashboard;
   
   // Default fallback
   return pageSEOConfigs.notFound;

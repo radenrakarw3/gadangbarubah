@@ -10,9 +10,21 @@ interface CampaignPopupProps {
 export default function CampaignPopup({ onClose }: CampaignPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
+  const [queryEnabled, setQueryEnabled] = useState(false);
+
+  useEffect(() => {
+    const enable = () => setQueryEnabled(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(enable, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = setTimeout(enable, 1500);
+    return () => clearTimeout(t);
+  }, []);
 
   const { data, isSuccess } = useQuery<{ success: boolean; campaign: Campaign | null }>({
     queryKey: ['/api/campaigns/active'],
+    enabled: queryEnabled,
   });
 
   const campaign = data?.campaign;
@@ -78,7 +90,7 @@ export default function CampaignPopup({ onClose }: CampaignPopupProps) {
       data-testid="campaign-popup-overlay"
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/65" />
 
       {/* Popup Content */}
       <div

@@ -30,13 +30,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ArrowLeft, Plus, UserCog, Trash2, Loader2 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useToast } from "@/hooks/use-toast";
@@ -49,16 +42,13 @@ import { z } from "zod";
 type StaffUser = {
   id: string;
   username: string;
-  role: "admin" | "kasir";
+  role: "admin";
   createdAt: string;
 };
 
 const staffFormSchema = z.object({
   username: z.string().min(3, "Username minimal 3 karakter"),
   password: z.string().min(6, "Password minimal 6 karakter"),
-  role: z.enum(["admin", "kasir"], {
-    errorMap: () => ({ message: "Pilih role" }),
-  }),
 });
 
 type StaffFormData = z.infer<typeof staffFormSchema>;
@@ -74,7 +64,6 @@ export default function AdminUsers() {
     defaultValues: {
       username: "",
       password: "",
-      role: "kasir",
     },
   });
 
@@ -96,7 +85,7 @@ export default function AdminUsers() {
       const response = await apiFetch("/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, role: "admin" }),
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -112,7 +101,7 @@ export default function AdminUsers() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setIsCreateDialogOpen(false);
-      form.reset({ username: "", password: "", role: "kasir" });
+      form.reset({ username: "", password: "" });
     },
     onError: (error: Error) => {
       toast({
@@ -165,7 +154,7 @@ export default function AdminUsers() {
         <title>Kelola User - Admin Gadang Barubah</title>
         <meta
           name="description"
-          content="Kelola akun admin dan kasir Gadang Barubah"
+          content="Kelola akun administrator Gadang Barubah"
         />
       </Helmet>
 
@@ -185,7 +174,7 @@ export default function AdminUsers() {
                 <UserCog className="h-6 w-6 text-primary" />
                 <div>
                   <h1 className="font-semibold text-lg">Kelola User</h1>
-                  <p className="text-sm text-muted-foreground">Admin & Kasir</p>
+                  <p className="text-sm text-muted-foreground">Admin Panel</p>
                 </div>
               </div>
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
@@ -235,30 +224,6 @@ export default function AdminUsers() {
                           </FormItem>
                         )}
                       />
-                      <FormField
-                        control={form.control}
-                        name="role"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Role</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Pilih role" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="kasir">Kasir</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
                       <Button
                         type="submit"
                         className="w-full"
@@ -302,9 +267,7 @@ export default function AdminUsers() {
                           Dibuat {formatDate(user.createdAt)}
                         </p>
                       </div>
-                      <Badge variant={user.role === "admin" ? "default" : "secondary"}>
-                        {user.role === "admin" ? "Admin" : "Kasir"}
-                      </Badge>
+                      <Badge variant="default">Admin</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>

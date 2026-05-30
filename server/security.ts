@@ -183,15 +183,18 @@ export const requestValidator = (req: Request, res: Response, next: NextFunction
   next();
 };
 
-// Enhanced security for member endpoints
-export const memberEndpointSecurity = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 10, // Allow more attempts for better user experience
+// Rate limit untuk endpoint admin (bukan member legacy)
+export const adminApiSecurity = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 120,
   message: {
     success: false,
-    message: "Terlalu banyak percobaan akses member. Coba lagi dalam 15 menit.",
-    code: "MEMBER_RATE_LIMIT"
+    message: "Terlalu banyak permintaan. Coba lagi dalam beberapa menit.",
+    code: "API_RATE_LIMIT",
   },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 });
+
+// Legacy alias — prefer adminApiSecurity
+export const memberEndpointSecurity = adminApiSecurity;

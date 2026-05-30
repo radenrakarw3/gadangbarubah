@@ -35,11 +35,11 @@ const services = [
     path: '/services/partnership'
   },
   {
-    id: 'membership',
-    name: 'VIP Membership',
+    id: 'reservasi',
+    name: 'Reservasi Meja',
     icon: Crown,
-    description: 'Dapatkan akses eksklusif ke benefit istimewa, reservasi prioritas untuk nasi padang, dan pengalaman kuliner Minang yang dipersonalisasi.',
-    path: '/services/membership'
+    description: 'Pesan meja reguler atau VIP room — konfirmasi cepat via WhatsApp.',
+    path: '/reservasi'
   },
   {
     id: 'catering',
@@ -72,7 +72,7 @@ export default function UniPage() {
       window.open(whatsAppUrl, '_blank');
     } else {
       // Track service page navigation
-      trackServiceView(service.id === 'membership' ? 'vip_membership' : 'outlet', {
+      trackServiceView(service.id === 'reservasi' ? 'reservation' : 'outlet', {
         event_label: `navigate_${service.id}`,
         custom_parameter_1: 'services_hub_navigation'
       });

@@ -1,12 +1,10 @@
-import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { UtensilsCrossed, Users, Calendar, Award, ArrowLeft } from 'lucide-react';
-import Logo from '../Logo';
+import { UtensilsCrossed, Users, Calendar, Award } from 'lucide-react';
+import PublicPageLayout from '../PublicPageLayout';
 import SEOHead from '../SEOHead';
 
 export default function CateringPage() {
-  const [, navigate] = useLocation();
 
   const packages = [
     {
@@ -43,32 +41,10 @@ export default function CateringPage() {
   ];
 
   return (
-    <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
+    <PublicPageLayout>
       <SEOHead pageKey="catering" />
-      
-      {/* Top section with back button and logo */}
-      <div className="px-4 pt-8 pb-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Button
-            onClick={() => navigate('/')}
-            variant="ghost"
-            size="sm"
-            className="hover:bg-accent/10 text-muted-foreground hover:text-foreground"
-            data-testid="button-back"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline ml-1 text-sm">Kembali</span>
-          </Button>
-          
-          <div className="flex-1 flex justify-center">
-            <Logo />
-          </div>
-          
-          <div className="w-20"></div>
-        </div>
-      </div>
 
-      <main className="px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-10">
         <div className="max-w-4xl mx-auto">
           {/* Title */}
           <div className="text-center mb-10">
@@ -144,6 +120,31 @@ export default function CateringPage() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </div>
+
+          {/* Highlight Venue Catering */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-center mb-6">Venue Catering</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Card className="border-border/30">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-foreground mb-2">On-Site di Outlet</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    VIP room dan area private di Pollux Mall Cikarang untuk gathering, arisan, dan acara
+                    keluarga hingga 30–50 tamu.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border-border/30">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-foreground mb-2">Off-Site / External Venue</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Tim kami siap setup buffet di kantor, gedung acara, atau lokasi pilihan Anda dengan
+                    peralatan makan lengkap.
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
 
@@ -242,7 +243,7 @@ export default function CateringPage() {
             </CardContent>
           </Card>
         </div>
-      </main>
-    </div>
+      </div>
+    </PublicPageLayout>
   );
 }
