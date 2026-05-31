@@ -4,24 +4,24 @@ import QuickReservationBar from "./QuickReservationBar";
 
 function HeroSectionInner() {
   return (
-    <section className="relative mb-24 sm:mb-28 lg:mb-32">
-      <div className="relative h-[50vh] sm:h-[58vh] lg:h-[62vh] min-h-[320px] overflow-visible">
+    <section className="relative mb-6 sm:mb-28 lg:mb-32">
+      <div className="relative h-[38vh] min-h-[220px] sm:h-[58vh] sm:min-h-[320px] lg:h-[62vh] overflow-hidden sm:overflow-visible">
         <div className="home-img-wrap absolute inset-0">
           <img
             src={heroImage}
             alt="Suasana bersantap Gadang Barubah — rumah makan Padang mewah"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
             loading="eager"
             fetchPriority="high"
             decoding="sync"
             draggable={false}
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/80 via-maroon-deep/25 to-transparent" />
-        {/* Form di tengah-tengah batas hero — overlap foto & section bawah (wireframe) */}
-        <div className="absolute inset-x-0 bottom-0 z-10 translate-y-1/2 px-4 sm:px-6 lg:px-8">
-          <QuickReservationBar />
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/85 via-maroon-deep/30 to-transparent" />
+      </div>
+      {/* Mobile: form di bawah hero. Desktop: overlap tengah */}
+      <div className="relative z-10 px-3 mt-3 sm:mt-0 sm:absolute sm:inset-x-0 sm:bottom-0 sm:translate-y-1/2 sm:px-6 lg:px-8">
+        <QuickReservationBar />
       </div>
     </section>
   );

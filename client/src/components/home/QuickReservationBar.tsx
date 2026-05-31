@@ -1,5 +1,5 @@
 import { memo, useState, useMemo, useRef, type FormEvent } from "react";
-import { Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,7 +15,7 @@ import { OUTLETS, RESERVATION_TIME_SLOTS, todayISO } from "@/lib/siteContent";
 import { cn } from "@/lib/utils";
 
 const CONTROL_CLASS =
-  "h-9 w-full rounded-sm border border-white/15 bg-white/[0.07] text-white text-sm placeholder:text-white/35 focus-visible:ring-1 focus-visible:ring-gold/50 focus-visible:border-gold/40 [color-scheme:dark]";
+  "h-11 sm:h-9 w-full rounded-sm border border-white/15 bg-white/[0.07] text-white text-base sm:text-sm placeholder:text-white/35 focus-visible:ring-1 focus-visible:ring-gold/50 focus-visible:border-gold/40 [color-scheme:dark]";
 
 const SELECT_TRIGGER_CLASS = cn(
   CONTROL_CLASS,
@@ -96,6 +96,7 @@ const Field = memo(function Field({
 function QuickReservationBarInner() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [tanggal, setTanggal] = useState(todayISO);
   const [waktu, setWaktu] = useState("18:00");
   const [outlet, setOutlet] = useState(OUTLETS[0].id as string);
@@ -110,6 +111,7 @@ function QuickReservationBarInner() {
     setWaktu("18:00");
     setOutlet(OUTLETS[0].id as string);
     setPax("2");
+    setMobileOpen(false);
   };
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -180,24 +182,58 @@ function QuickReservationBarInner() {
   };
 
   return (
-    <form
-      key={formKey.current}
-      onSubmit={handleSubmit}
-      className="max-w-6xl mx-auto overflow-hidden rounded-sm border border-gold/25 bg-maroon-deep/95 shadow-[0_16px_40px_-10px_rgba(0,0,0,0.5)] [contain:layout_paint] isolate"
-    >
+    <div className="max-w-6xl mx-auto overflow-hidden rounded-sm border border-gold/25 bg-maroon-deep/95 shadow-[0_16px_40px_-10px_rgba(0,0,0,0.5)] [contain:layout_paint] isolate">
       <div className="h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
 
-      <div className="flex flex-col lg:flex-row">
-        <div className="shrink-0 border-b lg:border-b-0 lg:border-r border-gold/15 bg-black/20 px-5 py-3 lg:py-0 lg:w-44 lg:flex lg:flex-col lg:justify-center lg:px-6">
-          <p className="font-display text-xl lg:text-2xl text-gold-light leading-tight tracking-wide">
-            Reservasi
-          </p>
-          <p className="text-[10px] uppercase tracking-[0.25em] text-white/45 mt-0.5">
-            Meja · Gadang Barubah
-          </p>
-        </div>
+      {/* Mobile: bar ringkas — tap untuk buka form */}
+      {!mobileOpen && (
+        <button
+          type="button"
+          className="md:hidden w-full flex items-center justify-between gap-4 px-4 py-4 text-left active:bg-black/20 transition-colors"
+          onClick={() => setMobileOpen(true)}
+          aria-expanded={false}
+          aria-controls="quick-reservation-form"
+        >
+          <div className="min-w-0">
+            <p className="font-display text-lg text-gold-light leading-tight tracking-wide">
+              Reservasi Meja
+            </p>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-white/45 mt-0.5">
+              Tap untuk booking online
+            </p>
+          </div>
+          <span className="shrink-0 flex items-center gap-1.5 rounded-sm bg-gold px-3 py-2 text-maroon-deep text-[10px] font-semibold uppercase tracking-[0.12em]">
+            Buka
+            <ChevronDown className="h-3.5 w-3.5" />
+          </span>
+        </button>
+      )}
 
-        <div className="flex-1 p-4 lg:p-5 space-y-3">
+      <form
+        id="quick-reservation-form"
+        key={formKey.current}
+        onSubmit={handleSubmit}
+        className={cn(!mobileOpen && "hidden md:block")}
+      >
+        <div className="flex flex-col lg:flex-row">
+          <div className="shrink-0 border-b lg:border-b-0 lg:border-r border-gold/15 bg-black/20 px-4 py-3 sm:px-5 lg:py-0 lg:w-44 lg:flex lg:flex-col lg:justify-center lg:px-6 text-center lg:text-left relative">
+            <button
+              type="button"
+              className="md:hidden absolute right-3 top-3 p-1.5 text-white/50 hover:text-white transition-colors"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Tutup form reservasi"
+            >
+              <ChevronUp className="h-5 w-5" />
+            </button>
+            <p className="font-display text-lg sm:text-xl lg:text-2xl text-gold-light leading-tight tracking-wide">
+              Reservasi
+            </p>
+            <p className="text-[10px] uppercase tracking-[0.25em] text-white/45 mt-0.5">
+              Meja · Gadang Barubah
+            </p>
+          </div>
+
+        <div className="flex-1 p-3 sm:p-4 lg:p-5 space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <Field label="Nama">
               <Input
@@ -239,7 +275,7 @@ function QuickReservationBarInner() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_6.5rem_1fr] gap-3 items-end">
             <Field label="Tanggal">
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   type="date"
                   min={minDate}
@@ -253,7 +289,7 @@ function QuickReservationBarInner() {
                   size="sm"
                   onClick={() => setTanggal(minDate)}
                   className={cn(
-                    "h-9 shrink-0 rounded-sm text-[10px] uppercase tracking-wider border-white/20",
+                    "h-11 sm:h-9 shrink-0 rounded-sm text-[10px] uppercase tracking-wider border-white/20 w-full sm:w-auto",
                     isToday
                       ? "bg-gold/20 text-gold-light border-gold/40 hover:bg-gold/25"
                       : "bg-transparent text-white/70 hover:bg-white/10 hover:text-white",
@@ -283,16 +319,17 @@ function QuickReservationBarInner() {
             </Field>            <Button
               type="submit"
               disabled={loading}
-              className="h-9 w-full rounded-sm bg-gold text-maroon-deep hover:bg-gold-light font-semibold uppercase tracking-[0.14em] text-xs shadow-md"
+              className="h-12 sm:h-9 w-full rounded-sm bg-gold text-maroon-deep hover:bg-gold-light font-semibold uppercase tracking-[0.14em] text-sm sm:text-xs shadow-md mt-1 sm:mt-0"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reservasi"}
             </Button>
           </div>
         </div>
-      </div>
+        </div>
+      </form>
 
       <div className="h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
-    </form>
+    </div>
   );
 }
 

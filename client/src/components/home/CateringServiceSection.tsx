@@ -13,17 +13,17 @@ function CateringServiceSection() {
   const [, navigate] = useLocation();
 
   return (
-    <section id="catering-section" className="py-16 sm:py-20 scroll-mt-24">
+    <section id="catering-section" className="py-12 sm:py-20 scroll-mt-20 sm:scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <h2 className="section-heading">Our Catering Service</h2>
           <div className="section-divider mt-4" />
-          <p className="text-muted-foreground mt-6 max-w-2xl mx-auto">
+          <p className="text-muted-foreground mt-4 sm:mt-6 max-w-2xl mx-auto text-sm sm:text-base px-2">
             Layanan katering Padang autentik untuk pernikahan, corporate event, arisan, dan gathering.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
           {CATERING_CATEGORIES.map((cat, i) => (
             <button
               key={cat.id}
@@ -41,8 +41,8 @@ function CateringServiceSection() {
                   draggable={false}
                 />
               </div>
-              <div className="p-3 sm:p-4 border-t border-border/40">
-                <p className="font-display text-base sm:text-lg text-foreground text-center">
+              <div className="p-2.5 sm:p-4 border-t border-border/40">
+                <p className="font-display text-sm sm:text-lg text-foreground text-center leading-snug">
                   {cat.name}
                 </p>
               </div>

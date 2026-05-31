@@ -46,19 +46,19 @@ export default function CateringInquirySection() {
   };
 
   return (
-    <section className="py-16 sm:py-20 bg-primary text-primary-foreground scroll-mt-24">
+    <section className="py-12 sm:py-20 bg-primary text-primary-foreground scroll-mt-20 sm:scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-wide text-cream">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="font-display text-2xl sm:text-4xl font-semibold tracking-wide text-cream px-2">
             Plan Your Catering With Us
           </h2>
           <div className="w-16 h-px bg-gold/60 mx-auto mt-4" />
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-stretch">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-stretch">
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 bg-maroon-deep/40 border border-gold/20 p-6 sm:p-8"
+            className="space-y-4 bg-maroon-deep/40 border border-gold/20 p-5 sm:p-8 order-2 lg:order-1"
           >
             <div>
               <label className="text-[10px] uppercase tracking-[0.15em] text-cream/70 mb-1.5 block">
@@ -132,7 +132,7 @@ export default function CateringInquirySection() {
             </Button>
           </form>
 
-          <div className="relative home-img-wrap border border-gold/20 min-h-[320px]">
+          <div className="relative home-img-wrap border border-gold/20 min-h-[220px] sm:min-h-[320px] order-1 lg:order-2">
             <img
               src={cateringImage}
               alt="Layanan catering Gadang Barubah"

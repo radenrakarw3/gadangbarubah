@@ -8,10 +8,10 @@ function AboutSection() {
   const [, navigate] = useLocation();
 
   return (
-    <section id="about-section" className="py-16 sm:py-20 bg-muted/30 scroll-mt-24">
+    <section id="about-section" className="py-12 sm:py-20 bg-muted/30 scroll-mt-20 sm:scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          <div className="relative aspect-[4/5] sm:aspect-[3/4] home-img-wrap luxury-card rounded-none">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center">
+          <div className="relative aspect-[16/11] sm:aspect-[3/4] home-img-wrap luxury-card rounded-none max-h-[280px] sm:max-h-none mx-auto w-full">
             <img
               src={aboutImage}
               alt="Interior Gadang Barubah — nuansa Minang yang mewah"
@@ -42,7 +42,7 @@ function AboutSection() {
               </p>
             </div>
             <Button
-              className="mt-8 rounded-none btn-reserve group"
+              className="mt-6 sm:mt-8 w-full sm:w-auto rounded-none btn-reserve group h-11"
               onClick={() => navigate("/services/outlet")}
             >
               Our Outlet

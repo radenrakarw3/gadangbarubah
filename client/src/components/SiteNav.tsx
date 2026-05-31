@@ -32,9 +32,9 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
   const mobileLinks = [...LEFT_NAV, ...MAIN_NAV.filter((n) => !LEFT_NAV.some((l) => l.href === n.href))];
 
   return (
-    <header className={`sticky top-0 z-50 border-b ${navBg}`}>
+    <header className={`sticky top-0 z-50 border-b safe-top ${navBg}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 sm:h-[4.5rem] gap-2">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-14 sm:h-[4.5rem] gap-2">
           {/* Left nav */}
           <nav className="hidden lg:flex items-center gap-6">
             {LEFT_NAV.map((item) => (
@@ -105,23 +105,23 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
 
           {/* Mobile reserve */}
           <Link href="/reservasi" className="lg:hidden justify-self-end">
-            <Button size="sm" className="btn-reserve rounded-none h-8 text-[10px] px-3">
+            <Button size="sm" className="btn-reserve rounded-none h-9 text-[11px] px-3.5">
               Reserve
             </Button>
           </Link>
         </div>
 
         {open && (
-          <div className="lg:hidden pb-5 border-t border-border/30 pt-4 space-y-1">
+          <div className="lg:hidden pb-4 pt-3 border-t border-border/30 space-y-0.5 max-h-[70vh] overflow-y-auto">
             {mobileLinks.map((item) => (
               <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start font-medium tracking-wide">
+                <Button variant="ghost" className="w-full justify-start font-medium tracking-wide h-11 text-base">
                   {item.label}
                 </Button>
               </Link>
             ))}
             <a href="#contact-section" onClick={() => setOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start font-medium tracking-wide">
+              <Button variant="ghost" className="w-full justify-start font-medium tracking-wide h-11 text-base">
                 Contact
               </Button>
             </a>

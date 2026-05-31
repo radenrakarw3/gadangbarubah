@@ -53,10 +53,10 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 lg:gap-16">
           {/* Nav columns */}
-          <div className="grid grid-cols-2 gap-8 md:col-span-1">
+          <div className="grid grid-cols-2 gap-6 sm:gap-8 md:col-span-1">
             <nav className="space-y-3">
               {FOOTER_NAV_LEFT.map((item) => (
                 <Link
@@ -87,10 +87,10 @@ export default function SiteFooter() {
               <img
                 src={logoImage}
                 alt="Gadang Barubah"
-                className="h-14 w-14 object-contain flex-shrink-0 sm:order-2"
+                className="h-12 w-12 sm:h-14 sm:w-14 object-contain flex-shrink-0"
                 loading="lazy"
               />
-              <div className="sm:order-1">
+              <div>
                 <p className="font-display text-xl text-gold mb-2 tracking-wide">Gadang Barubah</p>
                 <p className="text-cream/90 text-sm font-medium mb-2">{COMPANY.name}</p>
                 <p className="text-cream/60 text-sm leading-relaxed max-w-sm">{COMPANY.address}</p>
@@ -107,7 +107,7 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="border-t border-gold/15 mt-10 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="border-t border-gold/15 mt-8 sm:mt-10 pt-5 sm:pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             {LEGAL_NAV.map((item) => (
               <Link

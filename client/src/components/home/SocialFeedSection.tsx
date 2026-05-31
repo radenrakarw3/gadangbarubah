@@ -14,16 +14,16 @@ const FEED_IMAGES = [
 
 function SocialFeedSection() {
   return (
-    <section className="py-16 sm:py-20 border-t border-border/40">
+    <section className="py-12 sm:py-20 border-t border-border/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <p className="text-gold text-xs uppercase tracking-[0.25em] mb-2 font-medium">
+        <div className="text-center mb-8 sm:mb-10">
+          <p className="text-gold text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.25em] mb-2 font-medium">
             @gadangbarubahindonesia
           </p>
-          <h2 className="section-heading text-2xl sm:text-3xl">Follow Our Journey</h2>
+          <h2 className="section-heading">Follow Our Journey</h2>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
           {FEED_IMAGES.map((item, i) => (
             <a
               key={i}
