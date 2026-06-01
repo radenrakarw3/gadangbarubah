@@ -8,10 +8,10 @@ import SignatureMenuSection from "./home/SignatureMenuSection";
 import AboutSection from "./home/AboutSection";
 import CateringServiceSection from "./home/CateringServiceSection";
 import CateringInquirySection from "./home/CateringInquirySection";
-import SocialFeedSection from "./home/SocialFeedSection";
 import ContactSection from "./home/ContactSection";
+import SectionSeam from "./home/SectionSeam";
 import CampaignPopup from "./CampaignPopup";
-import { bootHomePage, pinHomeImages, type HomeBootPhase } from "@/lib/homePreload";
+import { bootHomePage, type HomeBootPhase } from "@/lib/homePreload";
 
 export default function WelcomePage() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -49,12 +49,9 @@ export default function WelcomePage() {
       if (cancelled) return;
 
       setExiting(true);
-      window.setTimeout(async () => {
+      window.setTimeout(() => {
         if (cancelled) return;
         setRevealed(true);
-        if (rootRef.current) {
-          await pinHomeImages(rootRef.current);
-        }
       }, 500);
     }
 
@@ -76,23 +73,28 @@ export default function WelcomePage() {
       {/* Layout tetap document-flow — tidak berubah fixed→static saat reveal */}
       <div
         ref={rootRef}
-        className={`home-page-root min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-ivory ${
+        className={`home-page-root min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] overflow-x-hidden bg-[#300505] ${
           revealed ? "home-page-enter" : "opacity-0 pointer-events-none select-none"
         }`}
         aria-hidden={!revealed}
       >
-        <SiteNav />
+        <div className="relative">
+          <SiteNav variant="transparent" />
+          <main className="home-scroll-content">
+            <HeroSection />
+            <SignatureMenuSection />
+            <SectionSeam variant="maroon-to-cream" />
+            <AboutSection />
+            <SectionSeam variant="cream-to-maroon" />
+            <CateringServiceSection />
+            <SectionSeam variant="maroon-to-inquiry" />
+            <CateringInquirySection />
+            <SectionSeam variant="inquiry-to-contact" />
+            <ContactSection />
+          </main>
+        </div>
 
-        <main className="home-scroll-content">
-          <HeroSection />
-          <SignatureMenuSection />
-          <AboutSection />
-          <CateringServiceSection />
-          <CateringInquirySection />
-          <SocialFeedSection />
-          <ContactSection />
-        </main>
-
+        <SectionSeam variant="contact-to-footer" />
         <SiteFooter />
 
         {revealed && <CampaignPopup />}

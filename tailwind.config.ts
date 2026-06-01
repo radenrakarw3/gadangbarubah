@@ -99,6 +99,9 @@ export default {
         sans: ["var(--font-sans)"],
         serif: ["var(--font-serif)"],
         display: ["var(--font-display)"],
+        heroScript: ["var(--font-hero-script)"],
+        heroCta: ["var(--font-hero-cta)"],
+        inquiry: ["var(--font-inquiry)"],
         mono: ["var(--font-mono)"],
       },
       keyframes: {

@@ -1,141 +1,135 @@
 import { useLocation } from "wouter";
-import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { memo, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { SIGNATURE_MENU } from "@/lib/siteContent";
 import { useSiteLanguage } from "@/lib/language";
 import rendangImg from "@assets/DSC02799_1758628102653.jpg";
-import ayamPopImg from "@assets/DSC02436_1758564588903.jpg";
-import gulaiImg from "@assets/DSC02371_1758564588950.jpg";
 import dendengImg from "@assets/DSC07168_1758564588951.jpg";
-import tumpengImg from "@assets/Nasi Tumpeng_1758628102631.webp";
-import nasiBoxImg from "@assets/Nasi Box_1758628102653.jpg";
+import gulaiImg from "@assets/DSC02371_1758564588950.jpg";
+import ayamPopImg from "@assets/DSC02436_1758564588903.jpg";
 
-const MENU_IMAGES = [rendangImg, ayamPopImg, gulaiImg, dendengImg, tumpengImg, nasiBoxImg];
+/** Empat andalan sesuai Figma Frame 4 (node 0-3) */
+const FIGMA_SIGNATURE_ITEMS = [
+  { nameID: "Tunjang Hotplate", nameEN: "Tunjang Hotplate", image: gulaiImg },
+  { nameID: "Dendeng Bakar", nameEN: "Grilled Dendeng", image: dendengImg },
+  { nameID: "Rendang", nameEN: "Rendang", image: rendangImg },
+  { nameID: "Es Tebak", nameEN: "Es Tebak", image: ayamPopImg },
+] as const;
+
+const CARD_SCROLL_STEP = 475;
 
 function SignatureMenuSection() {
   const [, navigate] = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const { lang } = useSiteLanguage();
 
+  const title =
+    lang === "ID" ? "Signature Menu Gadang Barubah" : "Signature Menu Gadang Barubah";
+
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
-    const step = Math.min(el.clientWidth * 0.85, 280);
-    el.scrollBy({ left: dir === "left" ? -step : step, behavior: "smooth" });
+    el.scrollBy({
+      left: dir === "left" ? -CARD_SCROLL_STEP : CARD_SCROLL_STEP,
+      behavior: "smooth",
+    });
   };
 
   return (
-    <section id="menu-section" className="py-12 sm:py-20 scroll-mt-20 sm:scroll-mt-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header: centered on mobile, arrows on sm+ */}
-        <div className="text-center sm:flex sm:items-start sm:justify-between sm:gap-4 mb-8 sm:mb-10">
-          <Button
-            variant="outline"
-            size="icon"
-            className="hidden sm:inline-flex shrink-0 rounded-none border-border/60 bg-ivory/95 shadow-sm order-first"
-            onClick={() => scroll("left")}
-            aria-label="Scroll kiri"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
+    <section
+      id="menu-section"
+      className="relative overflow-hidden bg-[#300505] py-10 scroll-mt-16 sm:scroll-mt-24 sm:py-12 lg:min-h-[800px] lg:py-0"
+    >
+      <div className="relative mx-auto max-w-[1690px] px-4 pb-10 sm:px-8 sm:pb-14 lg:px-[113px] lg:pb-20 lg:pt-[160px]">
+        {/* Header + garis dekor (Figma: Rubik 28px, garis 45×2px putih) */}
+        <div className="mb-6 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-start sm:justify-between sm:gap-4 lg:mb-[64px]">
+          <h2 className="text-figma-section-title max-w-[20rem] text-left text-white sm:max-w-[439px]">
+            {title}
+          </h2>
 
-          <div className="sm:flex-1 sm:min-w-0">
-            <h2 className="section-heading">{lang === "ID" ? "Menu Andalan" : "Signature Menu"}</h2>
-            <div className="section-divider mt-4" />
+          <div className="hidden sm:flex items-center gap-4 shrink-0 pt-2 lg:pt-[25px]">
+            <span className="w-[45px] border-t-2 border-white" aria-hidden />
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              className="p-2 text-white/90 hover:text-white transition-colors"
+              aria-label={lang === "ID" ? "Geser kiri" : "Scroll left"}
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              className="p-2 text-white/90 hover:text-white transition-colors"
+              aria-label={lang === "ID" ? "Geser kanan" : "Scroll right"}
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+            <span className="w-[45px] border-t-2 border-white" aria-hidden />
           </div>
-
-          <Button
-            variant="outline"
-            size="icon"
-            className="hidden sm:inline-flex shrink-0 rounded-none border-border/60 bg-ivory/95 shadow-sm order-last"
-            onClick={() => scroll("right")}
-            aria-label="Scroll kanan"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
         </div>
 
-        {/* Carousel + mobile arrows */}
-        <div className="relative">
-          <Button
-            variant="outline"
-            size="icon"
-            className="sm:hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full border-border/60 bg-ivory/95 shadow-md"
+        <div className="mb-3 flex justify-end gap-1 sm:hidden">
+          <button
+            type="button"
             onClick={() => scroll("left")}
-            aria-label="Scroll kiri"
+            className="p-2 text-white/80 hover:text-white"
+            aria-label={lang === "ID" ? "Geser kiri" : "Scroll left"}
           >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <button
+            type="button"
+            onClick={() => scroll("right")}
+            className="p-2 text-white/80 hover:text-white"
+            aria-label={lang === "ID" ? "Geser kanan" : "Scroll right"}
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
+        </div>
 
-          <div
-            ref={scrollRef}
-            className="flex gap-4 sm:gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 px-10 sm:px-0 sm:-mx-0"
-          >
-            {SIGNATURE_MENU.map((item, i) => (
+        {/* Carousel: kartu 400×250 putih + label Rubik 20px */}
+        <div
+          ref={scrollRef}
+          className="-mx-4 flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-4 pb-1 sm:mx-0 sm:gap-[75px] sm:px-0"
+        >
+          {FIGMA_SIGNATURE_ITEMS.map((item) => {
+            const label = lang === "ID" ? item.nameID : item.nameEN;
+            return (
               <article
-                key={item.name}
-                className="luxury-card flex-shrink-0 w-[72vw] max-w-[260px] sm:w-[260px] snap-center sm:snap-start overflow-hidden cursor-pointer"
-                onClick={() => navigate("/menu")}
+                key={item.nameID}
+                className="flex w-[min(72vw,280px)] shrink-0 snap-center flex-col items-center sm:w-[min(85vw,400px)] sm:snap-start"
               >
-                <div className="aspect-square home-img-wrap bg-muted">
+                <button
+                  type="button"
+                  onClick={() => navigate("/menu")}
+                  className="h-[150px] w-full overflow-hidden bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 sm:h-[220px] lg:h-[250px] lg:w-[400px]"
+                >
                   <img
-                    src={MENU_IMAGES[i]}
-                    alt={item.name}
+                    src={item.image}
+                    alt={label}
                     className="w-full h-full object-cover"
-                    loading="eager"
+                    loading="lazy"
                     decoding="async"
                     draggable={false}
                   />
-                </div>
-                <div className="p-3 sm:p-4 text-center border-t border-border/40">
-                  <p className="font-display text-base sm:text-lg text-foreground mb-0.5">{item.name}</p>
-                  <p className="text-gold font-medium text-sm tracking-wide">{item.price}</p>
-                </div>
+                </button>
+                <p className="mt-2 text-center font-heroCta text-base leading-tight text-white sm:mt-3 sm:text-lg lg:mt-4 lg:text-[20px] lg:leading-[50px]">
+                  {label}
+                </p>
               </article>
-            ))}
-          </div>
-
-          <Button
-            variant="outline"
-            size="icon"
-            className="sm:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full border-border/60 bg-ivory/95 shadow-md"
-            onClick={() => scroll("right")}
-            aria-label="Scroll kanan"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+            );
+          })}
         </div>
 
-        <p className="sm:hidden text-center text-muted-foreground/60 text-xs mt-3 tracking-wide">
-          {lang === "ID" ? "Geser untuk lihat menu lainnya" : "Swipe to see more menu items"}
-        </p>
-
-        <div className="mt-10 sm:mt-16 flex flex-col items-center px-2 sm:px-4">
-          <div className="section-divider w-20 mb-5 sm:mb-6" />
-          <p className="font-display italic text-muted-foreground text-sm sm:text-lg mb-2 max-w-xl mx-auto leading-relaxed text-center">
-            {lang === "ID"
-              ? "Lebih dari 50 hidangan autentik khas Minangkabau"
-              : "More than 50 authentic Minangkabau dishes"}
-          </p>
-          <p className="text-muted-foreground/80 text-xs sm:text-sm mb-6 sm:mb-8 max-w-md mx-auto text-center px-2">
-            {lang === "ID"
-              ? "Dari rendang legendaris hingga lauk pilihan harian — setiap hidangan disajikan dengan standar tertinggi."
-              : "From legendary rendang to daily favorites, every dish is served with the highest standards."}
-          </p>
+        <p className="mt-8 text-center">
           <button
             type="button"
-            className="btn-menu-luxury group w-full max-w-sm sm:w-auto sm:max-w-none"
             onClick={() => navigate("/menu")}
+            className="font-heroCta text-sm italic text-white/70 underline-offset-4 hover:text-white hover:underline"
           >
-            <span className="btn-menu-luxury-inner justify-center sm:justify-start">
-              <span className="btn-menu-luxury-label text-base sm:text-lg">
-                {lang === "ID" ? "Lihat Menu Lengkap" : "View Full Menu"}
-              </span>
-              <ArrowUpRight className="relative h-5 w-5 shrink-0 text-gold/90 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-gold" />
-            </span>
+            {lang === "ID" ? "Lihat menu lengkap →" : "View full menu →"}
           </button>
-        </div>
+        </p>
       </div>
     </section>
   );

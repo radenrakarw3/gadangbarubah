@@ -60,6 +60,10 @@
   --font-sans: "Inter", sans-serif;
   --font-serif: "Cormorant Garamond", Georgia, serif;
   --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-hero-script: "Luxurious Script", cursive;
+  --font-hero-cta: "Rubik", sans-serif;
+  --font-form: "Poppins", sans-serif;
+  --font-inquiry: "Spectral", Georgia, serif;
   --font-mono: Menlo, monospace;
   --radius: .5rem; /* 8px */
   --shadow-2xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.00);
@@ -387,6 +391,78 @@
     @apply bg-card border border-border/60 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gold/30;
   }
 
+  /* Figma Frame 2 — hero headline */
+  .hero-headline-figma {
+    font-family: var(--font-hero-script);
+    font-weight: 400;
+    font-style: normal;
+    font-synthesis: none;
+    letter-spacing: 0.03em;
+    text-align: center;
+    color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-headline-figma {
+      font-size: 90px;
+      line-height: 50px;
+      max-width: 690px;
+      min-height: 115px;
+    }
+  }
+
+  /* Figma tipografi umum */
+  .text-figma-nav {
+    font-family: var(--font-hero-cta);
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 18px;
+    letter-spacing: 0.01em;
+  }
+
+  .text-figma-section-title {
+    font-family: var(--font-hero-cta);
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 50px;
+    letter-spacing: 0.01em;
+  }
+
+  @media (max-width: 639px) {
+    .text-figma-section-title {
+      font-size: 1.25rem;
+      line-height: 1.35;
+    }
+
+    .text-figma-body {
+      font-size: 0.9375rem;
+      line-height: 1.5;
+    }
+
+    .text-figma-nav {
+      font-size: 0.6875rem;
+      line-height: 1rem;
+      letter-spacing: 0.06em;
+    }
+  }
+
+  .text-figma-body {
+    font-family: var(--font-hero-cta);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 20px;
+    letter-spacing: 0.02em;
+  }
+
+  .text-figma-inquiry-title {
+    font-family: var(--font-inquiry);
+    font-weight: 500;
+    font-size: 42px;
+    line-height: 50px;
+    letter-spacing: 0.01em;
+  }
+
   .nav-link-luxury {
     @apply text-xs sm:text-sm font-medium uppercase tracking-[0.15em] text-foreground/80 hover:text-gold transition-colors duration-200;
   }
@@ -439,8 +515,12 @@
     transform: translateZ(0);
   }
 
-  .home-scroll-content section {
-    content-visibility: visible;
+  .home-scroll-content {
+    background-color: #300505;
+  }
+
+  .home-scroll-content > section {
+    margin: 0;
   }
 
   .home-img-wrap {
@@ -454,6 +534,18 @@
     content-visibility: visible;
   }
 
+  @media (max-width: 1023px) {
+    .home-img-wrap {
+      contain: none;
+      transform: none;
+    }
+
+    .home-page-root header {
+      contain: none;
+      transform: none;
+    }
+  }
+
   .home-page-root .luxury-card {
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
   }
@@ -465,11 +557,6 @@
 
   .home-page-root {
     overflow-x: clip;
-  }
-
-  @media (max-width: 639px) {
-    .home-scroll-content section {
-      @apply py-12;
-    }
+    background-color: #300505;
   }
 }

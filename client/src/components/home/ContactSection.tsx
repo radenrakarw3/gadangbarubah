@@ -7,7 +7,10 @@ export default function ContactSection() {
   const { lang } = useSiteLanguage();
 
   return (
-    <section id="contact-section" className="py-12 sm:py-20 bg-muted/30 scroll-mt-20 sm:scroll-mt-24">
+    <section
+      id="contact-section"
+      className="bg-[#f3efe8] py-10 scroll-mt-16 sm:scroll-mt-24 sm:py-16 lg:py-20"
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
         <h2 className="section-heading mb-4">{lang === "ID" ? "Hubungi Kami" : "Contact Us"}</h2>
         <div className="section-divider mb-5 sm:mb-6" />

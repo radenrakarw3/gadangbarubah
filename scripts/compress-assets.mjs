@@ -18,14 +18,10 @@ const CARD_NAMES = new Set([
   "DSC02371_1758564588950.jpg",
   "DSC07168_1758564588951.jpg",
   "Nasi Box_1758628102653.jpg",
-  "DSC07130_1758564588953.jpg",
   "DSC07152_1758564588952.jpg",
   "DSC03147_1758567860387.jpg",
   "DSC03388_1758567885565.jpg",
-  "Nasi Tumpeng_1758628102631.png",
 ]);
-
-const PNG_TO_WEBP = new Set(["Nasi Tumpeng_1758628102631.png"]);
 
 function maxWidthFor(name) {
   if (HERO_NAMES.has(name)) return 1920;
@@ -81,23 +77,6 @@ async function compressWebp(filePath, name) {
   return { before, after };
 }
 
-async function pngToWebp(filePath) {
-  const before = fs.statSync(filePath).size;
-  const base = path.basename(filePath, ".png");
-  const newPath = path.join(path.dirname(filePath), `${base}.webp`);
-  const maxW = maxWidthFor(path.basename(filePath));
-
-  await sharp(filePath)
-    .rotate()
-    .resize({ width: maxW, withoutEnlargement: true })
-    .webp({ quality: 82 })
-    .toFile(newPath);
-
-  fs.unlinkSync(filePath);
-  const after = fs.statSync(newPath).size;
-  return { before, after, newName: `${base}.webp` };
-}
-
 async function compressPng(filePath, name) {
   const before = fs.statSync(filePath).size;
   const maxW = maxWidthFor(name);
@@ -122,22 +101,12 @@ async function main() {
 
   let totalBefore = 0;
   let totalAfter = 0;
-  const renames = [];
 
   for (const name of files) {
     const filePath = path.join(ASSETS_DIR, name);
     const ext = path.extname(name).toLowerCase();
 
     try {
-      if (PNG_TO_WEBP.has(name)) {
-        const r = await pngToWebp(filePath);
-        totalBefore += r.before;
-        totalAfter += r.after;
-        renames.push(`${name} → ${r.newName}`);
-        console.log(`✓ ${name} → ${r.newName}: ${formatBytes(r.before)} → ${formatBytes(r.after)}`);
-        continue;
-      }
-
       if (ext === ".jpg" || ext === ".jpeg") {
         const r = await compressJpeg(filePath, name);
         totalBefore += r.before;
@@ -163,10 +132,6 @@ async function main() {
   console.log(
     `Total: ${formatBytes(totalBefore)} → ${formatBytes(totalAfter)} (−${Math.round((1 - totalAfter / totalBefore) * 100)}%)`,
   );
-  if (renames.length) {
-    console.log("\nRenamed (update imports):");
-    renames.forEach((r) => console.log(`  ${r}`));
-  }
 }
 
 main();
