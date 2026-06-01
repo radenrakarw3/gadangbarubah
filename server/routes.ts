@@ -11,7 +11,12 @@ import {
 import rateLimit from "express-rate-limit";
 import { memberEndpointSecurity } from "./security";
 import { isReservationStatus } from "@shared/reservation-status";
-import { requireAdmin } from "./auth-middleware";
+import {
+  getRoleOutlet,
+  normalizeAdminRole,
+  requireAdmin,
+  requireMainAdmin,
+} from "./auth-middleware";
 import { notifyReservationCustomerAsync } from "./reservation-notify";
 import { upload, validateImageDimensions } from "./upload-middleware";
 import fs from "fs";
@@ -69,7 +74,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         req.session.userId = result.user.id;
         req.session.username = result.user.username;
-        req.session.role = "admin";
+        req.session.role = normalizeAdminRole(result.user.role) ?? "admin_main";
 
         req.session.save((saveErr) => {
           if (saveErr) {
@@ -107,15 +112,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/auth/session", async (req, res) => {
-    if (req.session.userId && req.session.role === "admin") {
+    const role = normalizeAdminRole(req.session.role);
+    if (req.session.userId && role) {
       return res.json({
         success: true,
         authenticated: true,
-        role: "admin",
+        role,
         user: {
           id: req.session.userId,
           username: req.session.username,
-          role: req.session.role,
+          role,
         },
       });
     }
@@ -157,9 +163,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/stats", requireAdmin, memberEndpointSecurity, async (_req, res) => {
+  app.get("/api/admin/stats", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
-      const stats = await storage.getAdminStats();
+      const outlet = getRoleOutlet(req.session.role);
+      const stats = await storage.getAdminStats(outlet ?? undefined);
       res.json({ success: true, data: stats });
     } catch (error) {
       console.error("Get admin stats error:", error);
@@ -173,8 +180,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const statusRaw = typeof req.query.status === "string" ? req.query.status : undefined;
       const status =
         statusRaw && isReservationStatus(statusRaw) ? statusRaw : undefined;
-
-      const data = await storage.getReservations({ date, status });
+      const outlet = getRoleOutlet(req.session.role);
+      const data = await storage.getReservations({ date, status, outlet: outlet ?? undefined });
       res.json({ success: true, data });
     } catch (error) {
       console.error("Get reservations error:", error);
@@ -184,6 +191,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/admin/reservations/:id/status", requireAdmin, memberEndpointSecurity, async (req, res) => {
     try {
+      const outlet = getRoleOutlet(req.session.role);
+      if (outlet) {
+        const current = await storage.getReservationById(req.params.id);
+        if (!current || current.outlet !== outlet) {
+          return res.status(403).json({
+            success: false,
+            message: "Anda hanya dapat mengelola reservasi cabang Anda",
+          });
+        }
+      }
       const { status } = updateReservationStatusSchema.parse(req.body);
       const updated = await storage.updateReservationStatus(req.params.id, status);
       notifyReservationCustomerAsync(updated, status);
@@ -202,7 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/users", requireAdmin, memberEndpointSecurity, async (_req, res) => {
+  app.get("/api/admin/users", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
     try {
       const staff = await storage.getStaffUsers();
       res.json({ success: true, data: staff });
@@ -212,7 +229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/users", requireAdmin, memberEndpointSecurity, async (req, res) => {
+  app.post("/api/admin/users", requireMainAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const validatedData = insertUserSchema.parse(req.body);
       const existing = await storage.getUserByUsername(validatedData.username);
@@ -232,7 +249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/admin/users/:id", requireAdmin, memberEndpointSecurity, async (req, res) => {
+  app.delete("/api/admin/users/:id", requireMainAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const { id } = req.params;
       if (id === req.session.userId) {
@@ -255,7 +272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post(
     "/api/admin/campaigns",
-    requireAdmin,
+    requireMainAdmin,
     memberEndpointSecurity,
     upload.single("image"),
     async (req, res) => {
@@ -289,7 +306,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
-  app.get("/api/admin/campaigns", requireAdmin, memberEndpointSecurity, async (_req, res) => {
+  app.get("/api/admin/campaigns", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
     try {
       const campaigns = await storage.getCampaigns();
       res.json({ success: true, campaigns });
@@ -314,7 +331,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch(
     "/api/admin/campaigns/:id/status",
-    requireAdmin,
+    requireMainAdmin,
     memberEndpointSecurity,
     async (req, res) => {
       try {
@@ -345,7 +362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
-  app.delete("/api/admin/campaigns/:id", requireAdmin, memberEndpointSecurity, async (req, res) => {
+  app.delete("/api/admin/campaigns/:id", requireMainAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const campaigns = await storage.getCampaigns();
       const campaign = campaigns.find((c) => c.id === req.params.id);

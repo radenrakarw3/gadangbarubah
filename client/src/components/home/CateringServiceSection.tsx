@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { useLocation } from "wouter";
 import { CATERING_CATEGORIES } from "@/lib/siteContent";
+import { useSiteLanguage } from "@/lib/language";
 import nasiBoxImg from "@assets/Nasi Box_1758628102653.jpg";
 import tumpengImg from "@assets/Nasi Tumpeng_1758628102631.webp";
 import buffetImg from "@assets/DSC07152_1758564588952.jpg";
@@ -11,15 +12,20 @@ const CATEGORY_IMAGES = [nasiBoxImg, snackImg, buffetImg, stallImg, tumpengImg];
 
 function CateringServiceSection() {
   const [, navigate] = useLocation();
+  const { lang } = useSiteLanguage();
 
   return (
     <section id="catering-section" className="py-12 sm:py-20 scroll-mt-20 sm:scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12">
-          <h2 className="section-heading">Our Catering Service</h2>
+          <h2 className="section-heading">
+            {lang === "ID" ? "Layanan Katering Kami" : "Our Catering Service"}
+          </h2>
           <div className="section-divider mt-4" />
           <p className="text-muted-foreground mt-4 sm:mt-6 max-w-2xl mx-auto text-sm sm:text-base px-2">
-            Layanan katering Padang autentik untuk pernikahan, corporate event, arisan, dan gathering.
+            {lang === "ID"
+              ? "Layanan katering Padang autentik untuk pernikahan, acara perusahaan, arisan, dan gathering."
+              : "Authentic Padang catering service for weddings, corporate events, social gatherings, and more."}
           </p>
         </div>
 

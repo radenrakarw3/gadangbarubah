@@ -13,9 +13,11 @@ import { queryClient, apiRequest } from '@/lib/queryClient';
 import { apiFetch } from '@/lib/api';
 import { format } from 'date-fns';
 import type { Campaign } from '@shared/schema';
+import { useSiteLanguage } from '@/lib/language';
 
 export default function AdminCampaigns() {
   const [, navigate] = useLocation();
+  const { lang } = useSiteLanguage();
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -209,12 +211,12 @@ export default function AdminCampaigns() {
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <Label htmlFor="title">Judul Campaign</Label>
+                    <Label htmlFor="title">{lang === 'ID' ? 'Judul Campaign' : 'Campaign Title'}</Label>
                     <Input
                       id="title"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="Contoh: Promo Ramadan 2025"
+                      placeholder={lang === 'ID' ? 'Contoh: Promo Ramadan 2025' : 'Example: Ramadan Promo 2025'}
                       required
                       data-testid="input-campaign-title"
                     />
@@ -250,14 +252,16 @@ export default function AdminCampaigns() {
                             setPreviewUrl(null);
                           }}
                         >
-                          Ganti Gambar
+                          {lang === 'ID' ? 'Ganti Gambar' : 'Change Image'}
                         </Button>
                       </div>
                     ) : (
                       <div className="space-y-2">
                         <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
                         <div>
-                          <p className="font-medium">Klik atau drag & drop gambar</p>
+                          <p className="font-medium">
+                            {lang === 'ID' ? 'Klik atau drag & drop gambar' : 'Click or drag & drop image'}
+                          </p>
                           <p className="text-sm text-muted-foreground">PNG, 600x600px, max 2MB</p>
                         </div>
                       </div>
@@ -276,7 +280,7 @@ export default function AdminCampaigns() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="validFrom">Tanggal Mulai</Label>
+                      <Label htmlFor="validFrom">{lang === 'ID' ? 'Tanggal Mulai' : 'Start Date'}</Label>
                       <Input
                         id="validFrom"
                         type="date"
@@ -287,7 +291,7 @@ export default function AdminCampaigns() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="validUntil">Tanggal Berakhir</Label>
+                      <Label htmlFor="validUntil">{lang === 'ID' ? 'Tanggal Berakhir' : 'End Date'}</Label>
                       <Input
                         id="validUntil"
                         type="date"
@@ -306,7 +310,9 @@ export default function AdminCampaigns() {
                     data-testid="button-create-campaign"
                   >
                     <Upload className="mr-2 h-4 w-4" />
-                    {uploadMutation.isPending ? 'Mengupload...' : 'Upload Campaign'}
+                    {uploadMutation.isPending
+                      ? (lang === 'ID' ? 'Mengupload...' : 'Uploading...')
+                      : (lang === 'ID' ? 'Upload Campaign' : 'Upload Campaign')}
                   </Button>
                 </form>
               </CardContent>

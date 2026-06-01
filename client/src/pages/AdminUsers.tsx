@@ -38,23 +38,26 @@ import { apiFetch } from "@/lib/api";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSiteLanguage } from "@/lib/language";
 
 type StaffUser = {
   id: string;
   username: string;
-  role: "admin";
+  role: "admin_main" | "admin_cikarang" | "admin_bintaro";
   createdAt: string;
 };
 
 const staffFormSchema = z.object({
   username: z.string().min(3, "Username minimal 3 karakter"),
   password: z.string().min(6, "Password minimal 6 karakter"),
+  role: z.enum(["admin_main", "admin_cikarang", "admin_bintaro"]),
 });
 
 type StaffFormData = z.infer<typeof staffFormSchema>;
 
 export default function AdminUsers() {
   const [, navigate] = useLocation();
+  const { lang } = useSiteLanguage();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -64,6 +67,7 @@ export default function AdminUsers() {
     defaultValues: {
       username: "",
       password: "",
+      role: "admin_cikarang",
     },
   });
 
@@ -85,7 +89,7 @@ export default function AdminUsers() {
       const response = await apiFetch("/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, role: "admin" }),
+        body: JSON.stringify(data),
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -101,7 +105,7 @@ export default function AdminUsers() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setIsCreateDialogOpen(false);
-      form.reset({ username: "", password: "" });
+      form.reset({ username: "", password: "", role: "admin_cikarang" });
     },
     onError: (error: Error) => {
       toast({
@@ -185,7 +189,7 @@ export default function AdminUsers() {
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Tambah User Baru</DialogTitle>
+                    <DialogTitle>{lang === "ID" ? "Tambah User Baru" : "Add New User"}</DialogTitle>
                   </DialogHeader>
                   <Form {...form}>
                     <form
@@ -199,9 +203,9 @@ export default function AdminUsers() {
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Username</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Username" : "Username"}</FormLabel>
                             <FormControl>
-                              <Input placeholder="nama.user" {...field} />
+                              <Input placeholder={lang === "ID" ? "nama.user" : "username"} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -212,13 +216,46 @@ export default function AdminUsers() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Password" : "Password"}</FormLabel>
                             <FormControl>
                               <Input
                                 type="password"
-                                placeholder="Minimal 6 karakter"
+                                placeholder={lang === "ID" ? "Minimal 6 karakter" : "Minimum 6 characters"}
                                 {...field}
                               />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="role"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{lang === "ID" ? "Tipe Admin" : "Admin Type"}</FormLabel>
+                            <FormControl>
+                              <select
+                                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                                value={field.value}
+                                onChange={(e) => field.onChange(e.target.value)}
+                              >
+                                <option value="admin_main">
+                                  {lang === "ID"
+                                    ? "Admin Utama (konten + semua cabang)"
+                                    : "Main Admin (content + all branches)"}
+                                </option>
+                                <option value="admin_cikarang">
+                                  {lang === "ID"
+                                    ? "Admin Cikarang (reservasi Cikarang)"
+                                    : "Cikarang Admin (Cikarang reservations)"}
+                                </option>
+                                <option value="admin_bintaro">
+                                  {lang === "ID"
+                                    ? "Admin Bintaro (reservasi Bintaro)"
+                                    : "Bintaro Admin (Bintaro reservations)"}
+                                </option>
+                              </select>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -232,10 +269,10 @@ export default function AdminUsers() {
                         {createUserMutation.isPending ? (
                           <>
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Menyimpan...
+                            {lang === "ID" ? "Menyimpan..." : "Saving..."}
                           </>
                         ) : (
-                          "Simpan User"
+                          lang === "ID" ? "Simpan User" : "Save User"
                         )}
                       </Button>
                     </form>
@@ -267,7 +304,13 @@ export default function AdminUsers() {
                           Dibuat {formatDate(user.createdAt)}
                         </p>
                       </div>
-                      <Badge variant="default">Admin</Badge>
+                      <Badge variant="default">
+                        {user.role === "admin_main"
+                          ? "Admin Utama"
+                          : user.role === "admin_cikarang"
+                            ? "Admin Cikarang"
+                            : "Admin Bintaro"}
+                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>

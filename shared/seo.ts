@@ -81,8 +81,8 @@ export const pageSEOConfigs = {
 
   about: createSEOConfig({
     title: "About Us - Gadang Barubah Indonesia",
-    description: "Kenali cerita Gadang Barubah, rumah makan Padang autentik dengan outlet di Pollux Mall Cikarang dan layanan VIP room.",
-    keywords: "about gadang barubah, tentang gadang barubah, outlet padang cikarang, rumah makan padang",
+    description: "Kenali cerita Gadang Barubah, rumah makan Padang autentik dengan 2 cabang di Pollux Mall Cikarang dan Bintaro.",
+    keywords: "about gadang barubah, tentang gadang barubah, outlet padang cikarang, outlet padang bintaro, rumah makan padang",
     path: "/about",
   }),
 
@@ -108,9 +108,9 @@ export const pageSEOConfigs = {
   }),
 
   reservation: createSEOConfig({
-    title: "Reservasi Meja - Gadang Barubah Pollux Mall Cikarang",
+    title: "Reservasi Meja - Gadang Barubah Cikarang & Bintaro",
     description: "Pesan meja reguler atau VIP room di Gadang Barubah. Isi form reservasi online dan tim kami konfirmasi via WhatsApp.",
-    keywords: "reservasi gadang barubah, booking meja padang, vip room cikarang, reservasi restoran",
+    keywords: "reservasi gadang barubah, booking meja padang, vip room cikarang, reservasi restoran, reservasi bintaro",
     path: "/reservasi",
   }),
 

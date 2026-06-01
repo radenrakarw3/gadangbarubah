@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -31,6 +32,29 @@ type AdminStats = {
 
 export default function AdminDashboard() {
   const [, navigate] = useLocation();
+  const [adminRole, setAdminRole] = useState<"admin_main" | "admin_cikarang" | "admin_bintaro">(
+    "admin_main",
+  );
+
+  useEffect(() => {
+    const loadSession = async () => {
+      try {
+        const res = await fetch("/api/auth/session", { credentials: "include" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (
+          data?.role === "admin_main" ||
+          data?.role === "admin_cikarang" ||
+          data?.role === "admin_bintaro"
+        ) {
+          setAdminRole(data.role);
+        }
+      } catch {
+        // noop
+      }
+    };
+    loadSession();
+  }, []);
 
   const { data: statsData, isLoading: statsLoading } = useQuery<{
     success: boolean;
@@ -64,7 +88,14 @@ export default function AdminDashboard() {
       route: "/admin/users",
       color: "bg-slate-600",
     },
-  ];
+  ].filter(() => adminRole === "admin_main");
+
+  const dashboardSubtitle =
+    adminRole === "admin_main"
+      ? "Pantau operasional semua cabang & kelola konten"
+      : adminRole === "admin_cikarang"
+        ? "Pantau operasional reservasi cabang Cikarang"
+        : "Pantau operasional reservasi cabang Bintaro";
 
   return (
     <>
@@ -83,7 +114,7 @@ export default function AdminDashboard() {
         <div className="p-4 lg:p-6 space-y-6">
           <div className="text-center lg:text-left">
             <h2 className="text-2xl font-bold mb-1">Dashboard Admin</h2>
-            <p className="text-muted-foreground">Pantau operasional hari ini & kelola konten</p>
+            <p className="text-muted-foreground">{dashboardSubtitle}</p>
           </div>
 
           {/* CTA operasional */}

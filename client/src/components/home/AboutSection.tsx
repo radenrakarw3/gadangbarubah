@@ -3,9 +3,11 @@ import { useLocation } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import aboutImage from "@assets/DSC07220_1758565473982.jpg";
+import { useSiteLanguage } from "@/lib/language";
 
 function AboutSection() {
   const [, navigate] = useLocation();
+  const { lang } = useSiteLanguage();
 
   return (
     <section id="about-section" className="py-12 sm:py-20 bg-muted/30 scroll-mt-20 sm:scroll-mt-24">
@@ -25,27 +27,27 @@ function AboutSection() {
 
           <div className="lg:py-8">
             <p className="text-gold text-xs uppercase tracking-[0.25em] mb-4 font-medium">
-              Tentang Kami
+              {lang === "ID" ? "Tentang Kami" : "About Us"}
             </p>
             <h2 className="section-heading mb-6">Gadang Barubah</h2>
             <div className="section-divider ml-0 mr-auto mb-8" />
             <div className="space-y-4 text-muted-foreground leading-relaxed">
               <p>
-                Rumah makan Padang yang menghadirkan nasi padang autentik dan masakan Minang tradisional
-                dengan standar kualitas tertinggi. Nama &ldquo;Gadang Barubah&rdquo; melambangkan semangat
-                besar untuk terus berinovasi, tanpa meninggalkan akar tradisi yang kaya.
+                {lang === "ID"
+                  ? "Rumah makan Padang yang menghadirkan nasi padang autentik dan masakan Minang tradisional dengan standar kualitas tertinggi. Nama \"Gadang Barubah\" melambangkan semangat besar untuk terus berinovasi, tanpa meninggalkan akar tradisi yang kaya."
+                  : "A Padang restaurant serving authentic Minang cuisine with the highest quality standards. The name \"Gadang Barubah\" reflects a strong spirit of innovation while staying rooted in rich traditions."}
               </p>
               <p>
-                Dari rendang daging yang mendunia, gulai kambing penuh rempah, hingga aneka lauk pauk
-                segar khas Padang — disajikan dengan sentuhan kekinian yang menggugah selera dalam
-                suasana bersantap yang hangat dan berkelas.
+                {lang === "ID"
+                  ? "Dari rendang daging yang mendunia, gulai kambing penuh rempah, hingga aneka lauk pauk segar khas Padang — disajikan dengan sentuhan kekinian yang menggugah selera dalam suasana bersantap yang hangat dan berkelas."
+                  : "From world-class beef rendang and spice-rich goat curry to fresh Padang side dishes, every menu is served with a modern touch in a warm and elegant dining atmosphere."}
               </p>
             </div>
             <Button
               className="mt-6 sm:mt-8 w-full sm:w-auto rounded-none btn-reserve group h-11"
               onClick={() => navigate("/services/outlet")}
             >
-              Our Outlet
+              {lang === "ID" ? "Outlet Kami" : "Our Outlet"}
               <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Button>
           </div>

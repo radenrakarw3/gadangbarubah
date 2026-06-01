@@ -21,6 +21,7 @@ import bcrypt from "bcrypt";
 export type ReservationFilters = {
   date?: string;
   status?: ReservationStatus | "cancelled";
+  outlet?: string;
 };
 
 export interface IStorage {
@@ -42,6 +43,7 @@ export interface IStorage {
 
   createReservation(data: InsertReservation): Promise<Reservation>;
   getReservations(filters?: ReservationFilters): Promise<Reservation[]>;
+  getReservationById(id: string): Promise<Reservation | undefined>;
   updateReservationStatus(id: string, status: ReservationStatus): Promise<Reservation>;
 
   createCampaign(campaign: InsertCampaign, imagePath: string, createdBy: string): Promise<Campaign>;
@@ -51,7 +53,7 @@ export interface IStorage {
   deleteCampaign(id: string): Promise<void>;
   incrementCampaignViewCount(id: string): Promise<void>;
 
-  getAdminStats(): Promise<{
+  getAdminStats(outlet?: string): Promise<{
     totalReservations: number;
     pendingReservations: number;
     confirmedReservations: number;
@@ -89,7 +91,7 @@ export class DatabaseStorage implements IStorage {
     const password = await bcrypt.hash(insertUser.password, 12);
     const [user] = await requireDb()
       .insert(users)
-      .values({ ...insertUser, password, role: "admin" })
+      .values({ ...insertUser, password })
       .returning();
     return user;
   }
@@ -186,6 +188,9 @@ export class DatabaseStorage implements IStorage {
     } else if (filters?.status) {
       conditions.push(eq(reservations.status, filters.status));
     }
+    if (filters?.outlet) {
+      conditions.push(eq(reservations.outlet, filters.outlet));
+    }
 
     const whereClause = conditions.length ? and(...conditions) : undefined;
 
@@ -199,6 +204,11 @@ export class DatabaseStorage implements IStorage {
       .from(reservations)
       .where(whereClause)
       .orderBy(...orderBy);
+  }
+
+  async getReservationById(id: string): Promise<Reservation | undefined> {
+    const [row] = await requireDb().select().from(reservations).where(eq(reservations.id, id));
+    return row || undefined;
   }
 
   async updateReservationStatus(id: string, status: ReservationStatus): Promise<Reservation> {
@@ -312,7 +322,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(campaigns.id, id));
   }
 
-  async getAdminStats() {
+  async getAdminStats(outlet?: string) {
     const today = new Date();
     const y = today.getFullYear();
     const m = String(today.getMonth() + 1).padStart(2, "0");
@@ -322,11 +332,14 @@ export class DatabaseStorage implements IStorage {
     const countForToday = (status?: ReservationStatus) => {
       const conditions = [eq(reservations.tanggalReservasi, todayStr)];
       if (status) conditions.push(eq(reservations.status, status));
+      if (outlet) conditions.push(eq(reservations.outlet, outlet));
       return requireDb()
         .select({ count: sql<number>`count(*)::int` })
         .from(reservations)
         .where(and(...conditions));
     };
+
+    const baseReservationConditions = outlet ? [eq(reservations.outlet, outlet)] : [];
 
     const [
       [totalRow],
@@ -340,15 +353,18 @@ export class DatabaseStorage implements IStorage {
       [todayDiningRow],
       [todayCompletedRow],
     ] = await Promise.all([
-      requireDb().select({ count: sql<number>`count(*)::int` }).from(reservations),
       requireDb()
         .select({ count: sql<number>`count(*)::int` })
         .from(reservations)
-        .where(eq(reservations.status, "pending")),
+        .where(baseReservationConditions.length ? and(...baseReservationConditions) : undefined),
       requireDb()
         .select({ count: sql<number>`count(*)::int` })
         .from(reservations)
-        .where(eq(reservations.status, "confirmed")),
+        .where(and(eq(reservations.status, "pending"), ...(baseReservationConditions))),
+      requireDb()
+        .select({ count: sql<number>`count(*)::int` })
+        .from(reservations)
+        .where(and(eq(reservations.status, "confirmed"), ...(baseReservationConditions))),
       requireDb().select({ count: sql<number>`count(*)::int` }).from(users),
       countForToday(),
       countForToday("pending"),
@@ -395,11 +411,11 @@ export class DatabaseStorage implements IStorage {
     const user = await this.getUser(id);
     if (!user) throw new Error("User tidak ditemukan");
 
-    if (user.role === "admin") {
+    if (user.role === "admin_main" || user.role === "admin") {
       const [adminCount] = await requireDb()
         .select({ count: sql<number>`count(*)::int` })
         .from(users)
-        .where(eq(users.role, "admin"));
+        .where(eq(users.role, "admin_main"));
       if ((adminCount?.count ?? 0) <= 1) {
         throw new Error("Tidak dapat menghapus admin terakhir");
       }

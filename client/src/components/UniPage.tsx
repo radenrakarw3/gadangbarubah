@@ -9,6 +9,7 @@ import SEOHead from './SEOHead';
 import Mascot from './Mascot';
 import { BacklinksFooter } from './BacklinksFooter';
 import { StructuredData } from './StructuredData';
+import { useSiteLanguage } from '@/lib/language';
 import restaurantBgImage from '@assets/DSC03165_1758566711557.jpg';
 import rendangKiloanImage from '@assets/DSC02799_1758569186868.jpg';
 
@@ -17,7 +18,7 @@ const services = [
     id: 'outlet',
     name: 'Outlet Location',
     icon: Store,
-    description: 'Kunjungi rumah makan Padang kami di Pollux Mall Cikarang dengan suasana mewah, VIP room eksklusif, dan pengalaman kuliner nasi padang yang tak terlupakan.',
+    description: 'Kunjungi 2 cabang kami di Pollux Mall Cikarang dan Bintaro (Jurang Mangu Barat) dengan suasana berkelas, VIP room, dan pengalaman kuliner Minang autentik.',
     path: '/services/outlet'
   },
   {
@@ -52,6 +53,7 @@ const services = [
 
 export default function UniPage() {
   const [, navigate] = useLocation();
+  const { lang } = useSiteLanguage();
 
   const handleServiceClick = (service: typeof services[0]) => {
     // Services that redirect to WhatsApp
@@ -97,7 +99,7 @@ export default function UniPage() {
             data-testid="button-back"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline ml-1 text-sm">Kembali</span>
+            <span className="hidden sm:inline ml-1 text-sm">{lang === 'ID' ? 'Kembali' : 'Back'}</span>
           </Button>
           
           <div className="flex-1 flex justify-center">
@@ -114,7 +116,9 @@ export default function UniPage() {
           {/* Introduction */}
           <div className="text-center mb-16">
             <h1 className="text-4xl sm:text-5xl font-serif font-light text-foreground mb-6">
-              Layanan Eksklusif Rumah Makan Padang - Gadang Barubah
+              {lang === 'ID'
+                ? 'Layanan Eksklusif Rumah Makan Padang - Gadang Barubah'
+                : 'Exclusive Padang Restaurant Services - Gadang Barubah'}
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             
@@ -130,7 +134,11 @@ export default function UniPage() {
               <div className="max-w-2xl mx-auto">
                 <Mascot 
                   isAnimating={false}
-                  message="Selamat datang di Gadang Barubah - rumah makan Padang Indonesia! Saya Uni, siap membantu Anda menemukan pengalaman kuliner nasi padang dan masakan Minang yang tak tertandingi."
+                  message={
+                    lang === 'ID'
+                      ? 'Selamat datang di Gadang Barubah - rumah makan Padang Indonesia! Saya Uni, siap membantu Anda menemukan pengalaman kuliner nasi padang dan masakan Minang yang tak tertandingi.'
+                      : 'Welcome to Gadang Barubah - an Indonesian Padang restaurant! I am Uni, ready to help you discover an exceptional Minang culinary experience.'
+                  }
                 />
               </div>
             </div>
@@ -139,7 +147,7 @@ export default function UniPage() {
           {/* Services Grid */}
           <div className="mb-16">
             <h2 className="text-2xl sm:text-3xl font-serif font-medium text-foreground text-center mb-8">
-              Jelajahi Layanan Kami
+              {lang === 'ID' ? 'Jelajahi Layanan Kami' : 'Explore Our Services'}
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
             {services.map((service) => {
@@ -166,7 +174,7 @@ export default function UniPage() {
                           {service.description}
                         </p>
                         <div className="flex items-center text-primary font-medium text-sm group-hover:translate-x-2 transition-transform duration-300">
-                          <span>Lihat Detail</span>
+                          <span>{lang === 'ID' ? 'Lihat Detail' : 'View Details'}</span>
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </div>
                       </div>
@@ -200,14 +208,18 @@ export default function UniPage() {
                         <div className="flex items-center mb-1 sm:mb-2">
                           <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2" />
                           <h3 className="font-serif text-base sm:text-lg font-medium text-foreground">
-                            Rendang Kiloan
+                            {lang === 'ID' ? 'Rendang Kiloan' : 'Bulk Rendang'}
                           </h3>
                         </div>
                         <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2 sm:mb-3">
-                          Nikmati kelezatan rendang berkualitas dalam kemasan praktis untuk keluarga
+                          {lang === 'ID'
+                            ? 'Nikmati kelezatan rendang berkualitas dalam kemasan praktis untuk keluarga'
+                            : 'Enjoy premium rendang in practical packaging for your family'}
                         </p>
                         <div className="text-xs text-primary/70 font-medium">
-                          ✨ Rasa otentik • Kemasan berkualitas • Tahan lama
+                          {lang === 'ID'
+                            ? '✨ Rasa otentik • Kemasan berkualitas • Tahan lama'
+                            : '✨ Authentic taste • Premium packaging • Long shelf life'}
                         </div>
                       </div>
                       
@@ -222,7 +234,7 @@ export default function UniPage() {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Order
+                          {lang === 'ID' ? 'Order' : 'Order'}
                         </a>
                       </Button>
                     </div>

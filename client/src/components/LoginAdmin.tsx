@@ -6,12 +6,14 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Shield, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useSiteLanguage } from '@/lib/language';
 
 interface LoginAdminProps {
   onLogin: () => void;
 }
 
 export default function LoginAdmin({ onLogin }: LoginAdminProps) {
+  const { lang } = useSiteLanguage();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -55,15 +57,15 @@ export default function LoginAdmin({ onLogin }: LoginAdminProps) {
 
       const data = await response.json();
       
-      if (data.user.role !== 'admin') {
+      if (!["admin_main", "admin_cikarang", "admin_bintaro", "admin"].includes(data.user.role)) {
         setErrorMessage('Akses ditolak. Akun ini bukan admin.');
         setIsLoading(false);
         return;
       }
 
       toast({
-        title: "Login berhasil",
-        description: `Selamat datang, ${data.user.username}`,
+        title: lang === 'ID' ? "Login berhasil" : "Login successful",
+        description: lang === 'ID' ? `Selamat datang, ${data.user.username}` : `Welcome, ${data.user.username}`,
       });
       
       onLogin();
@@ -81,9 +83,11 @@ export default function LoginAdmin({ onLogin }: LoginAdminProps) {
           <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Admin Login</CardTitle>
+          <CardTitle className="text-2xl">{lang === 'ID' ? 'Login Admin' : 'Admin Login'}</CardTitle>
           <CardDescription>
-            Masukkan username dan password untuk mengakses dashboard admin
+            {lang === 'ID'
+              ? 'Masukkan username dan password untuk mengakses dashboard admin'
+              : 'Enter username and password to access the admin dashboard'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -96,11 +100,11 @@ export default function LoginAdmin({ onLogin }: LoginAdminProps) {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">{lang === 'ID' ? 'Username' : 'Username'}</Label>
               <Input
                 id="username"
                 type="text"
-                placeholder="Masukkan username"
+                placeholder={lang === 'ID' ? 'Masukkan username' : 'Enter username'}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
@@ -110,11 +114,11 @@ export default function LoginAdmin({ onLogin }: LoginAdminProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{lang === 'ID' ? 'Password' : 'Password'}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Masukkan password"
+                placeholder={lang === 'ID' ? 'Masukkan password' : 'Enter password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
@@ -129,7 +133,9 @@ export default function LoginAdmin({ onLogin }: LoginAdminProps) {
               disabled={!username || !password || isLoading}
               data-testid="button-admin-login"
             >
-              {isLoading ? 'Memverifikasi...' : 'Masuk ke Admin'}
+              {isLoading
+                ? (lang === 'ID' ? 'Memverifikasi...' : 'Verifying...')
+                : (lang === 'ID' ? 'Masuk ke Admin' : 'Sign in as Admin')}
             </Button>
           </form>
         </CardContent>

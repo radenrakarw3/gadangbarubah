@@ -153,6 +153,16 @@ export default function OutletPage() {
       type: "Restoran Unggulan",
       description: "Outlet flagship kami di Mall Cikarang dengan konsep berkelas dan VIP room eksklusif.",
       googleMaps: "https://maps.app.goo.gl/jP1JMKQZBU9AXSLz5"
+    },
+    {
+      name: "Gadang Barubah Bintaro",
+      address: "Jl. Menteng Raya No.28 Blok FG, Jurang Mangu Barat, Kec. Pd. Aren, Kota Tangerang Selatan, Banten 15412",
+      phone: "0895-0976-6739",
+      hours: "10:00 - 22:00",
+      icon: Store,
+      type: "Cabang Bintaro",
+      description: "Cabang Bintaro kami menghadirkan cita rasa Minang autentik dengan suasana hangat untuk keluarga dan komunitas.",
+      googleMaps: "https://maps.google.com/?q=Jl.+Menteng+Raya+No.28+Blok+FG+Jurang+Mangu+Barat"
     }
   ];
 
@@ -187,11 +197,11 @@ export default function OutletPage() {
           {/* Title */}
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-serif font-light text-foreground mb-6">
-              Outlet Rumah Makan Padang Cikarang
+              Dua Cabang Gadang Barubah
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
-              Temukan pengalaman bersantap nasi padang eksklusif di Pollux Mall Cikarang dengan suasana mewah dan menu masakan Minang signature yang tak terlupakan
+              Kini hadir di Pollux Mall Cikarang dan Bintaro — nikmati pengalaman bersantap Minang autentik di cabang terdekat Anda
             </p>
           </div>
 

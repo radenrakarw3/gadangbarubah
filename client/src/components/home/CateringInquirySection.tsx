@@ -12,9 +12,11 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { CATERING_TYPES, COMPANY } from "@/lib/siteContent";
 import cateringImage from "@assets/DSC07153_1758564588952.jpg";
+import { useSiteLanguage } from "@/lib/language";
 
 export default function CateringInquirySection() {
   const { toast } = useToast();
+  const { lang } = useSiteLanguage();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     nama: "",
@@ -28,8 +30,8 @@ export default function CateringInquirySection() {
     e.preventDefault();
     if (!form.nama.trim() || form.telepon.length < 10) {
       toast({
-        title: "Data belum lengkap",
-        description: "Isi nama dan nomor telepon.",
+        title: lang === "ID" ? "Data belum lengkap" : "Incomplete data",
+        description: lang === "ID" ? "Isi nama dan nomor telepon." : "Please fill in your name and phone number.",
         variant: "destructive",
       });
       return;
@@ -38,10 +40,16 @@ export default function CateringInquirySection() {
     setLoading(true);
     const tipeLabel = CATERING_TYPES.find((t) => t.value === form.tipe)?.label ?? form.tipe;
     const message = encodeURIComponent(
-      `Halo Gadang Barubah, saya ingin konsultasi catering:\n\nNama: ${form.nama}\nTelepon: ${form.telepon}\nEmail: ${form.email || "-"}\nTipe: ${tipeLabel}\nPax: ${form.pax}`,
+      lang === "ID"
+        ? `Halo Gadang Barubah, saya ingin konsultasi catering:\n\nNama: ${form.nama}\nTelepon: ${form.telepon}\nEmail: ${form.email || "-"}\nTipe: ${tipeLabel}\nPax: ${form.pax}`
+        : `Hello Gadang Barubah, I want to discuss catering:\n\nName: ${form.nama}\nPhone: ${form.telepon}\nEmail: ${form.email || "-"}\nType: ${tipeLabel}\nPax: ${form.pax}`,
     );
     window.open(`https://wa.me/${COMPANY.whatsapp}?text=${message}`, "_blank");
-    toast({ title: "Membuka WhatsApp", description: "Lanjutkan pesan catering di WhatsApp." });
+    toast({
+      title: lang === "ID" ? "Membuka WhatsApp" : "Opening WhatsApp",
+      description:
+        lang === "ID" ? "Lanjutkan pesan catering di WhatsApp." : "Continue your catering message on WhatsApp.",
+    });
     setLoading(false);
   };
 
@@ -50,7 +58,9 @@ export default function CateringInquirySection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12">
           <h2 className="font-display text-2xl sm:text-4xl font-semibold tracking-wide text-cream px-2">
-            Plan Your Catering With Us
+            {lang === "ID"
+              ? "Rencanakan Katering Anda Bersama Kami"
+              : "Plan Your Catering With Us"}
           </h2>
           <div className="w-16 h-px bg-gold/60 mx-auto mt-4" />
         </div>
@@ -62,10 +72,10 @@ export default function CateringInquirySection() {
           >
             <div>
               <label className="text-[10px] uppercase tracking-[0.15em] text-cream/70 mb-1.5 block">
-                Name
+                {lang === "EN" ? "Name" : "Nama"}
               </label>
               <Input
-                placeholder="Nama lengkap"
+                placeholder={lang === "ID" ? "Nama lengkap" : "Full name"}
                 value={form.nama}
                 onChange={(e) => setForm({ ...form, nama: e.target.value })}
                 className="rounded-none border-gold/20 bg-maroon-deep/30 text-cream placeholder:text-cream/40 h-11"
@@ -73,10 +83,10 @@ export default function CateringInquirySection() {
             </div>
             <div>
               <label className="text-[10px] uppercase tracking-[0.15em] text-cream/70 mb-1.5 block">
-                No. Telepon
+                {lang === "EN" ? "Phone Number" : "No. Telepon"}
               </label>
               <Input
-                placeholder="08xxxxxxxxxx"
+                placeholder={lang === "ID" ? "08xxxxxxxxxx" : "08xxxxxxxxxx"}
                 value={form.telepon}
                 onChange={(e) => setForm({ ...form, telepon: e.target.value })}
                 className="rounded-none border-gold/20 bg-maroon-deep/30 text-cream placeholder:text-cream/40 h-11"
@@ -96,7 +106,7 @@ export default function CateringInquirySection() {
             </div>
             <div>
               <label className="text-[10px] uppercase tracking-[0.15em] text-cream/70 mb-1.5 block">
-                Tipe
+                {lang === "EN" ? "Type" : "Tipe"}
               </label>
               <Select value={form.tipe} onValueChange={(v) => setForm({ ...form, tipe: v })}>
                 <SelectTrigger className="rounded-none border-gold/20 bg-maroon-deep/30 text-cream h-11">
@@ -113,7 +123,7 @@ export default function CateringInquirySection() {
             </div>
             <div>
               <label className="text-[10px] uppercase tracking-[0.15em] text-cream/70 mb-1.5 block">
-                Pax
+                {lang === "EN" ? "Serving Size (Pax)" : "Jumlah Porsi (Pax)"}
               </label>
               <Input
                 type="number"
@@ -128,7 +138,13 @@ export default function CateringInquirySection() {
               disabled={loading}
               className="w-full rounded-none bg-gold text-maroon-deep hover:bg-gold-light uppercase tracking-[0.12em] text-xs font-semibold h-11 mt-2"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reserve"}
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : lang === "ID" ? (
+                "Kirim Permintaan"
+              ) : (
+                "Send Request"
+              )}
             </Button>
           </form>
 

@@ -4,11 +4,30 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoImage from "@assets/padang gadang barubah logo_1758561601552.webp";
 import { MAIN_NAV } from "@/lib/siteContent";
+import { useSiteLanguage } from "@/lib/language";
 
 const LEFT_NAV = [
   { href: "/whats-on", label: "What's On" },
   { href: "/about", label: "About" },
 ] as const;
+
+const EN_NAV_LABELS: Record<string, string> = {
+  "/": "Home",
+  "/about": "About Us",
+  "/whats-on": "What's On",
+  "/menu": "Menu",
+  "/catering": "Catering",
+  "/reservasi": "Reservation",
+};
+
+const ID_NAV_LABELS: Record<string, string> = {
+  "/": "Beranda",
+  "/about": "Tentang Kami",
+  "/whats-on": "Info Terkini",
+  "/menu": "Menu",
+  "/catering": "Katering",
+  "/reservasi": "Reservasi",
+};
 
 interface SiteNavProps {
   variant?: "default" | "transparent";
@@ -17,7 +36,7 @@ interface SiteNavProps {
 export default function SiteNav({ variant = "default" }: SiteNavProps) {
   const [location] = useLocation();
   const [open, setOpen] = useState(false);
-  const [lang, setLang] = useState<"ID" | "EN">("ID");
+  const { lang, setLang } = useSiteLanguage();
 
   const isActive = (href: string) => {
     if (href === "/") return location === "/";
@@ -29,6 +48,11 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
       ? "bg-transparent border-transparent"
       : "bg-ivory/[0.98] border-border/40 shadow-sm";
 
+  const localizeLabel = (href: string, fallback: string) => {
+    if (lang === "EN") return EN_NAV_LABELS[href] ?? fallback;
+    return ID_NAV_LABELS[href] ?? fallback;
+  };
+
   const mobileLinks = [...LEFT_NAV, ...MAIN_NAV.filter((n) => !LEFT_NAV.some((l) => l.href === n.href))];
 
   return (
@@ -39,7 +63,9 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
           <nav className="hidden lg:flex items-center gap-6">
             {LEFT_NAV.map((item) => (
               <Link key={item.href} href={item.href} className="nav-link-luxury">
-                <span className={isActive(item.href) ? "text-gold" : ""}>{item.label}</span>
+                <span className={isActive(item.href) ? "text-gold" : ""}>
+                  {localizeLabel(item.href, item.label)}
+                </span>
               </Link>
             ))}
             <button
@@ -79,10 +105,12 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
           {/* Right nav */}
           <div className="hidden lg:flex items-center justify-end gap-5">
             <a href="#contact-section" className="nav-link-luxury">
-              Contact
+              {lang === "ID" ? "Kontak" : "Contact"}
             </a>
             <Link href="/reservasi">
-              <Button className="btn-reserve rounded-none h-9">Reserve</Button>
+              <Button className="btn-reserve rounded-none h-9">
+                {lang === "ID" ? "Reservasi" : "Reserve"}
+              </Button>
             </Link>
             <div className="flex items-center gap-1 text-xs font-medium uppercase tracking-widest border-l border-border/60 pl-5">
               <button
@@ -106,7 +134,7 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
           {/* Mobile reserve */}
           <Link href="/reservasi" className="lg:hidden justify-self-end">
             <Button size="sm" className="btn-reserve rounded-none h-9 text-[11px] px-3.5">
-              Reserve
+              {lang === "ID" ? "Reservasi" : "Reserve"}
             </Button>
           </Link>
         </div>
@@ -116,13 +144,13 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
             {mobileLinks.map((item) => (
               <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start font-medium tracking-wide h-11 text-base">
-                  {item.label}
+                  {localizeLabel(item.href, item.label)}
                 </Button>
               </Link>
             ))}
             <a href="#contact-section" onClick={() => setOpen(false)}>
               <Button variant="ghost" className="w-full justify-start font-medium tracking-wide h-11 text-base">
-                Contact
+                {lang === "ID" ? "Kontak" : "Contact"}
               </Button>
             </a>
           </div>

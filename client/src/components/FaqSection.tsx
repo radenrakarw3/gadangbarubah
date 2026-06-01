@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { FAQ_ITEMS } from "@/lib/siteContent";
+import { useSiteLanguage } from "@/lib/language";
 
 interface FaqSectionProps {
   id?: string;
@@ -19,6 +20,7 @@ export default function FaqSection({
   subtitle = "Temukan jawaban seputar layanan, reservasi, dan outlet Gadang Barubah.",
   showViewAll = false,
 }: FaqSectionProps) {
+  const { lang } = useSiteLanguage();
   const items = showViewAll ? FAQ_ITEMS : FAQ_ITEMS.slice(0, 4);
 
   return (
@@ -28,7 +30,11 @@ export default function FaqSection({
           {title}
         </h2>
         <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-4" />
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{subtitle}</p>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          {lang === "ID"
+            ? subtitle
+            : "Find answers about services, reservations, and Gadang Barubah outlets."}
+        </p>
       </div>
 
       <Accordion type="single" collapsible className="max-w-3xl mx-auto">

@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import { memo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { SIGNATURE_MENU } from "@/lib/siteContent";
+import { useSiteLanguage } from "@/lib/language";
 import rendangImg from "@assets/DSC02799_1758628102653.jpg";
 import ayamPopImg from "@assets/DSC02436_1758564588903.jpg";
 import gulaiImg from "@assets/DSC02371_1758564588950.jpg";
@@ -15,6 +16,7 @@ const MENU_IMAGES = [rendangImg, ayamPopImg, gulaiImg, dendengImg, tumpengImg, n
 function SignatureMenuSection() {
   const [, navigate] = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { lang } = useSiteLanguage();
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
@@ -39,7 +41,7 @@ function SignatureMenuSection() {
           </Button>
 
           <div className="sm:flex-1 sm:min-w-0">
-            <h2 className="section-heading">Signature Menu</h2>
+            <h2 className="section-heading">{lang === "ID" ? "Menu Andalan" : "Signature Menu"}</h2>
             <div className="section-divider mt-4" />
           </div>
 
@@ -106,16 +108,20 @@ function SignatureMenuSection() {
         </div>
 
         <p className="sm:hidden text-center text-muted-foreground/60 text-xs mt-3 tracking-wide">
-          Geser untuk lihat menu lainnya
+          {lang === "ID" ? "Geser untuk lihat menu lainnya" : "Swipe to see more menu items"}
         </p>
 
         <div className="mt-10 sm:mt-16 flex flex-col items-center px-2 sm:px-4">
           <div className="section-divider w-20 mb-5 sm:mb-6" />
           <p className="font-display italic text-muted-foreground text-sm sm:text-lg mb-2 max-w-xl mx-auto leading-relaxed text-center">
-            Lebih dari 50 hidangan autentik khas Minangkabau
+            {lang === "ID"
+              ? "Lebih dari 50 hidangan autentik khas Minangkabau"
+              : "More than 50 authentic Minangkabau dishes"}
           </p>
           <p className="text-muted-foreground/80 text-xs sm:text-sm mb-6 sm:mb-8 max-w-md mx-auto text-center px-2">
-            Dari rendang legendaris hingga lauk pilihan harian — setiap hidangan disajikan dengan standar tertinggi.
+            {lang === "ID"
+              ? "Dari rendang legendaris hingga lauk pilihan harian — setiap hidangan disajikan dengan standar tertinggi."
+              : "From legendary rendang to daily favorites, every dish is served with the highest standards."}
           </p>
           <button
             type="button"
@@ -123,7 +129,9 @@ function SignatureMenuSection() {
             onClick={() => navigate("/menu")}
           >
             <span className="btn-menu-luxury-inner justify-center sm:justify-start">
-              <span className="btn-menu-luxury-label text-base sm:text-lg">Lihat Menu Lengkap</span>
+              <span className="btn-menu-luxury-label text-base sm:text-lg">
+                {lang === "ID" ? "Lihat Menu Lengkap" : "View Full Menu"}
+              </span>
               <ArrowUpRight className="relative h-5 w-5 shrink-0 text-gold/90 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-gold" />
             </span>
           </button>

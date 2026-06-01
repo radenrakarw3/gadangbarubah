@@ -28,6 +28,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, parseApiError } from "@/lib/queryClient";
 import { COMPANY, OUTLETS, RESERVATION_TIME_SLOTS, todayISO } from "@/lib/siteContent";
+import { useSiteLanguage } from "@/lib/language";
 
 const TIME_SLOTS = RESERVATION_TIME_SLOTS;
 
@@ -52,6 +53,7 @@ type ReservationFormData = z.infer<typeof reservationFormSchema>;
 
 export default function ReservationPage() {
   const { toast } = useToast();
+  const { lang } = useSiteLanguage();
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
   const form = useForm<ReservationFormData>({
@@ -89,7 +91,7 @@ export default function ReservationPage() {
       if (result.success) {
         setSubmittedId(result.data?.id ?? null);
         toast({
-          title: "Reservasi terkirim",
+          title: lang === "ID" ? "Reservasi terkirim" : "Reservation submitted",
           description: result.message,
         });
         form.reset({
@@ -105,7 +107,8 @@ export default function ReservationPage() {
       } else {
         toast({
           title: "Gagal",
-          description: result.message || "Reservasi gagal dikirim",
+          description:
+            result.message || (lang === "ID" ? "Reservasi gagal dikirim" : "Reservation failed"),
           variant: "destructive",
         });
       }
@@ -129,12 +132,13 @@ export default function ReservationPage() {
         <div className="max-w-2xl mx-auto space-y-8">
           <section className="text-center">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-primary mb-4">
-              Reservasi Meja
+              {lang === "ID" ? "Reservasi Meja" : "Table Reservation"}
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6" />
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Pesan meja di Gadang Barubah Pollux Mall Cikarang — meja reguler atau VIP room untuk
-              acara spesial Anda.
+              {lang === "ID"
+                ? "Pesan meja di cabang Gadang Barubah Cikarang atau Bintaro — meja reguler atau VIP room untuk acara spesial Anda."
+                : "Book your table at Gadang Barubah Cikarang or Bintaro branch — regular table or VIP room for your special occasion."}
             </p>
           </section>
 
@@ -142,9 +146,13 @@ export default function ReservationPage() {
             <Card className="border-green-200 bg-green-50/50 dark:bg-green-950/20">
               <CardContent className="p-8 text-center space-y-4">
                 <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto" />
-                <h2 className="text-xl font-semibold">Permintaan Reservasi Diterima</h2>
+                <h2 className="text-xl font-semibold">
+                  {lang === "ID" ? "Permintaan Reservasi Diterima" : "Reservation Request Received"}
+                </h2>
                 <p className="text-muted-foreground">
-                  Tim kami akan menghubungi Anda via WhatsApp untuk konfirmasi. Simpan ID reservasi:{" "}
+                  {lang === "ID"
+                    ? "Tim kami akan menghubungi Anda via WhatsApp untuk konfirmasi. Simpan ID reservasi: "
+                    : "Our team will contact you via WhatsApp for confirmation. Save your reservation ID: "}
                   <span className="font-mono text-sm">{submittedId.slice(0, 8)}</span>
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -156,11 +164,11 @@ export default function ReservationPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Konfirmasi via WhatsApp
+                      {lang === "ID" ? "Konfirmasi via WhatsApp" : "Confirm via WhatsApp"}
                     </a>
                   </Button>
                   <Button variant="outline" onClick={() => setSubmittedId(null)}>
-                    Buat Reservasi Lain
+                    {lang === "ID" ? "Buat Reservasi Lain" : "Create Another Reservation"}
                   </Button>
                 </div>
               </CardContent>
@@ -178,9 +186,9 @@ export default function ReservationPage() {
                       name="namaLengkap"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Nama Lengkap</FormLabel>
+                          <FormLabel>{lang === "ID" ? "Nama Lengkap" : "Full Name"}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Contoh: Budi Santoso" {...field} />
+                            <Input placeholder={lang === "ID" ? "Contoh: Budi Santoso" : "Example: John Doe"} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -193,7 +201,7 @@ export default function ReservationPage() {
                         name="noWhatsApp"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Nomor WhatsApp</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Nomor WhatsApp" : "WhatsApp Number"}</FormLabel>
                             <FormControl>
                               <Input placeholder="08xxxxxxxxxx" {...field} />
                             </FormControl>
@@ -206,7 +214,7 @@ export default function ReservationPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email (opsional)</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Email (opsional)" : "Email (optional)"}</FormLabel>
                             <FormControl>
                               <Input type="email" placeholder="email@example.com" {...field} />
                             </FormControl>
@@ -222,7 +230,7 @@ export default function ReservationPage() {
                         name="tanggalReservasi"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Tanggal</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Tanggal" : "Date"}</FormLabel>
                             <div className="flex gap-2">
                               <FormControl>
                                 <Input type="date" min={minDate} className="flex-1" {...field} />
@@ -233,7 +241,7 @@ export default function ReservationPage() {
                                 className="shrink-0"
                                 onClick={() => form.setValue("tanggalReservasi", minDate)}
                               >
-                                Hari Ini
+                                {lang === "ID" ? "Hari Ini" : "Today"}
                               </Button>
                             </div>
                             <FormMessage />
@@ -245,17 +253,17 @@ export default function ReservationPage() {
                         name="waktuReservasi"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Waktu</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Waktu" : "Time"}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Pilih waktu" />
+                                  <SelectValue placeholder={lang === "ID" ? "Pilih waktu" : "Select time"} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
                                 {TIME_SLOTS.map((slot) => (
                                   <SelectItem key={slot} value={slot}>
-                                    {slot} WIB
+                                    {slot} {lang === "ID" ? "WIB" : ""}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -272,7 +280,7 @@ export default function ReservationPage() {
                         name="jumlahTamu"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Jumlah Tamu</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Jumlah Tamu" : "Guests"}</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -288,15 +296,15 @@ export default function ReservationPage() {
                         name="tipeMeja"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Tipe Meja</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Tipe Meja" : "Table Type"}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Pilih tipe meja" />
+                                  <SelectValue placeholder={lang === "ID" ? "Pilih tipe meja" : "Select table type"} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="reguler">Meja Reguler</SelectItem>
+                                <SelectItem value="reguler">{lang === "ID" ? "Meja Reguler" : "Regular Table"}</SelectItem>
                                 <SelectItem value="vip">VIP Room</SelectItem>
                               </SelectContent>
                             </Select>
@@ -311,10 +319,14 @@ export default function ReservationPage() {
                       name="catatan"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Catatan (opsional)</FormLabel>
+                          <FormLabel>{lang === "ID" ? "Catatan (opsional)" : "Notes (optional)"}</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="Permintaan khusus, alergi makanan, acara ulang tahun, dll."
+                              placeholder={
+                                lang === "ID"
+                                  ? "Permintaan khusus, alergi makanan, acara ulang tahun, dll."
+                                  : "Special requests, food allergies, birthday event, etc."
+                              }
                               rows={3}
                               {...field}
                             />
@@ -328,12 +340,12 @@ export default function ReservationPage() {
                       {mutation.isPending ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Mengirim...
+                          {lang === "ID" ? "Mengirim..." : "Submitting..."}
                         </>
                       ) : (
                         <>
                           <CalendarDays className="mr-2 h-4 w-4" />
-                          Kirim Permintaan Reservasi
+                          {lang === "ID" ? "Kirim Permintaan Reservasi" : "Submit Reservation Request"}
                         </>
                       )}
                     </Button>
@@ -344,7 +356,9 @@ export default function ReservationPage() {
           )}
 
           <p className="text-sm text-center text-muted-foreground">
-            Jam operasional: 10:00 – 22:00 WIB • Reservasi VIP room disarankan H-1
+            {lang === "ID"
+              ? "Jam operasional: 10:00 – 22:00 WIB • Reservasi VIP room disarankan H-1"
+              : "Operating hours: 10:00 – 22:00 • VIP room reservation is recommended 1 day in advance"}
           </p>
         </div>
       </div>

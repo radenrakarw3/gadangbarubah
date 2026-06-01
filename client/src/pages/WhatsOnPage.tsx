@@ -5,8 +5,11 @@ import { Calendar, ChevronRight } from "lucide-react";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
 import { ARTICLES } from "@/lib/siteContent";
+import { useSiteLanguage } from "@/lib/language";
 
 export default function WhatsOnPage() {
+  const { lang } = useSiteLanguage();
+
   return (
     <PublicPageLayout>
       <SEOHead pageKey="whatsOn" />
@@ -15,11 +18,13 @@ export default function WhatsOnPage() {
         <div className="max-w-4xl mx-auto space-y-10">
           <section className="text-center">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-primary mb-4">
-              What's On
+              {lang === "ID" ? "Kabar Terkini" : "What's On"}
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6" />
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Berita, tips kuliner, dan update terbaru seputar Gadang Barubah Indonesia.
+              {lang === "ID"
+                ? "Berita, tips kuliner, dan update terbaru seputar Gadang Barubah Indonesia."
+                : "News, culinary tips, and latest updates from Gadang Barubah Indonesia."}
             </p>
           </section>
 
@@ -50,7 +55,7 @@ export default function WhatsOnPage() {
                       href={`/whats-on/${article.id}`}
                       className="inline-flex items-center text-sm text-primary font-medium shrink-0"
                     >
-                      Baca
+                      {lang === "ID" ? "Baca" : "Read"}
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Link>
                   </div>

@@ -21,7 +21,7 @@ async function seed() {
       .values({
         username: "admin",
         password: adminPassword,
-        role: "admin",
+        role: "admin_main",
         failedAttempts: 0,
       })
       .returning();

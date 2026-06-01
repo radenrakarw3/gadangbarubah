@@ -6,6 +6,7 @@ import {
 
 const OUTLET_LABELS: Record<string, string> = {
   "pollux-cikarang": "Pollux Mall Cikarang",
+  bintaro: "Bintaro (Jurang Mangu Barat)",
 };
 
 function formatDateId(dateStr: string): string {

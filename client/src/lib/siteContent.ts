@@ -14,6 +14,7 @@ export const SOCIAL_LINKS = {
 
 export const OUTLETS = [
   { id: "pollux-cikarang", label: "Pollux Mall Cikarang" },
+  { id: "bintaro", label: "Bintaro (Jurang Mangu Barat)" },
 ] as const;
 
 export const RESERVATION_TIME_SLOTS = [
@@ -74,35 +75,35 @@ export const CATERING_TYPES = [
 ] as const;
 
 export const FOOTER_NAV_LEFT = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About Us" },
-  { href: "/whats-on", label: "What's On" },
+  { href: "/", label: "Beranda" },
+  { href: "/about", label: "Tentang Kami" },
+  { href: "/whats-on", label: "Kabar Terkini" },
   { href: "/menu", label: "Menu" },
-  { href: "/catering", label: "Catering" },
+  { href: "/catering", label: "Katering" },
 ] as const;
 
 export const FOOTER_NAV_RIGHT = [
   { href: "/reservasi", label: "Reservasi" },
-  { href: "/faq", label: "FAQ's" },
+  { href: "/faq", label: "FAQ" },
 ] as const;
 
 export const MAIN_NAV = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About Us" },
-  { href: "/whats-on", label: "What's On" },
+  { href: "/", label: "Beranda" },
+  { href: "/about", label: "Tentang Kami" },
+  { href: "/whats-on", label: "Kabar Terkini" },
   { href: "/menu", label: "Menu" },
-  { href: "/catering", label: "Catering" },
+  { href: "/catering", label: "Katering" },
   { href: "/reservasi", label: "Reservasi" },
 ] as const;
 
 export const SECONDARY_NAV = [
   { href: "/reservasi", label: "Reservasi Meja" },
-  { href: "/faq", label: "FAQ's" },
+  { href: "/faq", label: "FAQ" },
 ] as const;
 
 export const LEGAL_NAV = [
-  { href: "/terms", label: "Terms and Conditions" },
-  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/terms", label: "Syarat dan Ketentuan" },
+  { href: "/privacy", label: "Kebijakan Privasi" },
 ] as const;
 
 export const FAQ_ITEMS = [
@@ -124,17 +125,17 @@ export const FAQ_ITEMS = [
   {
     question: "Apakah menerima pesanan catering untuk acara?",
     answer:
-      "Ya, kami melayani catering pernikahan, corporate event, arisan, dan gathering. Lihat halaman Catering untuk paket.",
+      "Ya, kami melayani katering pernikahan, acara perusahaan, arisan, dan gathering. Lihat halaman Katering untuk paket.",
   },
   {
     question: "Di mana lokasi outlet?",
     answer:
-      "Outlet unggulan kami berada di Pollux Mall Cikarang, GF. Alamat kantor perusahaan tercantum di footer website.",
+      "Saat ini kami memiliki 2 cabang: Pollux Mall Cikarang (GF) dan Bintaro (Jurang Mangu Barat).",
   },
   {
     question: "Apakah ada VIP room?",
     answer:
-      "Ya, VIP Private Room tersedia untuk gathering keluarga dan acara kecil. Pilih tipe VIP saat mengisi form reservasi.",
+      "Ya, VIP Private Room tersedia untuk gathering keluarga dan acara kecil. Pilih tipe VIP saat mengisi formulir reservasi.",
   },
 ] as const;
 
@@ -149,11 +150,11 @@ export const ARTICLES = [
   },
   {
     id: "2",
-    title: "Tips Memilih Paket Catering untuk Acara Kantor",
+    title: "Tips Memilih Paket Katering untuk Acara Kantor",
     excerpt:
       "Panduan praktis memilih menu nasi box atau buffet Padang yang pas untuk meeting, gathering, dan event perusahaan.",
     date: "8 Januari 2026",
-    category: "Catering",
+    category: "Katering",
   },
   {
     id: "3",
@@ -165,9 +166,9 @@ export const ARTICLES = [
   },
   {
     id: "4",
-    title: "Suasana VIP Room di Pollux Mall Cikarang",
+    title: "Suasana Outlet Gadang Barubah: Cikarang & Bintaro",
     excerpt:
-      "Nikmati pengalaman bersantap lebih privat di VIP room outlet kami — cocok untuk keluarga, reuni, dan acara kecil.",
+      "Kenali pengalaman bersantap di dua cabang kami, dari VIP room di Cikarang hingga suasana hangat di Bintaro.",
     date: "20 Desember 2025",
     category: "Outlet",
   },
@@ -177,13 +178,13 @@ export const SIGNATURE_MENU = [
   {
     name: "Rendang Daging",
     description: "Daging empuk dengan bumbu rempah khas Minang, dimasak hingga meresap sempurna.",
-    tag: "Best Seller",
+    tag: "Terlaris",
     price: "Rp 45.000",
   },
   {
     name: "Ayam Pop",
     description: "Ayam kampung lembut dengan kuah kaldu bening khas Padang.",
-    tag: "Signature",
+    tag: "Andalan",
     price: "Rp 38.000",
   },
   {
@@ -195,19 +196,19 @@ export const SIGNATURE_MENU = [
   {
     name: "Dendeng Balado",
     description: "Dendeng renyah dengan sambal balado pedas gurih.",
-    tag: "Signature",
+    tag: "Andalan",
     price: "Rp 42.000",
   },
   {
     name: "Nasi Tumpeng",
     description: "Paket lengkap 10–15 porsi untuk acara spesial keluarga dan kantor.",
-    tag: "Catering",
+    tag: "Katering",
     price: "Rp 1.500.000",
   },
   {
-    name: "Saji Gadang Menu",
+    name: "Menu Saji Gadang",
     description: "Nasi box praktis dengan pilihan lauk ayam, rendang, gulai, dan dendeng.",
-    tag: "Takeaway",
+    tag: "Bawa Pulang",
     price: "Rp 40.000",
   },
 ] as const;

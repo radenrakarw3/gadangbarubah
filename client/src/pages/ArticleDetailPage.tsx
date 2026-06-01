@@ -5,12 +5,14 @@ import FaqSection from "@/components/FaqSection";
 import { ARTICLES } from "@/lib/siteContent";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useSiteLanguage } from "@/lib/language";
 
 interface ArticleDetailPageProps {
   articleId: string;
 }
 
 export default function ArticleDetailPage({ articleId }: ArticleDetailPageProps) {
+  const { lang } = useSiteLanguage();
   const article = ARTICLES.find((a) => a.id === articleId);
 
   if (!article) {
@@ -22,7 +24,7 @@ export default function ArticleDetailPage({ articleId }: ArticleDetailPageProps)
           <Link href="/whats-on">
             <Button variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Kembali ke What's On
+              {lang === "ID" ? "Kembali ke Kabar Terkini" : "Back to What's On"}
             </Button>
           </Link>
         </div>
@@ -39,7 +41,7 @@ export default function ArticleDetailPage({ articleId }: ArticleDetailPageProps)
           <Link href="/whats-on">
             <Button variant="ghost" size="sm" className="mb-6">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              What's On
+              {lang === "ID" ? "Kabar Terkini" : "What's On"}
             </Button>
           </Link>
 
@@ -52,8 +54,11 @@ export default function ArticleDetailPage({ articleId }: ArticleDetailPageProps)
           <div className="prose prose-neutral dark:prose-invert max-w-none">
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">{article.excerpt}</p>
             <p className="text-muted-foreground leading-relaxed">
-              Artikel lengkap akan segera tersedia. Untuk informasi lebih lanjut tentang{" "}
-              {article.category.toLowerCase()} Gadang Barubah, hubungi kami via WhatsApp di{" "}
+              {lang === "ID"
+                ? "Artikel lengkap akan segera tersedia. Untuk informasi lebih lanjut tentang "
+                : "The full article will be available soon. For more information about "}
+              {lang === "ID" ? article.category.toLowerCase() : article.category}
+              {lang === "ID" ? " Gadang Barubah, hubungi kami via WhatsApp di " : " at Gadang Barubah, contact us on WhatsApp at "}
               <a
                 href="https://wa.me/6289509766739"
                 target="_blank"

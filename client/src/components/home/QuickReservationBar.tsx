@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, parseApiError } from "@/lib/queryClient";
 import { OUTLETS, RESERVATION_TIME_SLOTS, todayISO } from "@/lib/siteContent";
 import { cn } from "@/lib/utils";
+import { useSiteLanguage } from "@/lib/language";
 
 const CONTROL_CLASS =
   "h-11 sm:h-9 w-full rounded-sm border border-white/15 bg-white/[0.07] text-white text-base sm:text-sm placeholder:text-white/35 focus-visible:ring-1 focus-visible:ring-gold/50 focus-visible:border-gold/40 [color-scheme:dark]";
@@ -95,6 +96,7 @@ const Field = memo(function Field({
 
 function QuickReservationBarInner() {
   const { toast } = useToast();
+  const { lang } = useSiteLanguage();
   const [loading, setLoading] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tanggal, setTanggal] = useState(todayISO);
@@ -121,8 +123,11 @@ function QuickReservationBarInner() {
     const email = String(fd.get("email") ?? "").trim();
 
     if (!nama || telepon.length < 10) {      toast({
-        title: "Data belum lengkap",
-        description: "Isi nama dan nomor telepon minimal 10 digit.",
+        title: lang === "ID" ? "Data belum lengkap" : "Incomplete data",
+        description:
+          lang === "ID"
+            ? "Isi nama dan nomor telepon minimal 10 digit."
+            : "Please provide name and at least 10-digit phone number.",
         variant: "destructive",
       });
       return;
@@ -163,8 +168,11 @@ function QuickReservationBarInner() {
       const result = await res.json();
       if (result.success) {
         toast({
-          title: "Reservasi terkirim",
-          description: "Tim kami akan menghubungi Anda via WhatsApp.",
+          title: lang === "ID" ? "Reservasi terkirim" : "Reservation submitted",
+          description:
+            lang === "ID"
+              ? "Tim kami akan menghubungi Anda via WhatsApp."
+              : "Our team will contact you via WhatsApp.",
         });
         resetForm();
       } else {
@@ -196,10 +204,10 @@ function QuickReservationBarInner() {
         >
           <div className="min-w-0">
             <p className="font-display text-lg text-gold-light leading-tight tracking-wide">
-              Reservasi Meja
+              {lang === "ID" ? "Reservasi Meja" : "Table Reservation"}
             </p>
             <p className="text-[10px] uppercase tracking-[0.22em] text-white/45 mt-0.5">
-              Tap untuk booking online
+              {lang === "ID" ? "Tap untuk booking online" : "Tap to book online"}
             </p>
           </div>
           <span className="shrink-0 flex items-center gap-1.5 rounded-sm bg-gold px-3 py-2 text-maroon-deep text-[10px] font-semibold uppercase tracking-[0.12em]">
@@ -226,7 +234,7 @@ function QuickReservationBarInner() {
               <ChevronUp className="h-5 w-5" />
             </button>
             <p className="font-display text-lg sm:text-xl lg:text-2xl text-gold-light leading-tight tracking-wide">
-              Reservasi
+              {lang === "ID" ? "Reservasi" : "Reservation"}
             </p>
             <p className="text-[10px] uppercase tracking-[0.25em] text-white/45 mt-0.5">
               Meja · Gadang Barubah
@@ -235,25 +243,25 @@ function QuickReservationBarInner() {
 
         <div className="flex-1 p-3 sm:p-4 lg:p-5 space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <Field label="Nama">
+            <Field label={lang === "ID" ? "Nama" : "Name"}>
               <Input
                 name="nama"
-                placeholder="Nama lengkap"
+                placeholder={lang === "ID" ? "Nama lengkap" : "Full name"}
                 defaultValue=""
                 autoComplete="name"
                 className={CONTROL_CLASS}
               />
             </Field>
-            <Field label="Telepon">
+            <Field label={lang === "ID" ? "Telepon" : "Phone"}>
               <Input
                 name="telepon"
-                placeholder="08xxxxxxxxxx"
+                placeholder={lang === "ID" ? "08xxxxxxxxxx" : "08xxxxxxxxxx"}
                 defaultValue=""
                 autoComplete="tel"
                 className={CONTROL_CLASS}
               />
             </Field>
-            <Field label="Email (opsional)">
+            <Field label={lang === "ID" ? "Email (opsional)" : "Email (optional)"}>
               <Input
                 name="email"
                 type="email"
@@ -263,18 +271,18 @@ function QuickReservationBarInner() {
                 className={CONTROL_CLASS}
               />
             </Field>
-            <Field label="Outlet">
+            <Field label={lang === "ID" ? "Outlet" : "Outlet"}>
               <ReservationSelect
                 value={outlet}
                 onValueChange={setOutlet}
                 options={OUTLET_OPTIONS}
-                placeholder="Pilih outlet"
+                placeholder={lang === "ID" ? "Pilih outlet" : "Select outlet"}
                 aria-label="Outlet"
               />
             </Field>          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_6.5rem_1fr] gap-3 items-end">
-            <Field label="Tanggal">
+            <Field label={lang === "ID" ? "Tanggal" : "Date"}>
               <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   type="date"
@@ -295,25 +303,25 @@ function QuickReservationBarInner() {
                       : "bg-transparent text-white/70 hover:bg-white/10 hover:text-white",
                   )}
                 >
-                  Hari Ini
+                  {lang === "ID" ? "Hari Ini" : "Today"}
                 </Button>
               </div>
             </Field>
-            <Field label="Jam">
+            <Field label={lang === "ID" ? "Jam" : "Time"}>
               <ReservationSelect
                 value={waktu}
                 onValueChange={setWaktu}
                 options={TIME_OPTIONS}
-                placeholder="Pilih jam"
+                placeholder={lang === "ID" ? "Pilih jam" : "Select time"}
                 aria-label="Jam reservasi"
               />
             </Field>
-            <Field label="Tamu">
+            <Field label={lang === "ID" ? "Tamu" : "Guests"}>
               <ReservationSelect
                 value={pax}
                 onValueChange={setPax}
                 options={PAX_OPTIONS}
-                placeholder="Jumlah tamu"
+                placeholder={lang === "ID" ? "Jumlah tamu" : "Guest count"}
                 aria-label="Jumlah tamu"
               />
             </Field>            <Button
@@ -321,7 +329,7 @@ function QuickReservationBarInner() {
               disabled={loading}
               className="h-12 sm:h-9 w-full rounded-sm bg-gold text-maroon-deep hover:bg-gold-light font-semibold uppercase tracking-[0.14em] text-sm sm:text-xs shadow-md mt-1 sm:mt-0"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reservasi"}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : lang === "ID" ? "Reservasi" : "Reserve"}
             </Button>
           </div>
         </div>

@@ -8,6 +8,19 @@ import {
   LEGAL_NAV,
   SOCIAL_LINKS,
 } from "@/lib/siteContent";
+import { useSiteLanguage } from "@/lib/language";
+
+const EN_FOOTER_LABELS: Record<string, string> = {
+  "/": "Home",
+  "/about": "About Us",
+  "/whats-on": "What's On",
+  "/menu": "Menu",
+  "/catering": "Catering",
+  "/reservasi": "Reservation",
+  "/faq": "FAQ",
+  "/terms": "Terms and Conditions",
+  "/privacy": "Privacy Policy",
+};
 
 function TikTokIcon({ className }: { className?: string }) {
   return (
@@ -18,6 +31,12 @@ function TikTokIcon({ className }: { className?: string }) {
 }
 
 export default function SiteFooter() {
+  const { lang } = useSiteLanguage();
+  const localize = (href: string, label: string) => {
+    if (lang === "EN") return EN_FOOTER_LABELS[href] ?? label;
+    return label;
+  };
+
   return (
     <footer className="bg-maroon-deep text-cream border-t border-gold/20">
       {/* Social icons row */}
@@ -64,7 +83,7 @@ export default function SiteFooter() {
                   href={item.href}
                   className="block text-cream/75 hover:text-gold transition-colors text-sm tracking-wide"
                 >
-                  {item.label}
+                  {localize(item.href, item.label)}
                 </Link>
               ))}
             </nav>
@@ -75,7 +94,7 @@ export default function SiteFooter() {
                   href={item.href}
                   className="block text-cream/75 hover:text-gold transition-colors text-sm tracking-wide"
                 >
-                  {item.label}
+                  {localize(item.href, item.label)}
                 </Link>
               ))}
             </nav>
@@ -115,12 +134,13 @@ export default function SiteFooter() {
                 href={item.href}
                 className="text-cream/50 hover:text-gold text-xs transition-colors"
               >
-                {item.label}
+                {localize(item.href, item.label)}
               </Link>
             ))}
           </div>
           <p className="text-cream/40 text-xs tracking-wide">
-            © {new Date().getFullYear()} Gadang Barubah, Inc. All Rights Reserved.
+            © {new Date().getFullYear()} Gadang Barubah, Inc.{" "}
+            {lang === "ID" ? "Hak Cipta Dilindungi." : "All Rights Reserved."}
           </p>
         </div>
       </div>

@@ -27,11 +27,16 @@ import FaqPage from "@/pages/FaqPage";
 import TermsPage from "@/pages/TermsPage";
 import PrivacyPage from "@/pages/PrivacyPage";
 import ReservationPage from "@/pages/ReservationPage";
+import { LanguageProvider } from "@/lib/language";
+
+type AdminRole = "admin_main" | "admin_cikarang" | "admin_bintaro";
 
 function ProtectedAdminRoute({
   component: Component,
+  allowedRoles,
 }: {
   component: React.ComponentType;
+  allowedRoles?: AdminRole[];
 }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +49,10 @@ function ProtectedAdminRoute({
         const response = await fetch("/api/auth/session", { credentials: "include" });
         if (response.ok) {
           const data = await response.json();
-          setIsAuthenticated(data.authenticated && data.role === "admin");
+          const isAllowed =
+            data.authenticated &&
+            (allowedRoles ? allowedRoles.includes(data.role as AdminRole) : true);
+          setIsAuthenticated(isAllowed);
         } else {
           setIsAuthenticated(false);
         }
@@ -56,7 +64,7 @@ function ProtectedAdminRoute({
     };
 
     checkSession();
-  }, [recheckTrigger]);
+  }, [allowedRoles, recheckTrigger]);
 
   const handleLogin = () => setRecheckTrigger((prev) => prev + 1);
 
@@ -67,6 +75,10 @@ function ProtectedAdminRoute({
 
 function AdminRoute({ component: Component }: { component: React.ComponentType }) {
   return <ProtectedAdminRoute component={Component} />;
+}
+
+function MainAdminRoute({ component: Component }: { component: React.ComponentType }) {
+  return <ProtectedAdminRoute component={Component} allowedRoles={["admin_main"]} />;
 }
 
 function ArticleRoute() {
@@ -103,8 +115,11 @@ function Router() {
         path="/admin/reservations"
         component={() => <AdminRoute component={AdminReservations} />}
       />
-      <Route path="/admin/campaigns" component={() => <AdminRoute component={AdminCampaigns} />} />
-      <Route path="/admin/users" component={() => <AdminRoute component={AdminUsers} />} />
+      <Route
+        path="/admin/campaigns"
+        component={() => <MainAdminRoute component={AdminCampaigns} />}
+      />
+      <Route path="/admin/users" component={() => <MainAdminRoute component={AdminUsers} />} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -127,9 +142,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <HelmetProvider>
-          <ScrollToTop />
-          <Toaster />
-          <Router />
+          <LanguageProvider>
+            <ScrollToTop />
+            <Toaster />
+            <Router />
+          </LanguageProvider>
         </HelmetProvider>
       </TooltipProvider>
     </QueryClientProvider>
