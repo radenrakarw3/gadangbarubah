@@ -1,32 +1,7 @@
 import heroImage from "@assets/DSC07140_1758564407964.jpg";
 import heroWebp from "@assets/DSC07140_1758564407964.webp";
-import aboutTitle from "@assets/about-title-gadang-barubah.svg";
-import aboutImage from "@assets/DSC07220_1758565473982.jpg";
-import cateringImage from "@assets/DSC07153_1758564588952.jpg";
-import rendangImg from "@assets/DSC02799_1758628102653.jpg";
-import ayamPopImg from "@assets/DSC02436_1758564588903.jpg";
-import gulaiImg from "@assets/DSC02371_1758564588950.jpg";
-import dendengImg from "@assets/DSC07168_1758564588951.jpg";
-import nasiBoxImg from "@assets/Nasi Box_1758628102653.jpg";
-import buffetImg from "@assets/DSC07152_1758564588952.jpg";
-import stallImg from "@assets/DSC05600_1758565473997.jpg";
-import snackImg from "@assets/DSC03165_1758567860370.jpg";
 
 export const HERO_IMAGE_URLS = [heroWebp, heroImage] as const;
-
-const DEFERRED_IMAGES = [
-  aboutTitle,
-  aboutImage,
-  cateringImage,
-  rendangImg,
-  ayamPopImg,
-  gulaiImg,
-  dendengImg,
-  nasiBoxImg,
-  buffetImg,
-  stallImg,
-  snackImg,
-] as const;
 
 let deferredStarted = false;
 
@@ -50,26 +25,31 @@ export function injectHeroPreload(): void {
   }
 }
 
-/** Gambar bawah fold — tidak memblokir tampilan awal. */
-export function preloadDeferredHomeImages(): void {
+/** Gambar bawah fold — chunk terpisah, tidak memblokir parse JS awal. */
+export async function preloadDeferredHomeImages(): Promise<void> {
   if (deferredStarted) return;
   deferredStarted = true;
 
-  const run = () => {
-    for (const src of Array.from(new Set(DEFERRED_IMAGES))) {
-      preloadImage(src);
+  const run = async () => {
+    try {
+      const { DEFERRED_IMAGES } = await import("./homeDeferredAssets");
+      for (const src of Array.from(new Set(DEFERRED_IMAGES))) {
+        preloadImage(src);
+      }
+    } catch {
+      /* chunk gagal — hero tetap tampil */
     }
   };
 
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(run, { timeout: 4000 });
+    window.requestIdleCallback(() => void run(), { timeout: 5000 });
   } else {
-    window.setTimeout(run, 800);
+    window.setTimeout(() => void run(), 1000);
   }
 }
 
-/** Pemanasan non-blocking: hero preload + deferred saat browser idle. */
+/** Pemanasan non-blocking. */
 export function warmHomePage(): void {
   injectHeroPreload();
-  preloadDeferredHomeImages();
+  void preloadDeferredHomeImages();
 }

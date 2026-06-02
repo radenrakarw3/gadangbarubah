@@ -5,31 +5,33 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
 import { initializeAnalytics, trackPageView } from "@/lib/analytics";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import WelcomePage from "@/components/WelcomePage";
 import ScrollToTop from "@/components/ScrollToTop";
 import RouteFallback from "@/components/RouteFallback";
+import AppErrorBoundary from "@/components/AppErrorBoundary";
 import LoginAdmin from "@/components/LoginAdmin";
 import { LanguageProvider } from "@/lib/language";
+import { lazyRetry } from "@/lib/lazyRetry";
 
-const UniPage = lazy(() => import("@/components/UniPage"));
-const OutletPage = lazy(() => import("@/components/services/OutletPage"));
-const DeliveryPage = lazy(() => import("@/components/services/DeliveryPage"));
-const PartnershipPage = lazy(() => import("@/components/services/PartnershipPage"));
-const CateringPage = lazy(() => import("@/components/services/CateringPage"));
-const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
-const AdminCampaigns = lazy(() => import("@/pages/AdminCampaigns"));
-const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
-const AdminReservations = lazy(() => import("@/pages/AdminReservations"));
-const NotFound = lazy(() => import("@/pages/not-found"));
-const AboutPage = lazy(() => import("@/pages/AboutPage"));
-const MenuPage = lazy(() => import("@/pages/MenuPage"));
-const WhatsOnPage = lazy(() => import("@/pages/WhatsOnPage"));
-const ArticleDetailPage = lazy(() => import("@/pages/ArticleDetailPage"));
-const FaqPage = lazy(() => import("@/pages/FaqPage"));
-const TermsPage = lazy(() => import("@/pages/TermsPage"));
-const PrivacyPage = lazy(() => import("@/pages/PrivacyPage"));
-const ReservationPage = lazy(() => import("@/pages/ReservationPage"));
+const UniPage = lazyRetry(() => import("@/components/UniPage"));
+const OutletPage = lazyRetry(() => import("@/components/services/OutletPage"));
+const DeliveryPage = lazyRetry(() => import("@/components/services/DeliveryPage"));
+const PartnershipPage = lazyRetry(() => import("@/components/services/PartnershipPage"));
+const CateringPage = lazyRetry(() => import("@/components/services/CateringPage"));
+const AdminDashboard = lazyRetry(() => import("@/pages/AdminDashboard"));
+const AdminCampaigns = lazyRetry(() => import("@/pages/AdminCampaigns"));
+const AdminUsers = lazyRetry(() => import("@/pages/AdminUsers"));
+const AdminReservations = lazyRetry(() => import("@/pages/AdminReservations"));
+const NotFound = lazyRetry(() => import("@/pages/not-found"));
+const AboutPage = lazyRetry(() => import("@/pages/AboutPage"));
+const MenuPage = lazyRetry(() => import("@/pages/MenuPage"));
+const WhatsOnPage = lazyRetry(() => import("@/pages/WhatsOnPage"));
+const ArticleDetailPage = lazyRetry(() => import("@/pages/ArticleDetailPage"));
+const FaqPage = lazyRetry(() => import("@/pages/FaqPage"));
+const TermsPage = lazyRetry(() => import("@/pages/TermsPage"));
+const PrivacyPage = lazyRetry(() => import("@/pages/PrivacyPage"));
+const ReservationPage = lazyRetry(() => import("@/pages/ReservationPage"));
 
 type AdminRole = "admin_main" | "admin_cikarang" | "admin_bintaro";
 
@@ -168,9 +170,11 @@ function App() {
       <TooltipProvider>
         <HelmetProvider>
           <LanguageProvider>
-            <ScrollToTop />
-            <Toaster />
-            <Router />
+            <AppErrorBoundary>
+              <ScrollToTop />
+              <Toaster />
+              <Router />
+            </AppErrorBoundary>
           </LanguageProvider>
         </HelmetProvider>
       </TooltipProvider>

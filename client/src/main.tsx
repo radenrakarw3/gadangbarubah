@@ -2,5 +2,9 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-// Use createRoot for client-side rendering (no SSR body)
-createRoot(document.getElementById("root")!).render(<App />);
+const rootEl = document.getElementById("root");
+if (!rootEl) {
+  throw new Error("Elemen #root tidak ditemukan");
+}
+
+createRoot(rootEl).render(<App />);

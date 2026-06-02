@@ -1,17 +1,18 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import SEOHead from "./SEOHead";
 import SiteNav from "./SiteNav";
 import SiteFooter from "./SiteFooter";
 import HeroSection from "./home/HeroSection";
 import SectionSeam from "./home/SectionSeam";
+import { lazyRetry } from "@/lib/lazyRetry";
 import { warmHomePage } from "@/lib/homePreload";
 
-const SignatureMenuSection = lazy(() => import("./home/SignatureMenuSection"));
-const AboutSection = lazy(() => import("./home/AboutSection"));
-const CateringServiceSection = lazy(() => import("./home/CateringServiceSection"));
-const CateringInquirySection = lazy(() => import("./home/CateringInquirySection"));
-const ContactSection = lazy(() => import("./home/ContactSection"));
-const CampaignPopup = lazy(() => import("./CampaignPopup"));
+const SignatureMenuSection = lazyRetry(() => import("./home/SignatureMenuSection"));
+const AboutSection = lazyRetry(() => import("./home/AboutSection"));
+const CateringServiceSection = lazyRetry(() => import("./home/CateringServiceSection"));
+const CateringInquirySection = lazyRetry(() => import("./home/CateringInquirySection"));
+const ContactSection = lazyRetry(() => import("./home/ContactSection"));
+const CampaignPopup = lazyRetry(() => import("./CampaignPopup"));
 
 function SectionPlaceholder({ className = "bg-[#300505]" }: { className?: string }) {
   return <div className={`min-h-[280px] sm:min-h-[360px] ${className}`} aria-hidden />;
@@ -22,7 +23,7 @@ export default function WelcomePage() {
 
   useEffect(() => {
     warmHomePage();
-    const t = window.setTimeout(() => setShowCampaign(true), 2500);
+    const t = window.setTimeout(() => setShowCampaign(true), 3000);
     return () => window.clearTimeout(t);
   }, []);
 
