@@ -5,7 +5,6 @@ import SiteFooter from "./SiteFooter";
 import HeroSection from "./home/HeroSection";
 import SectionSeam from "./home/SectionSeam";
 import LazyWhenVisible from "./home/LazyWhenVisible";
-import HomeMicroSplash, { useMicroSplash } from "./home/HomeMicroSplash";
 import { lazyRetry } from "@/lib/lazyRetry";
 import { warmHomePage } from "@/lib/homePreload";
 
@@ -26,30 +25,16 @@ function BelowFoldChunk() {
 
 export default function WelcomePage() {
   const [showCampaign, setShowCampaign] = useState(false);
-  const { visible: splashVisible, exiting: splashExiting, dismiss: dismissSplash } =
-    useMicroSplash();
 
   useEffect(() => {
     warmHomePage();
   }, []);
-
-  useEffect(() => {
-    if (splashVisible) {
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = "";
-      };
-    }
-    document.body.style.overflow = "";
-  }, [splashVisible]);
 
   const tryShowCampaign = useCallback(() => {
     setShowCampaign((v) => v || true);
   }, []);
 
   useEffect(() => {
-    if (splashVisible) return;
-
     let idleTimer: number | undefined;
     let shown = false;
 
@@ -74,23 +59,17 @@ export default function WelcomePage() {
       window.removeEventListener("scroll", onScroll);
       if (idleTimer !== undefined) window.clearTimeout(idleTimer);
     };
-  }, [splashVisible, tryShowCampaign]);
-
-  const onHeroImageLoad = useCallback(() => {
-    dismissSplash();
-  }, [dismissSplash]);
+  }, [tryShowCampaign]);
 
   return (
     <>
       <SEOHead pageKey="home" />
 
-      <HomeMicroSplash visible={splashVisible} exiting={splashExiting} />
-
       <div className="home-page-root min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] overflow-x-hidden bg-[#300505]">
         <div className="relative">
           <SiteNav variant="transparent" />
           <main className="home-scroll-content">
-            <HeroSection onHeroImageLoad={onHeroImageLoad} />
+            <HeroSection />
 
             <LazyWhenVisible
               fallback={<BelowFoldFallback />}

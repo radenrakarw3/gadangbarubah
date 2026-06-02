@@ -7,11 +7,7 @@ import heroHeadline from "@assets/hero-headline-en.svg";
 import HeroReservationSlot from "./HeroReservationSlot";
 import { useSiteLanguage } from "@/lib/language";
 
-interface HeroSectionProps {
-  onHeroImageLoad?: () => void;
-}
-
-function HeroSectionInner({ onHeroImageLoad }: HeroSectionProps) {
+function HeroSectionInner() {
   const { lang } = useSiteLanguage();
   const headlineAlt =
     lang === "ID"
@@ -38,7 +34,6 @@ function HeroSectionInner({ onHeroImageLoad }: HeroSectionProps) {
               fetchPriority="high"
               decoding="async"
               draggable={false}
-              onLoad={onHeroImageLoad}
             />
           </picture>
         </div>

@@ -8,3 +8,5 @@ if (!rootEl) {
 }
 
 createRoot(rootEl).render(<App />);
+
+document.getElementById("html-boot")?.remove();
