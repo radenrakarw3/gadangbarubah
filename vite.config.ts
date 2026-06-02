@@ -1,9 +1,57 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
+function injectCriticalPreload(): Plugin {
+  return {
+    name: "inject-critical-preload",
+    apply: "build",
+    transformIndexHtml: {
+      order: "post",
+      handler(html, ctx) {
+        const bundle = ctx.bundle;
+        if (!bundle) return html;
+
+        const tags: string[] = [];
+
+        for (const [fileName, item] of Object.entries(bundle)) {
+          if (item.type === "chunk") {
+            const href = `/${fileName.replace(/\\/g, "/")}`;
+            if (fileName.includes("vendor-react")) {
+              tags.push(
+                `<link rel="modulepreload" crossorigin href="${href}">`,
+              );
+            }
+            if (/assets\/index-[^/]+\.js$/.test(fileName.replace(/\\/g, "/"))) {
+              tags.push(
+                `<link rel="modulepreload" crossorigin href="${href}">`,
+              );
+            }
+          }
+          if (
+            fileName.includes("DSC07140") &&
+            fileName.includes("768w") &&
+            fileName.endsWith(".webp")
+          ) {
+            const href = `/${fileName.replace(/\\/g, "/")}`;
+            tags.push(
+              `<link rel="preload" href="${href}" as="image" type="image/webp">`,
+            );
+          }
+        }
+
+        if (tags.length === 0) return html;
+        return html.replace(
+          "<!--ssr-helmet-link-->",
+          `${tags.join("\n    ")}\n    <!--ssr-helmet-link-->`,
+        );
+      },
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), injectCriticalPreload()],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),

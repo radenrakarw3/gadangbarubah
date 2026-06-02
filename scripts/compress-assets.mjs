@@ -76,19 +76,25 @@ async function compressJpeg(filePath, name) {
   return { before, after };
 }
 
-async function exportHeroWebp(jpegPath, name) {
-  const webpPath = jpegPath.replace(/\.jpe?g$/i, ".webp");
-  const before = fs.existsSync(webpPath) ? fs.statSync(webpPath).size : 0;
+async function exportHeroWebpVariants(jpegPath) {
+  const base = jpegPath.replace(/\.jpe?g$/i, "");
+  const variants = [
+    { width: 768, suffix: "-768w" },
+    { width: 1280, suffix: "-1280w" },
+    { width: 1920, suffix: "" },
+  ];
 
-  await sharp(jpegPath)
-    .rotate()
-    .resize({ width: maxWidthFor(name), withoutEnlargement: true })
-    .webp({ quality: 78, effort: 4 })
-    .toFile(`${webpPath}.tmp`);
-
-  safeReplace(`${webpPath}.tmp`, webpPath);
-  const after = fs.statSync(webpPath).size;
-  return { before, after, webpPath };
+  for (const { width, suffix } of variants) {
+    const webpPath = `${base}${suffix}.webp`;
+    const tmp = `${webpPath}.tmp`;
+    await sharp(jpegPath)
+      .rotate()
+      .resize({ width, withoutEnlargement: true })
+      .webp({ quality: 78, effort: 4 })
+      .toFile(tmp);
+    safeReplace(tmp, webpPath);
+    console.log(`  ↳ ${path.basename(webpPath)}: ${formatBytes(fs.statSync(webpPath).size)}`);
+  }
 }
 
 async function compressWebp(filePath, name) {
@@ -144,18 +150,12 @@ async function main() {
         console.log(`✓ ${name}: ${formatBytes(r.before)} → ${formatBytes(r.after)}`);
 
         if (HERO_NAMES.has(name)) {
-          const w = await exportHeroWebp(filePath, name);
-          const label = path.basename(w.webpPath);
-          if (w.before > 0) {
-            console.log(
-              `  ↳ ${label}: ${formatBytes(w.before)} → ${formatBytes(w.after)}`,
-            );
-          } else {
-            console.log(`  ↳ ${label}: ${formatBytes(w.after)} (baru)`);
-          }
-          totalAfter += w.after;
+          await exportHeroWebpVariants(filePath);
         }
       } else if (ext === ".webp") {
+        if (name.includes("DSC07140") && /-\d+w\.webp$/i.test(name)) {
+          continue;
+        }
         const r = await compressWebp(filePath, name);
         totalBefore += r.before;
         totalAfter += r.after;

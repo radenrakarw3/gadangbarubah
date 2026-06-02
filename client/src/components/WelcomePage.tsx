@@ -1,69 +1,103 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import SEOHead from "./SEOHead";
 import SiteNav from "./SiteNav";
 import SiteFooter from "./SiteFooter";
 import HeroSection from "./home/HeroSection";
 import SectionSeam from "./home/SectionSeam";
+import LazyWhenVisible from "./home/LazyWhenVisible";
+import HomeMicroSplash, { useMicroSplash } from "./home/HomeMicroSplash";
 import { lazyRetry } from "@/lib/lazyRetry";
 import { warmHomePage } from "@/lib/homePreload";
 
-const SignatureMenuSection = lazyRetry(() => import("./home/SignatureMenuSection"));
-const AboutSection = lazyRetry(() => import("./home/AboutSection"));
-const CateringServiceSection = lazyRetry(() => import("./home/CateringServiceSection"));
-const CateringInquirySection = lazyRetry(() => import("./home/CateringInquirySection"));
-const ContactSection = lazyRetry(() => import("./home/ContactSection"));
+const HomeBelowFold = lazyRetry(() => import("./home/HomeBelowFold"));
 const CampaignPopup = lazyRetry(() => import("./CampaignPopup"));
 
-function SectionPlaceholder({ className = "bg-[#300505]" }: { className?: string }) {
-  return <div className={`min-h-[280px] sm:min-h-[360px] ${className}`} aria-hidden />;
+function BelowFoldFallback() {
+  return <div className="h-20 animate-pulse bg-white/5" aria-hidden />;
+}
+
+function BelowFoldChunk() {
+  return (
+    <Suspense fallback={<BelowFoldFallback />}>
+      <HomeBelowFold />
+    </Suspense>
+  );
 }
 
 export default function WelcomePage() {
   const [showCampaign, setShowCampaign] = useState(false);
+  const { visible: splashVisible, exiting: splashExiting, dismiss: dismissSplash } =
+    useMicroSplash();
 
   useEffect(() => {
     warmHomePage();
-    const t = window.setTimeout(() => setShowCampaign(true), 3000);
-    return () => window.clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    if (splashVisible) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+    document.body.style.overflow = "";
+  }, [splashVisible]);
+
+  const tryShowCampaign = useCallback(() => {
+    setShowCampaign((v) => v || true);
+  }, []);
+
+  useEffect(() => {
+    if (splashVisible) return;
+
+    let idleTimer: number | undefined;
+    let shown = false;
+
+    const show = () => {
+      if (shown) return;
+      shown = true;
+      tryShowCampaign();
+    };
+
+    const onScroll = () => {
+      if (window.scrollY > 100) {
+        show();
+        window.removeEventListener("scroll", onScroll);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    idleTimer = window.setTimeout(show, 5000);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (idleTimer !== undefined) window.clearTimeout(idleTimer);
+    };
+  }, [splashVisible, tryShowCampaign]);
+
+  const onHeroImageLoad = useCallback(() => {
+    dismissSplash();
+  }, [dismissSplash]);
 
   return (
     <>
       <SEOHead pageKey="home" />
 
+      <HomeMicroSplash visible={splashVisible} exiting={splashExiting} />
+
       <div className="home-page-root min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] overflow-x-hidden bg-[#300505]">
         <div className="relative">
           <SiteNav variant="transparent" />
           <main className="home-scroll-content">
-            <HeroSection />
+            <HeroSection onHeroImageLoad={onHeroImageLoad} />
 
-            <Suspense fallback={<SectionPlaceholder />}>
-              <SignatureMenuSection />
-            </Suspense>
-
-            <SectionSeam variant="maroon-to-cream" />
-
-            <Suspense fallback={<SectionPlaceholder className="bg-[#f5ebe6]" />}>
-              <AboutSection />
-            </Suspense>
-
-            <SectionSeam variant="cream-to-maroon" />
-
-            <Suspense fallback={<SectionPlaceholder />}>
-              <CateringServiceSection />
-            </Suspense>
-
-            <SectionSeam variant="maroon-to-inquiry" />
-
-            <Suspense fallback={<SectionPlaceholder className="bg-[#FFFCF8]" />}>
-              <CateringInquirySection />
-            </Suspense>
-
-            <SectionSeam variant="inquiry-to-contact" />
-
-            <Suspense fallback={<SectionPlaceholder className="bg-[#f3efe8]" />}>
-              <ContactSection />
-            </Suspense>
+            <LazyWhenVisible
+              fallback={<BelowFoldFallback />}
+              rootMargin="280px 0px"
+            >
+              <BelowFoldChunk />
+            </LazyWhenVisible>
           </main>
         </div>
 
