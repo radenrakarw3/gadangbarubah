@@ -34,7 +34,7 @@ function AboutSection() {
       className="relative bg-[#f5ebe6] scroll-mt-20 sm:scroll-mt-24 overflow-hidden"
     >
       {/* Mobile / tablet: stack */}
-      <div className="lg:hidden">
+      <div className="xl:hidden">
         <div className="relative h-[32vh] min-h-[200px] max-h-[280px] overflow-hidden sm:h-[42vh] sm:max-h-none sm:min-h-[280px]">
           <img
             src={aboutImage}
@@ -65,38 +65,32 @@ function AboutSection() {
       </div>
 
       {/* Desktop: layout absolut sesuai Figma (800px foto + panel kanan 900px) */}
-      <div className="hidden lg:block relative h-[900px] max-w-[1920px] mx-auto">
-        <div className="absolute left-0 top-0 w-[800px] h-[900px] overflow-hidden">
+      <div className="hidden xl:grid xl:grid-cols-[minmax(0,800px)_1fr] relative min-h-[min(900px,90svh)] max-w-[1920px] mx-auto">
+        <div className="relative min-h-[640px] overflow-hidden">
           <img
             src={aboutImage}
             alt="Interior Gadang Barubah"
-            className="absolute left-0 top-[-174px] w-[800px] h-[1200px] max-w-none object-cover object-center"
+            className="absolute inset-0 h-full w-full object-cover object-center"
             loading="lazy"
             decoding="async"
             draggable={false}
           />
-          <div
-            className="absolute left-0 top-[-174px] w-[800px] h-[1200px] bg-black/[0.13] pointer-events-none"
-            aria-hidden
-          />
+          <div className="absolute inset-0 bg-black/[0.13] pointer-events-none" aria-hidden />
         </div>
 
-        <div className="absolute left-[800px] right-0 top-0 h-[900px]">
-          <h2 className="absolute top-[213px] left-[83px] w-[564px] max-w-[564px]">
+        <div className="relative flex min-h-[640px] flex-col justify-center px-8 py-12 2xl:px-16">
+          <h2 className="mb-6 w-full max-w-[564px]">
             <AboutTitleGraphic />
           </h2>
 
-          <p
-            className="text-figma-body absolute right-[154px] w-[768px] max-w-[calc(100%-237px)] text-black"
-            style={{ top: "calc(50% - 130px + 22px)" }}
-          >
+          <p className="text-figma-body max-w-[768px] text-black">
             {ABOUT_COPY[lang]}
           </p>
 
           <button
             type="button"
             onClick={() => navigate("/about")}
-            className="absolute right-[154px] top-[661px] flex h-[60px] w-[215px] items-center justify-between rounded-lg bg-[#3F0000] px-6 font-heroCta text-[18px] font-medium italic leading-[50px] tracking-[0.03em] text-white hover:bg-[#520000] transition-colors"
+            className="mt-8 inline-flex h-[52px] w-full max-w-[215px] items-center justify-between rounded-lg bg-[#3F0000] px-6 font-heroCta text-base font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors 2xl:h-[60px] 2xl:text-[18px]"
           >
             <span>{storyLabel}</span>
             <span className="w-[25px] border-t-2 border-white shrink-0" aria-hidden />

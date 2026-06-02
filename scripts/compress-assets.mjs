@@ -1,5 +1,5 @@
 /**
- * Kompres semua gambar di attached_assets (in-place).
+ * Kompres gambar di attached_assets (in-place) + WebP untuk hero.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -8,7 +8,7 @@ import sharp from "sharp";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ASSETS_DIR = path.resolve(__dirname, "..", "attached_assets");
-const SKIP_EXT = new Set([".pdf"]);
+const SKIP_EXT = new Set([".pdf", ".svg"]);
 
 const HERO_NAMES = new Set(["DSC07140_1758564407964.jpg"]);
 
@@ -21,14 +21,28 @@ const CARD_NAMES = new Set([
   "DSC07152_1758564588952.jpg",
   "DSC03147_1758567860387.jpg",
   "DSC03388_1758567885565.jpg",
+  "DSC03165_1758567860370.jpg",
+  "DSC05600_1758565473997.jpg",
+]);
+
+const SECTION_NAMES = new Set([
+  "DSC07220_1758565473982.jpg",
+  "DSC07153_1758564588952.jpg",
 ]);
 
 function maxWidthFor(name) {
-  if (HERO_NAMES.has(name)) return 1920;
+  if (HERO_NAMES.has(name)) return 1600;
   if (CARD_NAMES.has(name)) return 720;
+  if (SECTION_NAMES.has(name)) return 1200;
   if (name.includes("logo")) return 512;
   if (name.endsWith(".png")) return 800;
-  return 1400;
+  return 1280;
+}
+
+function jpegQualityFor(name) {
+  if (HERO_NAMES.has(name)) return 76;
+  if (CARD_NAMES.has(name)) return 74;
+  return 78;
 }
 
 function safeReplace(tmp, dest) {
@@ -48,17 +62,33 @@ function formatBytes(n) {
 async function compressJpeg(filePath, name) {
   const before = fs.statSync(filePath).size;
   const maxW = maxWidthFor(name);
+  const quality = jpegQualityFor(name);
   const tmp = `${filePath}.tmp`;
 
   await sharp(filePath)
     .rotate()
     .resize({ width: maxW, withoutEnlargement: true })
-    .jpeg({ quality: 78, mozjpeg: true })
+    .jpeg({ quality, mozjpeg: true })
     .toFile(tmp);
 
   safeReplace(tmp, filePath);
   const after = fs.statSync(filePath).size;
   return { before, after };
+}
+
+async function exportHeroWebp(jpegPath, name) {
+  const webpPath = jpegPath.replace(/\.jpe?g$/i, ".webp");
+  const before = fs.existsSync(webpPath) ? fs.statSync(webpPath).size : 0;
+
+  await sharp(jpegPath)
+    .rotate()
+    .resize({ width: maxWidthFor(name), withoutEnlargement: true })
+    .webp({ quality: 78, effort: 4 })
+    .toFile(`${webpPath}.tmp`);
+
+  safeReplace(`${webpPath}.tmp`, webpPath);
+  const after = fs.statSync(webpPath).size;
+  return { before, after, webpPath };
 }
 
 async function compressWebp(filePath, name) {
@@ -69,7 +99,7 @@ async function compressWebp(filePath, name) {
   await sharp(filePath)
     .rotate()
     .resize({ width: maxW, withoutEnlargement: true })
-    .webp({ quality: 82 })
+    .webp({ quality: 80 })
     .toFile(tmp);
 
   safeReplace(tmp, filePath);
@@ -112,6 +142,19 @@ async function main() {
         totalBefore += r.before;
         totalAfter += r.after;
         console.log(`✓ ${name}: ${formatBytes(r.before)} → ${formatBytes(r.after)}`);
+
+        if (HERO_NAMES.has(name)) {
+          const w = await exportHeroWebp(filePath, name);
+          const label = path.basename(w.webpPath);
+          if (w.before > 0) {
+            console.log(
+              `  ↳ ${label}: ${formatBytes(w.before)} → ${formatBytes(w.after)}`,
+            );
+          } else {
+            console.log(`  ↳ ${label}: ${formatBytes(w.after)} (baru)`);
+          }
+          totalAfter += w.after;
+        }
       } else if (ext === ".webp") {
         const r = await compressWebp(filePath, name);
         totalBefore += r.before;
@@ -129,9 +172,7 @@ async function main() {
   }
 
   console.log("\n---");
-  console.log(
-    `Total: ${formatBytes(totalBefore)} → ${formatBytes(totalAfter)} (−${Math.round((1 - totalAfter / totalBefore) * 100)}%)`,
-  );
+  console.log(`Selesai. Perkiraan total setelah kompresi: ~${formatBytes(totalAfter)}`);
 }
 
 main();

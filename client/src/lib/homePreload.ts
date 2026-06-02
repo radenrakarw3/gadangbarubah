@@ -1,7 +1,8 @@
 import heroImage from "@assets/DSC07140_1758564407964.jpg";
+import heroWebp from "@assets/DSC07140_1758564407964.webp";
 import heroHeadlineEn from "@assets/hero-headline-en.svg";
-import aboutTitle from "@assets/about-title-gadang-barubah.svg";
 import logoImage from "@assets/padang gadang barubah logo_1758561601552.webp";
+import aboutTitle from "@assets/about-title-gadang-barubah.svg";
 import aboutImage from "@assets/DSC07220_1758565473982.jpg";
 import cateringImage from "@assets/DSC07153_1758564588952.jpg";
 import rendangImg from "@assets/DSC02799_1758628102653.jpg";
@@ -15,12 +16,13 @@ import snackImg from "@assets/DSC03165_1758567860370.jpg";
 
 export type HomeBootPhase = "assets" | "render" | "ready";
 
-/** Aset homepage saja — selaras dengan section yang dirender di WelcomePage. */
-const HOME_IMAGES = [
-  heroImage,
-  heroHeadlineEn,
+export const HERO_IMAGE_URLS = [heroWebp, heroImage] as const;
+
+/** Aset kritis above-the-fold — WebP hero diprioritaskan. */
+const CRITICAL_IMAGES = [heroWebp, heroImage, heroHeadlineEn, logoImage] as const;
+
+const DEFERRED_IMAGES = [
   aboutTitle,
-  logoImage,
   aboutImage,
   cateringImage,
   rendangImg,
@@ -31,132 +33,125 @@ const HOME_IMAGES = [
   buffetImg,
   stallImg,
   snackImg,
-];
+] as const;
 
-const MIN_TOTAL_MS = 700;
-const MAX_WAIT_MS = 20000;
+const BOOT_HARD_CAP_MS = 1800;
+const IMAGE_TIMEOUT_MS = 1600;
+const FONT_TIMEOUT_MS = 800;
+
+const SESSION_READY_KEY = "gb_home_splash_done";
+
+export function hasSeenHomeSplash(): boolean {
+  try {
+    return sessionStorage.getItem(SESSION_READY_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function markHomeSplashDone(): void {
+  try {
+    sessionStorage.setItem(SESSION_READY_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function preloadImageDecoded(src: string): Promise<void> {
+function preloadImage(src: string, timeoutMs: number): Promise<void> {
   return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = async () => {
-      try {
-        await img.decode();
-      } catch {
-        /* ignore */
-      }
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
       resolve();
     };
-    img.onerror = () => resolve();
+
+    const timer = window.setTimeout(finish, timeoutMs);
+
+    const img = new Image();
+    img.onload = () => {
+      window.clearTimeout(timer);
+      finish();
+    };
+    img.onerror = () => {
+      window.clearTimeout(timer);
+      finish();
+    };
     img.src = src;
   });
 }
 
-export function waitForHomePaint(): Promise<void> {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => resolve());
-    });
-  });
-}
-
-async function waitForDomImages(root: HTMLElement): Promise<void> {
-  const imgs = Array.from(root.querySelectorAll("img"));
-
-  await Promise.all(
-    imgs.map(async (img) => {
-      if (!img.complete) {
-        await new Promise<void>((resolve) => {
-          img.onload = () => resolve();
-          img.onerror = () => resolve();
-        });
-      }
-      if (img.naturalWidth === 0) return;
-      try {
-        await img.decode();
-      } catch {
-        /* ignore */
-      }
-    }),
-  );
-}
-
-async function loadFonts(): Promise<void> {
+async function loadCriticalFonts(): Promise<void> {
+  if (!document.fonts?.load) return;
   try {
-    await Promise.all([
-      document.fonts.load('400 1rem "Cormorant Garamond"'),
-      document.fonts.load('600 1rem "Cormorant Garamond"'),
-      document.fonts.load('400 1rem "Inter"'),
-      document.fonts.load('500 1rem "Inter"'),
-      document.fonts.load('400 1rem "Rubik"'),
-      document.fonts.load('400 28px "Rubik"'),
-      document.fonts.load('400 90px "Luxurious Script"'),
-      document.fonts.load('500 42px "Spectral"'),
-      document.fonts.ready,
+    await Promise.race([
+      Promise.all([
+        document.fonts.load('400 1rem "Rubik"'),
+        document.fonts.ready,
+      ]),
+      sleep(FONT_TIMEOUT_MS),
     ]);
   } catch {
     /* ignore */
   }
 }
 
-let bootInFlight: Promise<void> | null = null;
+let deferredKickoff = false;
 
+export function preloadDeferredHomeImages(): void {
+  if (deferredKickoff) return;
+  deferredKickoff = true;
+  for (const src of Array.from(new Set(DEFERRED_IMAGES))) {
+    void preloadImage(src, 12000);
+  }
+}
+
+export function injectHeroPreload(): void {
+  if (typeof document === "undefined") return;
+  for (const href of HERO_IMAGE_URLS) {
+    const existing = document.querySelector(
+      `link[rel="preload"][as="image"][href="${href}"]`,
+    );
+    if (existing) continue;
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = href;
+    document.head.appendChild(link);
+  }
+}
+
+/** Boot ringan — tidak pernah menolak masuk; selalu selesai dalam BOOT_HARD_CAP_MS. */
 export async function bootHomePage(
-  root: HTMLElement,
   onProgress?: (percent: number, phase?: HomeBootPhase) => void,
 ): Promise<void> {
-  if (bootInFlight) {
-    await bootInFlight;
-    onProgress?.(100, "ready");
-    return;
-  }
+  const report = (percent: number, phase?: HomeBootPhase) =>
+    onProgress?.(Math.min(100, percent), phase);
 
-  bootInFlight = (async () => {
-    const started = Date.now();
-    const report = (percent: number, phase?: HomeBootPhase) =>
-      onProgress?.(Math.min(100, percent), phase);
+  report(10, "assets");
 
-    const uniqueImages = Array.from(new Set(HOME_IMAGES));
+  const critical = Array.from(new Set(CRITICAL_IMAGES));
+  let loaded = 0;
 
-    report(5, "assets");
-    await waitForHomePaint();
+  await Promise.race([
+    (async () => {
+      await Promise.all(
+        critical.map(async (src) => {
+          await preloadImage(src, IMAGE_TIMEOUT_MS);
+          loaded += 1;
+          report(10 + Math.round((loaded / critical.length) * 55), "assets");
+        }),
+      );
+      report(75, "render");
+      await loadCriticalFonts();
+    })(),
+    sleep(BOOT_HARD_CAP_MS),
+  ]);
 
-    let loaded = 0;
-
-    await Promise.race([
-      (async () => {
-        await Promise.all(
-          uniqueImages.map(async (src) => {
-            await preloadImageDecoded(src);
-            loaded += 1;
-            report(5 + Math.round((loaded / uniqueImages.length) * 55), "assets");
-          }),
-        );
-      })(),
-      sleep(MAX_WAIT_MS),
-    ]);
-
-    report(65, "render");
-    await Promise.all([loadFonts(), waitForDomImages(root)]);
-
-    report(90, "render");
-    await waitForHomePaint();
-
-    const elapsed = Date.now() - started;
-    if (elapsed < MIN_TOTAL_MS) {
-      await sleep(MIN_TOTAL_MS - elapsed);
-    }
-
-    report(100, "ready");
-  })();
-
-  try {
-    await bootInFlight;
-  } finally {
-    bootInFlight = null;
-  }
+  report(100, "ready");
+  preloadDeferredHomeImages();
 }

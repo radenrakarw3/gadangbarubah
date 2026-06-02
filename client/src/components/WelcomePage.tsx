@@ -11,68 +11,95 @@ import CateringInquirySection from "./home/CateringInquirySection";
 import ContactSection from "./home/ContactSection";
 import SectionSeam from "./home/SectionSeam";
 import CampaignPopup from "./CampaignPopup";
-import { bootHomePage, type HomeBootPhase } from "@/lib/homePreload";
+import {
+  bootHomePage,
+  hasSeenHomeSplash,
+  injectHeroPreload,
+  markHomeSplashDone,
+  preloadDeferredHomeImages,
+  type HomeBootPhase,
+} from "@/lib/homePreload";
+
+const SPLASH_MAX_MS = 2400;
 
 export default function WelcomePage() {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const [revealed, setRevealed] = useState(false);
+  const skipSplash = hasSeenHomeSplash();
+  const [revealed, setRevealed] = useState(skipSplash);
+  const [showLoader, setShowLoader] = useState(!skipSplash);
   const [exiting, setExiting] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [phase, setPhase] = useState<HomeBootPhase>("assets");
+  const [progress, setProgress] = useState(skipSplash ? 100 : 0);
+  const [phase, setPhase] = useState<HomeBootPhase>(skipSplash ? "ready" : "assets");
+  const revealStartedRef = useRef(skipSplash);
 
   useEffect(() => {
-    if (!revealed) {
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = "";
-      };
+    injectHeroPreload();
+  }, []);
+
+  useEffect(() => {
+    if (!showLoader) {
+      document.body.style.overflow = "";
+      return;
     }
-    document.body.style.overflow = "";
-  }, [revealed]);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showLoader]);
 
   useEffect(() => {
+    if (skipSplash) {
+      preloadDeferredHomeImages();
+      return;
+    }
+
     let cancelled = false;
+    let didReveal = false;
+    let maxWaitTimer: number | undefined;
+    let fadeTimer: number | undefined;
 
-    async function start() {
-      await new Promise<void>((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      });
-
-      if (cancelled || !rootRef.current) return;
-
-      await bootHomePage(rootRef.current, (pct, bootPhase) => {
-        if (cancelled) return;
-        setProgress(pct);
-        if (bootPhase) setPhase(bootPhase);
-      });
-
-      if (cancelled) return;
-
+    const revealNow = () => {
+      if (cancelled || revealStartedRef.current) return;
+      revealStartedRef.current = true;
+      didReveal = true;
+      markHomeSplashDone();
+      preloadDeferredHomeImages();
+      setProgress(100);
+      setPhase("ready");
       setExiting(true);
-      window.setTimeout(() => {
+      fadeTimer = window.setTimeout(() => {
         if (cancelled) return;
+        setShowLoader(false);
         setRevealed(true);
-      }, 500);
-    }
+      }, 180);
+    };
 
-    start();
+    maxWaitTimer = window.setTimeout(revealNow, SPLASH_MAX_MS);
+
+    void bootHomePage((pct, bootPhase) => {
+      if (cancelled || revealStartedRef.current) return;
+      setProgress(pct);
+      if (bootPhase) setPhase(bootPhase);
+    }).finally(() => {
+      if (!cancelled) revealNow();
+    });
 
     return () => {
       cancelled = true;
+      if (maxWaitTimer !== undefined) window.clearTimeout(maxWaitTimer);
+      if (fadeTimer !== undefined) window.clearTimeout(fadeTimer);
+      if (!didReveal) revealStartedRef.current = false;
     };
-  }, []);
+  }, [skipSplash]);
 
   return (
     <>
       <SEOHead pageKey="home" />
 
-      {!revealed && (
+      {showLoader && (
         <HomePageLoader progress={progress} phase={phase} exiting={exiting} />
       )}
 
-      {/* Layout tetap document-flow — tidak berubah fixed→static saat reveal */}
       <div
-        ref={rootRef}
         className={`home-page-root min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] overflow-x-hidden bg-[#300505] ${
           revealed ? "home-page-enter" : "opacity-0 pointer-events-none select-none"
         }`}

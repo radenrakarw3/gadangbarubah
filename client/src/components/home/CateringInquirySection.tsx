@@ -73,7 +73,7 @@ function CateringForm({
         <p className="mb-1.5 sm:mb-2 font-[var(--font-form)] text-[11px] sm:text-xs font-semibold uppercase tracking-[0.14em] text-[#8b5a3c]">
           {copy.eyebrow}
         </p>
-        <h2 className="font-[var(--font-inquiry)] text-[1.65rem] font-medium leading-[1.2] tracking-[0.01em] text-[#3F0000] sm:text-[2rem] lg:text-[42px] lg:leading-[50px]">
+        <h2 className="text-figma-inquiry-title text-[#3F0000]">
           {copy.title}
         </h2>
         <p className="mt-2 sm:mt-3 font-[var(--font-form)] text-sm sm:text-base leading-relaxed text-[#5c4040]/90 lg:ml-auto lg:max-w-[480px]">
@@ -156,7 +156,7 @@ function CateringForm({
             type="submit"
             disabled={loading}
             className={cn(
-              "h-11 w-full shrink-0 rounded-lg border border-[#3F0000]/20 px-6 font-heroCta text-[15px] font-bold italic tracking-[0.03em] text-white sm:h-[52px] sm:px-8 sm:text-base lg:h-[60px] lg:text-lg",
+              "h-11 w-full shrink-0 rounded-lg border border-[#3F0000]/20 px-6 font-heroCta text-[15px] font-bold italic tracking-[0.03em] text-white sm:h-[52px] sm:px-8 sm:text-base xl:h-[60px] xl:text-lg",
               "bg-gradient-to-r from-[#3F0000] to-[#5a0000] shadow-[0_14px_32px_-12px_rgba(63,0,0,0.55)]",
               "transition-all hover:from-[#520000] hover:to-[#6a0000] hover:shadow-[0_18px_36px_-10px_rgba(63,0,0,0.6)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3F0000]/30 focus-visible:ring-offset-2",
@@ -241,7 +241,7 @@ export default function CateringInquirySection() {
       className="relative bg-[#FFFCF8] scroll-mt-20 sm:scroll-mt-24 overflow-hidden"
     >
       {/* Mobile / tablet: form atas, foto bawah */}
-      <div className="lg:hidden">
+      <div className="xl:hidden">
         <div className="px-4 py-8 sm:px-8 sm:py-12 lg:py-16">
           <CateringForm
             form={form}
@@ -264,7 +264,7 @@ export default function CateringInquirySection() {
       </div>
 
       {/* Desktop: pecah kiri (form) | kanan (foto) — Figma Frame 7 */}
-      <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_800px] xl:grid-cols-[minmax(520px,1fr)_800px] min-h-[900px] max-w-[1920px] mx-auto">
+      <div className="hidden xl:grid xl:grid-cols-[minmax(520px,1fr)_minmax(0,800px)] min-h-[min(900px,90svh)] max-w-[1920px] mx-auto">
         <div className="flex items-center justify-end py-16 pl-8 xl:pl-[217px] pr-8 xl:pr-12">
           <CateringForm
             form={form}

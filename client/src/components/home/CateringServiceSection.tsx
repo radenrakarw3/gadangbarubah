@@ -37,10 +37,10 @@ function CateringServiceSection() {
   return (
     <section
       id="catering-section"
-      className="relative scroll-mt-16 overflow-hidden bg-[#300505] py-10 sm:scroll-mt-24 sm:py-12 lg:min-h-[800px] lg:py-0"
+      className="relative scroll-mt-16 overflow-hidden bg-[#300505] py-10 sm:scroll-mt-24 sm:py-12 xl:min-h-[800px] xl:py-0"
     >
       {/* Mobile / tablet */}
-      <div className="lg:hidden">
+      <div className="xl:hidden">
         <h2 className="text-figma-section-title mb-4 px-4 text-center text-white sm:mb-6 sm:px-8">
           {title}
         </h2>
@@ -92,7 +92,7 @@ function CateringServiceSection() {
       </div>
 
       {/* Desktop: layout Figma */}
-      <div className="relative hidden min-h-[800px] lg:block">
+      <div className="relative hidden min-h-[min(800px,85svh)] xl:block">
         <h2 className="absolute right-[85px] top-[209px] z-10 whitespace-nowrap text-right font-heroCta text-[28px] font-normal leading-[50px] tracking-[0.01em] text-white">
           {title}
         </h2>

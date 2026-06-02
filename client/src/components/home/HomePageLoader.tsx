@@ -20,7 +20,7 @@ export default function HomePageLoader({
 }: HomePageLoaderProps) {
   return (
     <div
-      className={`fixed inset-0 z-[200] flex flex-col items-center justify-center bg-maroon-deep transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[200] flex flex-col items-center justify-center bg-maroon-deep transition-opacity duration-300 ${
         exiting ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
       role="status"
@@ -40,7 +40,7 @@ export default function HomePageLoader({
         <div className="w-52 sm:w-60">
           <div className="h-[2px] w-full bg-ivory/15 overflow-hidden rounded-full">
             <div
-              className="h-full bg-gold transition-[width] duration-500 ease-out rounded-full"
+              className="h-full bg-gold transition-[width] duration-200 ease-out rounded-full"
               style={{ width: `${progress}%` }}
             />
           </div>

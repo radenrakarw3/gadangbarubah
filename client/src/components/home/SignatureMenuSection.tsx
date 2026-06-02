@@ -37,16 +37,16 @@ function SignatureMenuSection() {
   return (
     <section
       id="menu-section"
-      className="relative overflow-hidden bg-[#300505] py-10 scroll-mt-16 sm:scroll-mt-24 sm:py-12 lg:min-h-[800px] lg:py-0"
+      className="relative overflow-hidden bg-[#300505] py-10 scroll-mt-16 sm:scroll-mt-24 sm:py-12 xl:min-h-[800px] xl:py-0"
     >
-      <div className="relative mx-auto max-w-[1690px] px-4 pb-10 sm:px-8 sm:pb-14 lg:px-[113px] lg:pb-20 lg:pt-[160px]">
+      <div className="relative mx-auto max-w-[1690px] px-4 pb-10 sm:px-8 sm:pb-14 lg:px-10 lg:pb-14 lg:pt-12 xl:px-[113px] xl:pb-20 xl:pt-[160px]">
         {/* Header + garis dekor (Figma: Rubik 28px, garis 45×2px putih) */}
-        <div className="mb-6 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-start sm:justify-between sm:gap-4 lg:mb-[64px]">
+        <div className="mb-6 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-start sm:justify-between sm:gap-4 xl:mb-[64px]">
           <h2 className="text-figma-section-title max-w-[20rem] text-left text-white sm:max-w-[439px]">
             {title}
           </h2>
 
-          <div className="hidden sm:flex items-center gap-4 shrink-0 pt-2 lg:pt-[25px]">
+          <div className="hidden sm:flex items-center gap-4 shrink-0 pt-2 xl:pt-[25px]">
             <span className="w-[45px] border-t-2 border-white" aria-hidden />
             <button
               type="button"
@@ -102,7 +102,7 @@ function SignatureMenuSection() {
                 <button
                   type="button"
                   onClick={() => navigate("/menu")}
-                  className="h-[150px] w-full overflow-hidden bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 sm:h-[220px] lg:h-[250px] lg:w-[400px]"
+                  className="h-[150px] w-full overflow-hidden bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 sm:h-[220px] xl:h-[250px] xl:w-[400px]"
                 >
                   <img
                     src={item.image}
@@ -113,7 +113,7 @@ function SignatureMenuSection() {
                     draggable={false}
                   />
                 </button>
-                <p className="mt-2 text-center font-heroCta text-base leading-tight text-white sm:mt-3 sm:text-lg lg:mt-4 lg:text-[20px] lg:leading-[50px]">
+                <p className="mt-2 text-center font-heroCta text-base leading-tight text-white sm:mt-3 sm:text-lg xl:mt-4 xl:text-[20px] xl:leading-[50px]">
                   {label}
                 </p>
               </article>
