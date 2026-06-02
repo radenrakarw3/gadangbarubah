@@ -1,97 +1,79 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import SEOHead from "./SEOHead";
 import SiteNav from "./SiteNav";
 import SiteFooter from "./SiteFooter";
 import HeroSection from "./home/HeroSection";
-import HomePageLoader from "./home/HomePageLoader";
-import SignatureMenuSection from "./home/SignatureMenuSection";
-import AboutSection from "./home/AboutSection";
-import CateringServiceSection from "./home/CateringServiceSection";
-import CateringInquirySection from "./home/CateringInquirySection";
-import ContactSection from "./home/ContactSection";
 import SectionSeam from "./home/SectionSeam";
-import CampaignPopup from "./CampaignPopup";
-import {
-  bootHomePage,
-  injectHeroPreload,
-  preloadDeferredHomeImages,
-  type HomeBootPhase,
-} from "@/lib/homePreload";
+import { warmHomePage } from "@/lib/homePreload";
 
-const SPLASH_MAX_MS = 2000;
+const SignatureMenuSection = lazy(() => import("./home/SignatureMenuSection"));
+const AboutSection = lazy(() => import("./home/AboutSection"));
+const CateringServiceSection = lazy(() => import("./home/CateringServiceSection"));
+const CateringInquirySection = lazy(() => import("./home/CateringInquirySection"));
+const ContactSection = lazy(() => import("./home/ContactSection"));
+const CampaignPopup = lazy(() => import("./CampaignPopup"));
+
+function SectionPlaceholder({ className = "bg-[#300505]" }: { className?: string }) {
+  return <div className={`min-h-[280px] sm:min-h-[360px] ${className}`} aria-hidden />;
+}
 
 export default function WelcomePage() {
-  const [showSplash, setShowSplash] = useState(true);
-  const [exiting, setExiting] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [phase, setPhase] = useState<HomeBootPhase>("assets");
+  const [showCampaign, setShowCampaign] = useState(false);
 
   useEffect(() => {
-    injectHeroPreload();
-    preloadDeferredHomeImages();
-
-    let done = false;
-
-    const hideSplash = () => {
-      if (done) return;
-      done = true;
-      setExiting(true);
-      window.setTimeout(() => setShowSplash(false), 200);
-    };
-
-    const capTimer = window.setTimeout(hideSplash, SPLASH_MAX_MS);
-
-    void bootHomePage((pct, bootPhase) => {
-      setProgress(pct);
-      if (bootPhase) setPhase(bootPhase);
-    }).finally(hideSplash);
-
-    return () => {
-      window.clearTimeout(capTimer);
-    };
+    warmHomePage();
+    const t = window.setTimeout(() => setShowCampaign(true), 2500);
+    return () => window.clearTimeout(t);
   }, []);
-
-  useEffect(() => {
-    if (!showSplash) {
-      document.body.style.overflow = "";
-      return;
-    }
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [showSplash]);
 
   return (
     <>
       <SEOHead pageKey="home" />
 
-      {showSplash && (
-        <HomePageLoader progress={progress} phase={phase} exiting={exiting} />
-      )}
-
-      {/* Konten selalu di DOM & terlihat — splash hanya overlay */}
       <div className="home-page-root min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] overflow-x-hidden bg-[#300505]">
         <div className="relative">
           <SiteNav variant="transparent" />
           <main className="home-scroll-content">
             <HeroSection />
-            <SignatureMenuSection />
+
+            <Suspense fallback={<SectionPlaceholder />}>
+              <SignatureMenuSection />
+            </Suspense>
+
             <SectionSeam variant="maroon-to-cream" />
-            <AboutSection />
+
+            <Suspense fallback={<SectionPlaceholder className="bg-[#f5ebe6]" />}>
+              <AboutSection />
+            </Suspense>
+
             <SectionSeam variant="cream-to-maroon" />
-            <CateringServiceSection />
+
+            <Suspense fallback={<SectionPlaceholder />}>
+              <CateringServiceSection />
+            </Suspense>
+
             <SectionSeam variant="maroon-to-inquiry" />
-            <CateringInquirySection />
+
+            <Suspense fallback={<SectionPlaceholder className="bg-[#FFFCF8]" />}>
+              <CateringInquirySection />
+            </Suspense>
+
             <SectionSeam variant="inquiry-to-contact" />
-            <ContactSection />
+
+            <Suspense fallback={<SectionPlaceholder className="bg-[#f3efe8]" />}>
+              <ContactSection />
+            </Suspense>
           </main>
         </div>
 
         <SectionSeam variant="contact-to-footer" />
         <SiteFooter />
 
-        {!showSplash && <CampaignPopup />}
+        {showCampaign && (
+          <Suspense fallback={null}>
+            <CampaignPopup />
+          </Suspense>
+        )}
       </div>
     </>
   );

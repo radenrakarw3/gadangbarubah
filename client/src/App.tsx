@@ -5,29 +5,31 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
 import { initializeAnalytics, trackPageView } from "@/lib/analytics";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import WelcomePage from "@/components/WelcomePage";
-import UniPage from "@/components/UniPage";
-import OutletPage from "@/components/services/OutletPage";
-import DeliveryPage from "@/components/services/DeliveryPage";
-import PartnershipPage from "@/components/services/PartnershipPage";
-import CateringPage from "@/components/services/CateringPage";
-import AdminDashboard from "@/pages/AdminDashboard";
-import AdminCampaigns from "@/pages/AdminCampaigns";
-import AdminUsers from "@/pages/AdminUsers";
-import AdminReservations from "@/pages/AdminReservations";
-import LoginAdmin from "@/components/LoginAdmin";
 import ScrollToTop from "@/components/ScrollToTop";
-import NotFound from "@/pages/not-found";
-import AboutPage from "@/pages/AboutPage";
-import MenuPage from "@/pages/MenuPage";
-import WhatsOnPage from "@/pages/WhatsOnPage";
-import ArticleDetailPage from "@/pages/ArticleDetailPage";
-import FaqPage from "@/pages/FaqPage";
-import TermsPage from "@/pages/TermsPage";
-import PrivacyPage from "@/pages/PrivacyPage";
-import ReservationPage from "@/pages/ReservationPage";
+import RouteFallback from "@/components/RouteFallback";
+import LoginAdmin from "@/components/LoginAdmin";
 import { LanguageProvider } from "@/lib/language";
+
+const UniPage = lazy(() => import("@/components/UniPage"));
+const OutletPage = lazy(() => import("@/components/services/OutletPage"));
+const DeliveryPage = lazy(() => import("@/components/services/DeliveryPage"));
+const PartnershipPage = lazy(() => import("@/components/services/PartnershipPage"));
+const CateringPage = lazy(() => import("@/components/services/CateringPage"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const AdminCampaigns = lazy(() => import("@/pages/AdminCampaigns"));
+const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
+const AdminReservations = lazy(() => import("@/pages/AdminReservations"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+const AboutPage = lazy(() => import("@/pages/AboutPage"));
+const MenuPage = lazy(() => import("@/pages/MenuPage"));
+const WhatsOnPage = lazy(() => import("@/pages/WhatsOnPage"));
+const ArticleDetailPage = lazy(() => import("@/pages/ArticleDetailPage"));
+const FaqPage = lazy(() => import("@/pages/FaqPage"));
+const TermsPage = lazy(() => import("@/pages/TermsPage"));
+const PrivacyPage = lazy(() => import("@/pages/PrivacyPage"));
+const ReservationPage = lazy(() => import("@/pages/ReservationPage"));
 
 type AdminRole = "admin_main" | "admin_cikarang" | "admin_bintaro";
 
@@ -68,7 +70,7 @@ function ProtectedAdminRoute({
 
   const handleLogin = () => setRecheckTrigger((prev) => prev + 1);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <RouteFallback />;
   if (!isAuthenticated) return <LoginAdmin onLogin={handleLogin} />;
   return <Component />;
 }
@@ -83,7 +85,19 @@ function MainAdminRoute({ component: Component }: { component: React.ComponentTy
 
 function ArticleRoute() {
   const [, params] = useRoute("/whats-on/:id");
-  return <ArticleDetailPage articleId={params?.id ?? ""} />;
+  return (
+    <Suspense fallback={<RouteFallback />}>
+      <ArticleDetailPage articleId={params?.id ?? ""} />
+    </Suspense>
+  );
+}
+
+function LazyRoute({ component: Component }: { component: React.ComponentType }) {
+  return (
+    <Suspense fallback={<RouteFallback />}>
+      <Component />
+    </Suspense>
+  );
 }
 
 function Router() {
@@ -96,20 +110,20 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={WelcomePage} />
-      <Route path="/about" component={AboutPage} />
-      <Route path="/menu" component={MenuPage} />
-      <Route path="/catering" component={CateringPage} />
-      <Route path="/reservasi" component={ReservationPage} />
-      <Route path="/whats-on" component={WhatsOnPage} />
+      <Route path="/about" component={() => <LazyRoute component={AboutPage} />} />
+      <Route path="/menu" component={() => <LazyRoute component={MenuPage} />} />
+      <Route path="/catering" component={() => <LazyRoute component={CateringPage} />} />
+      <Route path="/reservasi" component={() => <LazyRoute component={ReservationPage} />} />
+      <Route path="/whats-on" component={() => <LazyRoute component={WhatsOnPage} />} />
       <Route path="/whats-on/:id" component={ArticleRoute} />
-      <Route path="/faq" component={FaqPage} />
-      <Route path="/terms" component={TermsPage} />
-      <Route path="/privacy" component={PrivacyPage} />
-      <Route path="/uni" component={UniPage} />
-      <Route path="/services/outlet" component={OutletPage} />
-      <Route path="/services/delivery" component={DeliveryPage} />
-      <Route path="/services/partnership" component={PartnershipPage} />
-      <Route path="/services/catering" component={CateringPage} />
+      <Route path="/faq" component={() => <LazyRoute component={FaqPage} />} />
+      <Route path="/terms" component={() => <LazyRoute component={TermsPage} />} />
+      <Route path="/privacy" component={() => <LazyRoute component={PrivacyPage} />} />
+      <Route path="/uni" component={() => <LazyRoute component={UniPage} />} />
+      <Route path="/services/outlet" component={() => <LazyRoute component={OutletPage} />} />
+      <Route path="/services/delivery" component={() => <LazyRoute component={DeliveryPage} />} />
+      <Route path="/services/partnership" component={() => <LazyRoute component={PartnershipPage} />} />
+      <Route path="/services/catering" component={() => <LazyRoute component={CateringPage} />} />
       <Route path="/admin" component={() => <AdminRoute component={AdminDashboard} />} />
       <Route
         path="/admin/reservations"
@@ -120,14 +134,25 @@ function Router() {
         component={() => <MainAdminRoute component={AdminCampaigns} />}
       />
       <Route path="/admin/users" component={() => <MainAdminRoute component={AdminUsers} />} />
-      <Route component={NotFound} />
+      <Route component={() => <LazyRoute component={NotFound} />} />
     </Switch>
   );
 }
 
 function App() {
   useEffect(() => {
-    initializeAnalytics();
+    const scheduleAnalytics = () => {
+      initializeAnalytics();
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(scheduleAnalytics, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = window.setTimeout(scheduleAnalytics, 1500);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }

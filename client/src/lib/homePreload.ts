@@ -1,7 +1,5 @@
 import heroImage from "@assets/DSC07140_1758564407964.jpg";
 import heroWebp from "@assets/DSC07140_1758564407964.webp";
-import heroHeadlineEn from "@assets/hero-headline-en.svg";
-import logoImage from "@assets/padang gadang barubah logo_1758561601552.webp";
 import aboutTitle from "@assets/about-title-gadang-barubah.svg";
 import aboutImage from "@assets/DSC07220_1758565473982.jpg";
 import cateringImage from "@assets/DSC07153_1758564588952.jpg";
@@ -14,12 +12,7 @@ import buffetImg from "@assets/DSC07152_1758564588952.jpg";
 import stallImg from "@assets/DSC05600_1758565473997.jpg";
 import snackImg from "@assets/DSC03165_1758567860370.jpg";
 
-export type HomeBootPhase = "assets" | "render" | "ready";
-
 export const HERO_IMAGE_URLS = [heroWebp, heroImage] as const;
-
-/** Aset kritis above-the-fold — WebP hero diprioritaskan. */
-const CRITICAL_IMAGES = [heroWebp, heroImage, heroHeadlineEn, logoImage] as const;
 
 const DEFERRED_IMAGES = [
   aboutTitle,
@@ -35,63 +28,14 @@ const DEFERRED_IMAGES = [
   snackImg,
 ] as const;
 
-const BOOT_HARD_CAP_MS = 1800;
-const IMAGE_TIMEOUT_MS = 1600;
-const FONT_TIMEOUT_MS = 800;
+let deferredStarted = false;
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function preloadImage(src: string): void {
+  const img = new Image();
+  img.src = src;
 }
 
-function preloadImage(src: string, timeoutMs: number): Promise<void> {
-  return new Promise((resolve) => {
-    let settled = false;
-    const finish = () => {
-      if (settled) return;
-      settled = true;
-      resolve();
-    };
-
-    const timer = window.setTimeout(finish, timeoutMs);
-
-    const img = new Image();
-    img.onload = () => {
-      window.clearTimeout(timer);
-      finish();
-    };
-    img.onerror = () => {
-      window.clearTimeout(timer);
-      finish();
-    };
-    img.src = src;
-  });
-}
-
-async function loadCriticalFonts(): Promise<void> {
-  if (!document.fonts?.load) return;
-  try {
-    await Promise.race([
-      Promise.all([
-        document.fonts.load('400 1rem "Rubik"'),
-        document.fonts.ready,
-      ]),
-      sleep(FONT_TIMEOUT_MS),
-    ]);
-  } catch {
-    /* ignore */
-  }
-}
-
-let deferredKickoff = false;
-
-export function preloadDeferredHomeImages(): void {
-  if (deferredKickoff) return;
-  deferredKickoff = true;
-  for (const src of Array.from(new Set(DEFERRED_IMAGES))) {
-    void preloadImage(src, 12000);
-  }
-}
-
+/** Prioritas hero — dipanggil segera saat homepage mount. */
 export function injectHeroPreload(): void {
   if (typeof document === "undefined") return;
   for (const href of HERO_IMAGE_URLS) {
@@ -106,33 +50,26 @@ export function injectHeroPreload(): void {
   }
 }
 
-/** Boot ringan — tidak pernah menolak masuk; selalu selesai dalam BOOT_HARD_CAP_MS. */
-export async function bootHomePage(
-  onProgress?: (percent: number, phase?: HomeBootPhase) => void,
-): Promise<void> {
-  const report = (percent: number, phase?: HomeBootPhase) =>
-    onProgress?.(Math.min(100, percent), phase);
+/** Gambar bawah fold — tidak memblokir tampilan awal. */
+export function preloadDeferredHomeImages(): void {
+  if (deferredStarted) return;
+  deferredStarted = true;
 
-  report(10, "assets");
+  const run = () => {
+    for (const src of Array.from(new Set(DEFERRED_IMAGES))) {
+      preloadImage(src);
+    }
+  };
 
-  const critical = Array.from(new Set(CRITICAL_IMAGES));
-  let loaded = 0;
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(run, { timeout: 4000 });
+  } else {
+    window.setTimeout(run, 800);
+  }
+}
 
-  await Promise.race([
-    (async () => {
-      await Promise.all(
-        critical.map(async (src) => {
-          await preloadImage(src, IMAGE_TIMEOUT_MS);
-          loaded += 1;
-          report(10 + Math.round((loaded / critical.length) * 55), "assets");
-        }),
-      );
-      report(75, "render");
-      await loadCriticalFonts();
-    })(),
-    sleep(BOOT_HARD_CAP_MS),
-  ]);
-
-  report(100, "ready");
+/** Pemanasan non-blocking: hero preload + deferred saat browser idle. */
+export function warmHomePage(): void {
+  injectHeroPreload();
   preloadDeferredHomeImages();
 }
