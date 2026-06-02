@@ -1,40 +1,33 @@
 import { Switch, Route, useLocation, useRoute } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
 import { initializeAnalytics, trackPageView } from "@/lib/analytics";
-import { Suspense, lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import WelcomePage from "@/components/WelcomePage";
-import ScrollToTop from "@/components/ScrollToTop";
-import RouteFallback from "@/components/RouteFallback";
-import AppErrorBoundary from "@/components/AppErrorBoundary";
+import UniPage from "@/components/UniPage";
+import OutletPage from "@/components/services/OutletPage";
+import DeliveryPage from "@/components/services/DeliveryPage";
+import PartnershipPage from "@/components/services/PartnershipPage";
+import CateringPage from "@/components/services/CateringPage";
+import AdminDashboard from "@/pages/AdminDashboard";
+import AdminCampaigns from "@/pages/AdminCampaigns";
+import AdminUsers from "@/pages/AdminUsers";
+import AdminReservations from "@/pages/AdminReservations";
 import LoginAdmin from "@/components/LoginAdmin";
+import ScrollToTop from "@/components/ScrollToTop";
+import NotFound from "@/pages/not-found";
+import AboutPage from "@/pages/AboutPage";
+import MenuPage from "@/pages/MenuPage";
+import WhatsOnPage from "@/pages/WhatsOnPage";
+import ArticleDetailPage from "@/pages/ArticleDetailPage";
+import FaqPage from "@/pages/FaqPage";
+import TermsPage from "@/pages/TermsPage";
+import PrivacyPage from "@/pages/PrivacyPage";
+import ReservationPage from "@/pages/ReservationPage";
 import { LanguageProvider } from "@/lib/language";
-import { lazyRetry } from "@/lib/lazyRetry";
-
-const Toaster = lazy(() =>
-  import("@/components/ui/toaster").then((m) => ({ default: m.Toaster })),
-);
-
-const UniPage = lazyRetry(() => import("@/components/UniPage"));
-const OutletPage = lazyRetry(() => import("@/components/services/OutletPage"));
-const DeliveryPage = lazyRetry(() => import("@/components/services/DeliveryPage"));
-const PartnershipPage = lazyRetry(() => import("@/components/services/PartnershipPage"));
-const CateringPage = lazyRetry(() => import("@/components/services/CateringPage"));
-const AdminDashboard = lazyRetry(() => import("@/pages/AdminDashboard"));
-const AdminCampaigns = lazyRetry(() => import("@/pages/AdminCampaigns"));
-const AdminUsers = lazyRetry(() => import("@/pages/AdminUsers"));
-const AdminReservations = lazyRetry(() => import("@/pages/AdminReservations"));
-const NotFound = lazyRetry(() => import("@/pages/not-found"));
-const AboutPage = lazyRetry(() => import("@/pages/AboutPage"));
-const MenuPage = lazyRetry(() => import("@/pages/MenuPage"));
-const WhatsOnPage = lazyRetry(() => import("@/pages/WhatsOnPage"));
-const ArticleDetailPage = lazyRetry(() => import("@/pages/ArticleDetailPage"));
-const FaqPage = lazyRetry(() => import("@/pages/FaqPage"));
-const TermsPage = lazyRetry(() => import("@/pages/TermsPage"));
-const PrivacyPage = lazyRetry(() => import("@/pages/PrivacyPage"));
-const ReservationPage = lazyRetry(() => import("@/pages/ReservationPage"));
 
 type AdminRole = "admin_main" | "admin_cikarang" | "admin_bintaro";
 
@@ -75,7 +68,7 @@ function ProtectedAdminRoute({
 
   const handleLogin = () => setRecheckTrigger((prev) => prev + 1);
 
-  if (isLoading) return <RouteFallback />;
+  if (isLoading) return <div>Loading...</div>;
   if (!isAuthenticated) return <LoginAdmin onLogin={handleLogin} />;
   return <Component />;
 }
@@ -90,19 +83,7 @@ function MainAdminRoute({ component: Component }: { component: React.ComponentTy
 
 function ArticleRoute() {
   const [, params] = useRoute("/whats-on/:id");
-  return (
-    <Suspense fallback={<RouteFallback />}>
-      <ArticleDetailPage articleId={params?.id ?? ""} />
-    </Suspense>
-  );
-}
-
-function LazyRoute({ component: Component }: { component: React.ComponentType }) {
-  return (
-    <Suspense fallback={<RouteFallback />}>
-      <Component />
-    </Suspense>
-  );
+  return <ArticleDetailPage articleId={params?.id ?? ""} />;
 }
 
 function Router() {
@@ -115,20 +96,20 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={WelcomePage} />
-      <Route path="/about" component={() => <LazyRoute component={AboutPage} />} />
-      <Route path="/menu" component={() => <LazyRoute component={MenuPage} />} />
-      <Route path="/catering" component={() => <LazyRoute component={CateringPage} />} />
-      <Route path="/reservasi" component={() => <LazyRoute component={ReservationPage} />} />
-      <Route path="/whats-on" component={() => <LazyRoute component={WhatsOnPage} />} />
+      <Route path="/about" component={AboutPage} />
+      <Route path="/menu" component={MenuPage} />
+      <Route path="/catering" component={CateringPage} />
+      <Route path="/reservasi" component={ReservationPage} />
+      <Route path="/whats-on" component={WhatsOnPage} />
       <Route path="/whats-on/:id" component={ArticleRoute} />
-      <Route path="/faq" component={() => <LazyRoute component={FaqPage} />} />
-      <Route path="/terms" component={() => <LazyRoute component={TermsPage} />} />
-      <Route path="/privacy" component={() => <LazyRoute component={PrivacyPage} />} />
-      <Route path="/uni" component={() => <LazyRoute component={UniPage} />} />
-      <Route path="/services/outlet" component={() => <LazyRoute component={OutletPage} />} />
-      <Route path="/services/delivery" component={() => <LazyRoute component={DeliveryPage} />} />
-      <Route path="/services/partnership" component={() => <LazyRoute component={PartnershipPage} />} />
-      <Route path="/services/catering" component={() => <LazyRoute component={CateringPage} />} />
+      <Route path="/faq" component={FaqPage} />
+      <Route path="/terms" component={TermsPage} />
+      <Route path="/privacy" component={PrivacyPage} />
+      <Route path="/uni" component={UniPage} />
+      <Route path="/services/outlet" component={OutletPage} />
+      <Route path="/services/delivery" component={DeliveryPage} />
+      <Route path="/services/partnership" component={PartnershipPage} />
+      <Route path="/services/catering" component={CateringPage} />
       <Route path="/admin" component={() => <AdminRoute component={AdminDashboard} />} />
       <Route
         path="/admin/reservations"
@@ -139,32 +120,14 @@ function Router() {
         component={() => <MainAdminRoute component={AdminCampaigns} />}
       />
       <Route path="/admin/users" component={() => <MainAdminRoute component={AdminUsers} />} />
-      <Route component={() => <LazyRoute component={NotFound} />} />
+      <Route component={NotFound} />
     </Switch>
   );
 }
 
 function App() {
-  const [showToaster, setShowToaster] = useState(false);
-
   useEffect(() => {
-    const t = window.setTimeout(() => setShowToaster(true), 0);
-    return () => window.clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    const scheduleAnalytics = () => {
-      initializeAnalytics();
-    };
-    if (typeof window.requestIdleCallback === "function") {
-      const id = window.requestIdleCallback(scheduleAnalytics, { timeout: 3000 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const t = window.setTimeout(scheduleAnalytics, 1500);
-    return () => window.clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
+    initializeAnalytics();
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }
@@ -180,15 +143,9 @@ function App() {
       <TooltipProvider>
         <HelmetProvider>
           <LanguageProvider>
-            <AppErrorBoundary>
-              <ScrollToTop />
-              {showToaster && (
-                <Suspense fallback={null}>
-                  <Toaster />
-                </Suspense>
-              )}
-              <Router />
-            </AppErrorBoundary>
+            <ScrollToTop />
+            <Toaster />
+            <Router />
           </LanguageProvider>
         </HelmetProvider>
       </TooltipProvider>

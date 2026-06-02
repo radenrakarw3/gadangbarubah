@@ -1,99 +1,130 @@
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SEOHead from "./SEOHead";
 import SiteNav from "./SiteNav";
 import SiteFooter from "./SiteFooter";
 import HeroSection from "./home/HeroSection";
+import HomePageLoader from "./home/HomePageLoader";
+import SignatureMenuSection from "./home/SignatureMenuSection";
+import AboutSection from "./home/AboutSection";
+import CateringServiceSection from "./home/CateringServiceSection";
+import CateringInquirySection from "./home/CateringInquirySection";
+import ContactSection from "./home/ContactSection";
 import SectionSeam from "./home/SectionSeam";
-import LazyWhenVisible from "./home/LazyWhenVisible";
-import { lazyRetry } from "@/lib/lazyRetry";
-import { warmHomePage } from "@/lib/homePreload";
+import CampaignPopup from "./CampaignPopup";
+import {
+  bootHomePage,
+  hasSeenHomeSplash,
+  injectHeroPreload,
+  markHomeSplashDone,
+  preloadDeferredHomeImages,
+  type HomeBootPhase,
+} from "@/lib/homePreload";
 
-const HomeBelowFold = lazyRetry(() => import("./home/HomeBelowFold"));
-const CampaignPopup = lazyRetry(() => import("./CampaignPopup"));
-
-function BelowFoldFallback() {
-  return <div className="h-20 animate-pulse bg-white/5" aria-hidden />;
-}
-
-function BelowFoldChunk() {
-  return (
-    <Suspense fallback={<BelowFoldFallback />}>
-      <HomeBelowFold />
-    </Suspense>
-  );
-}
+const SPLASH_MAX_MS = 2400;
 
 export default function WelcomePage() {
-  const [showCampaign, setShowCampaign] = useState(false);
+  const skipSplash = hasSeenHomeSplash();
+  const [revealed, setRevealed] = useState(skipSplash);
+  const [showLoader, setShowLoader] = useState(!skipSplash);
+  const [exiting, setExiting] = useState(false);
+  const [progress, setProgress] = useState(skipSplash ? 100 : 0);
+  const [phase, setPhase] = useState<HomeBootPhase>(skipSplash ? "ready" : "assets");
+  const revealStartedRef = useRef(skipSplash);
 
   useEffect(() => {
-    const run = () => warmHomePage();
-    if (typeof window.requestIdleCallback === "function") {
-      const id = window.requestIdleCallback(run, { timeout: 2000 });
-      return () => window.cancelIdleCallback(id);
+    injectHeroPreload();
+  }, []);
+
+  useEffect(() => {
+    if (!showLoader) {
+      document.body.style.overflow = "";
+      return;
     }
-    const t = window.setTimeout(run, 300);
-    return () => window.clearTimeout(t);
-  }, []);
-
-  const tryShowCampaign = useCallback(() => {
-    setShowCampaign((v) => v || true);
-  }, []);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showLoader]);
 
   useEffect(() => {
-    let idleTimer: number | undefined;
-    let shown = false;
+    if (skipSplash) {
+      preloadDeferredHomeImages();
+      return;
+    }
 
-    const show = () => {
-      if (shown) return;
-      shown = true;
-      tryShowCampaign();
+    let cancelled = false;
+    let didReveal = false;
+    let maxWaitTimer: number | undefined;
+    let fadeTimer: number | undefined;
+
+    const revealNow = () => {
+      if (cancelled || revealStartedRef.current) return;
+      revealStartedRef.current = true;
+      didReveal = true;
+      markHomeSplashDone();
+      preloadDeferredHomeImages();
+      setProgress(100);
+      setPhase("ready");
+      setExiting(true);
+      fadeTimer = window.setTimeout(() => {
+        if (cancelled) return;
+        setShowLoader(false);
+        setRevealed(true);
+      }, 180);
     };
 
-    const onScroll = () => {
-      if (window.scrollY > 100) {
-        show();
-        window.removeEventListener("scroll", onScroll);
-      }
-    };
+    maxWaitTimer = window.setTimeout(revealNow, SPLASH_MAX_MS);
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    idleTimer = window.setTimeout(show, 5000);
+    void bootHomePage((pct, bootPhase) => {
+      if (cancelled || revealStartedRef.current) return;
+      setProgress(pct);
+      if (bootPhase) setPhase(bootPhase);
+    }).finally(() => {
+      if (!cancelled) revealNow();
+    });
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (idleTimer !== undefined) window.clearTimeout(idleTimer);
+      cancelled = true;
+      if (maxWaitTimer !== undefined) window.clearTimeout(maxWaitTimer);
+      if (fadeTimer !== undefined) window.clearTimeout(fadeTimer);
+      if (!didReveal) revealStartedRef.current = false;
     };
-  }, [tryShowCampaign]);
+  }, [skipSplash]);
 
   return (
     <>
       <SEOHead pageKey="home" />
 
-      <div className="home-page-root min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] overflow-x-hidden bg-[#300505]">
+      {showLoader && (
+        <HomePageLoader progress={progress} phase={phase} exiting={exiting} />
+      )}
+
+      <div
+        className={`home-page-root min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] overflow-x-hidden bg-[#300505] ${
+          revealed ? "home-page-enter" : "opacity-0 pointer-events-none select-none"
+        }`}
+        aria-hidden={!revealed}
+      >
         <div className="relative">
           <SiteNav variant="transparent" />
           <main className="home-scroll-content">
             <HeroSection />
-
-            <LazyWhenVisible
-              fallback={<BelowFoldFallback />}
-              rootMargin="280px 0px"
-            >
-              <BelowFoldChunk />
-            </LazyWhenVisible>
+            <SignatureMenuSection />
+            <SectionSeam variant="maroon-to-cream" />
+            <AboutSection />
+            <SectionSeam variant="cream-to-maroon" />
+            <CateringServiceSection />
+            <SectionSeam variant="maroon-to-inquiry" />
+            <CateringInquirySection />
+            <SectionSeam variant="inquiry-to-contact" />
+            <ContactSection />
           </main>
         </div>
 
         <SectionSeam variant="contact-to-footer" />
         <SiteFooter />
 
-        {showCampaign && (
-          <Suspense fallback={null}>
-            <CampaignPopup />
-          </Suspense>
-        )}
+        {revealed && <CampaignPopup />}
       </div>
     </>
   );
