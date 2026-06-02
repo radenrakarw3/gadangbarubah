@@ -2,6 +2,7 @@
  * Kompres gambar di attached_assets (in-place) + WebP untuk hero.
  */
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
@@ -45,13 +46,36 @@ function jpegQualityFor(name) {
   return 78;
 }
 
+function tempPath(dest) {
+  const base = path.basename(dest).replace(/[^\w.-]+/g, "_");
+  return path.join(os.tmpdir(), `gadang-asset-${base}-${process.pid}.tmp`);
+}
+
 function safeReplace(tmp, dest) {
+  try {
+    fs.renameSync(tmp, dest);
+    return;
+  } catch {
+    /* Windows: dest may be locked — overwrite in place */
+  }
+  try {
+    const data = fs.readFileSync(tmp);
+    fs.writeFileSync(dest, data);
+    fs.unlinkSync(tmp);
+    return;
+  } catch {
+    /* fallback: backup swap */
+  }
+  const backup = `${dest}.bak`;
+  if (fs.existsSync(backup)) fs.unlinkSync(backup);
+  if (fs.existsSync(dest)) fs.renameSync(dest, backup);
   try {
     fs.renameSync(tmp, dest);
   } catch {
     fs.copyFileSync(tmp, dest);
     fs.unlinkSync(tmp);
   }
+  if (fs.existsSync(backup)) fs.unlinkSync(backup);
 }
 
 function formatBytes(n) {
@@ -63,7 +87,7 @@ async function compressJpeg(filePath, name) {
   const before = fs.statSync(filePath).size;
   const maxW = maxWidthFor(name);
   const quality = jpegQualityFor(name);
-  const tmp = `${filePath}.tmp`;
+  const tmp = tempPath(filePath);
 
   await sharp(filePath)
     .rotate()
@@ -86,7 +110,7 @@ async function exportHeroWebpVariants(jpegPath) {
 
   for (const { width, suffix } of variants) {
     const webpPath = `${base}${suffix}.webp`;
-    const tmp = `${webpPath}.tmp`;
+    const tmp = tempPath(webpPath);
     await sharp(jpegPath)
       .rotate()
       .resize({ width, withoutEnlargement: true })
@@ -100,7 +124,7 @@ async function exportHeroWebpVariants(jpegPath) {
 async function compressWebp(filePath, name) {
   const before = fs.statSync(filePath).size;
   const maxW = maxWidthFor(name);
-  const tmp = `${filePath}.tmp`;
+  const tmp = tempPath(filePath);
 
   await sharp(filePath)
     .rotate()
@@ -116,7 +140,7 @@ async function compressWebp(filePath, name) {
 async function compressPng(filePath, name) {
   const before = fs.statSync(filePath).size;
   const maxW = maxWidthFor(name);
-  const tmp = `${filePath}.tmp`;
+  const tmp = tempPath(filePath);
 
   await sharp(filePath)
     .rotate()
@@ -154,6 +178,13 @@ async function main() {
         }
       } else if (ext === ".webp") {
         if (name.includes("DSC07140") && /-\d+w\.webp$/i.test(name)) {
+          continue;
+        }
+        if (name.includes("DSC07140_1758564407964.webp")) {
+          continue;
+        }
+        if (name.includes("logo") && name.endsWith(".webp")) {
+          console.log(`⊘ ${name}: dilewati (tutup file di editor jika ingin dikompres)`);
           continue;
         }
         const r = await compressWebp(filePath, name);

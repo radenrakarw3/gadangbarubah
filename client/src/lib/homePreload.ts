@@ -1,9 +1,7 @@
-import heroImage from "@assets/DSC07140_1758564407964.jpg";
 import heroWebp768 from "@assets/DSC07140_1758564407964-768w.webp";
-import heroWebp from "@assets/DSC07140_1758564407964.webp";
 
-/** Mobile-first preload untuk LCP */
-export const HERO_IMAGE_URLS = [heroWebp768, heroWebp, heroImage] as const;
+/** Satu URL hero mobile — cukup untuk LCP, hindari 3× preload bersaing */
+export const HERO_LCP_URL = heroWebp768;
 
 let deferredStarted = false;
 
@@ -14,16 +12,15 @@ function preloadImage(src: string): void {
 
 export function injectHeroPreload(): void {
   if (typeof document === "undefined") return;
-  for (const href of HERO_IMAGE_URLS) {
-    const id = `preload-hero-${href.slice(-24)}`;
-    if (document.getElementById(id)) continue;
-    const link = document.createElement("link");
-    link.id = id;
-    link.rel = "preload";
-    link.as = "image";
-    link.href = href;
-    document.head.appendChild(link);
-  }
+  const id = "preload-hero-lcp";
+  if (document.getElementById(id)) return;
+  const link = document.createElement("link");
+  link.id = id;
+  link.rel = "preload";
+  link.as = "image";
+  link.type = "image/webp";
+  link.href = HERO_LCP_URL;
+  document.head.appendChild(link);
 }
 
 export async function preloadDeferredHomeImages(): Promise<void> {

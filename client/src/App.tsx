@@ -1,19 +1,21 @@
 import { Switch, Route, useLocation, useRoute } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
+import { lazyRetry } from "@/lib/lazyRetry";
+
+const Toaster = lazy(() =>
+  import("@/components/ui/toaster").then((m) => ({ default: m.Toaster })),
+);
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
 import { initializeAnalytics, trackPageView } from "@/lib/analytics";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import WelcomePage from "@/components/WelcomePage";
 import ScrollToTop from "@/components/ScrollToTop";
 import RouteFallback from "@/components/RouteFallback";
 import AppErrorBoundary from "@/components/AppErrorBoundary";
 import LoginAdmin from "@/components/LoginAdmin";
 import { LanguageProvider } from "@/lib/language";
-import { lazyRetry } from "@/lib/lazyRetry";
-
 const UniPage = lazyRetry(() => import("@/components/UniPage"));
 const OutletPage = lazyRetry(() => import("@/components/services/OutletPage"));
 const DeliveryPage = lazyRetry(() => import("@/components/services/DeliveryPage"));
@@ -142,6 +144,13 @@ function Router() {
 }
 
 function App() {
+  const [showToaster, setShowToaster] = useState(false);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setShowToaster(true), 0);
+    return () => window.clearTimeout(t);
+  }, []);
+
   useEffect(() => {
     const scheduleAnalytics = () => {
       initializeAnalytics();
@@ -172,7 +181,11 @@ function App() {
           <LanguageProvider>
             <AppErrorBoundary>
               <ScrollToTop />
-              <Toaster />
+              {showToaster && (
+                <Suspense fallback={null}>
+                  <Toaster />
+                </Suspense>
+              )}
               <Router />
             </AppErrorBoundary>
           </LanguageProvider>

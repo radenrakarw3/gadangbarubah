@@ -27,7 +27,13 @@ export default function WelcomePage() {
   const [showCampaign, setShowCampaign] = useState(false);
 
   useEffect(() => {
-    warmHomePage();
+    const run = () => warmHomePage();
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(run, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = window.setTimeout(run, 300);
+    return () => window.clearTimeout(t);
   }, []);
 
   const tryShowCampaign = useCallback(() => {

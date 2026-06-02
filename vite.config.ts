@@ -17,12 +17,12 @@ function injectCriticalPreload(): Plugin {
         for (const [fileName, item] of Object.entries(bundle)) {
           if (item.type === "chunk") {
             const href = `/${fileName.replace(/\\/g, "/")}`;
-            if (fileName.includes("vendor-react")) {
-              tags.push(
-                `<link rel="modulepreload" crossorigin href="${href}">`,
-              );
-            }
-            if (/assets\/index-[^/]+\.js$/.test(fileName.replace(/\\/g, "/"))) {
+            if (
+              fileName.includes("vendor-react") ||
+              fileName.includes("vendor-misc") ||
+              fileName.includes("vendor-router") ||
+              /assets\/index-[^/]+\.js$/.test(fileName.replace(/\\/g, "/"))
+            ) {
               tags.push(
                 `<link rel="modulepreload" crossorigin href="${href}">`,
               );
@@ -69,10 +69,13 @@ export default defineConfig({
           if (!id.includes("node_modules")) return;
           if (id.includes("react-dom") || /\/react\//.test(id)) return "vendor-react";
           if (id.includes("@tanstack/react-query")) return "vendor-query";
+          if (id.includes("wouter")) return "vendor-router";
+          if (id.includes("react-helmet-async")) return "vendor-helmet";
           if (
             id.includes("recharts") ||
             id.includes("framer-motion") ||
-            id.includes("@radix-ui")
+            id.includes("@radix-ui") ||
+            id.includes("lucide-react")
           ) {
             return "vendor-ui";
           }
