@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import SEOHead from "./SEOHead";
 import SiteNav from "./SiteNav";
 import SiteFooter from "./SiteFooter";
@@ -13,30 +13,46 @@ import SectionSeam from "./home/SectionSeam";
 import CampaignPopup from "./CampaignPopup";
 import {
   bootHomePage,
-  hasSeenHomeSplash,
   injectHeroPreload,
-  markHomeSplashDone,
   preloadDeferredHomeImages,
   type HomeBootPhase,
 } from "@/lib/homePreload";
 
-const SPLASH_MAX_MS = 2400;
+const SPLASH_MAX_MS = 2000;
 
 export default function WelcomePage() {
-  const skipSplash = hasSeenHomeSplash();
-  const [revealed, setRevealed] = useState(skipSplash);
-  const [showLoader, setShowLoader] = useState(!skipSplash);
+  const [showSplash, setShowSplash] = useState(true);
   const [exiting, setExiting] = useState(false);
-  const [progress, setProgress] = useState(skipSplash ? 100 : 0);
-  const [phase, setPhase] = useState<HomeBootPhase>(skipSplash ? "ready" : "assets");
-  const revealStartedRef = useRef(skipSplash);
+  const [progress, setProgress] = useState(0);
+  const [phase, setPhase] = useState<HomeBootPhase>("assets");
 
   useEffect(() => {
     injectHeroPreload();
+    preloadDeferredHomeImages();
+
+    let done = false;
+
+    const hideSplash = () => {
+      if (done) return;
+      done = true;
+      setExiting(true);
+      window.setTimeout(() => setShowSplash(false), 200);
+    };
+
+    const capTimer = window.setTimeout(hideSplash, SPLASH_MAX_MS);
+
+    void bootHomePage((pct, bootPhase) => {
+      setProgress(pct);
+      if (bootPhase) setPhase(bootPhase);
+    }).finally(hideSplash);
+
+    return () => {
+      window.clearTimeout(capTimer);
+    };
   }, []);
 
   useEffect(() => {
-    if (!showLoader) {
+    if (!showSplash) {
       document.body.style.overflow = "";
       return;
     }
@@ -44,67 +60,18 @@ export default function WelcomePage() {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [showLoader]);
-
-  useEffect(() => {
-    if (skipSplash) {
-      preloadDeferredHomeImages();
-      return;
-    }
-
-    let cancelled = false;
-    let didReveal = false;
-    let maxWaitTimer: number | undefined;
-    let fadeTimer: number | undefined;
-
-    const revealNow = () => {
-      if (cancelled || revealStartedRef.current) return;
-      revealStartedRef.current = true;
-      didReveal = true;
-      markHomeSplashDone();
-      preloadDeferredHomeImages();
-      setProgress(100);
-      setPhase("ready");
-      setExiting(true);
-      fadeTimer = window.setTimeout(() => {
-        if (cancelled) return;
-        setShowLoader(false);
-        setRevealed(true);
-      }, 180);
-    };
-
-    maxWaitTimer = window.setTimeout(revealNow, SPLASH_MAX_MS);
-
-    void bootHomePage((pct, bootPhase) => {
-      if (cancelled || revealStartedRef.current) return;
-      setProgress(pct);
-      if (bootPhase) setPhase(bootPhase);
-    }).finally(() => {
-      if (!cancelled) revealNow();
-    });
-
-    return () => {
-      cancelled = true;
-      if (maxWaitTimer !== undefined) window.clearTimeout(maxWaitTimer);
-      if (fadeTimer !== undefined) window.clearTimeout(fadeTimer);
-      if (!didReveal) revealStartedRef.current = false;
-    };
-  }, [skipSplash]);
+  }, [showSplash]);
 
   return (
     <>
       <SEOHead pageKey="home" />
 
-      {showLoader && (
+      {showSplash && (
         <HomePageLoader progress={progress} phase={phase} exiting={exiting} />
       )}
 
-      <div
-        className={`home-page-root min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] overflow-x-hidden bg-[#300505] ${
-          revealed ? "home-page-enter" : "opacity-0 pointer-events-none select-none"
-        }`}
-        aria-hidden={!revealed}
-      >
+      {/* Konten selalu di DOM & terlihat — splash hanya overlay */}
+      <div className="home-page-root min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] overflow-x-hidden bg-[#300505]">
         <div className="relative">
           <SiteNav variant="transparent" />
           <main className="home-scroll-content">
@@ -124,7 +91,7 @@ export default function WelcomePage() {
         <SectionSeam variant="contact-to-footer" />
         <SiteFooter />
 
-        {revealed && <CampaignPopup />}
+        {!showSplash && <CampaignPopup />}
       </div>
     </>
   );

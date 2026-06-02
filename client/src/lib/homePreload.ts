@@ -39,24 +39,6 @@ const BOOT_HARD_CAP_MS = 1800;
 const IMAGE_TIMEOUT_MS = 1600;
 const FONT_TIMEOUT_MS = 800;
 
-const SESSION_READY_KEY = "gb_home_splash_done";
-
-export function hasSeenHomeSplash(): boolean {
-  try {
-    return sessionStorage.getItem(SESSION_READY_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-export function markHomeSplashDone(): void {
-  try {
-    sessionStorage.setItem(SESSION_READY_KEY, "1");
-  } catch {
-    /* ignore */
-  }
-}
-
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -113,11 +95,10 @@ export function preloadDeferredHomeImages(): void {
 export function injectHeroPreload(): void {
   if (typeof document === "undefined") return;
   for (const href of HERO_IMAGE_URLS) {
-    const existing = document.querySelector(
-      `link[rel="preload"][as="image"][href="${href}"]`,
-    );
-    if (existing) continue;
+    const id = `preload-hero-${href.slice(-24)}`;
+    if (document.getElementById(id)) continue;
     const link = document.createElement("link");
+    link.id = id;
     link.rel = "preload";
     link.as = "image";
     link.href = href;
