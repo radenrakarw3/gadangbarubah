@@ -5,37 +5,49 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
 import { initializeAnalytics, trackPageView } from "@/lib/analytics";
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState, type ComponentType } from "react";
 import WelcomePage from "@/components/WelcomePage";
-import UniPage from "@/components/UniPage";
-import OutletPage from "@/components/services/OutletPage";
-import DeliveryPage from "@/components/services/DeliveryPage";
-import PartnershipPage from "@/components/services/PartnershipPage";
-import CateringPage from "@/components/services/CateringPage";
-import AdminDashboard from "@/pages/AdminDashboard";
-import AdminCampaigns from "@/pages/AdminCampaigns";
-import AdminUsers from "@/pages/AdminUsers";
-import AdminReservations from "@/pages/AdminReservations";
-import LoginAdmin from "@/components/LoginAdmin";
+import RouteFallback from "@/components/RouteFallback";
 import ScrollToTop from "@/components/ScrollToTop";
-import NotFound from "@/pages/not-found";
-import AboutPage from "@/pages/AboutPage";
-import MenuPage from "@/pages/MenuPage";
-import WhatsOnPage from "@/pages/WhatsOnPage";
-import ArticleDetailPage from "@/pages/ArticleDetailPage";
-import FaqPage from "@/pages/FaqPage";
-import TermsPage from "@/pages/TermsPage";
-import PrivacyPage from "@/pages/PrivacyPage";
-import ReservationPage from "@/pages/ReservationPage";
+import LoginAdmin from "@/components/LoginAdmin";
 import { LanguageProvider } from "@/lib/language";
 
+const AboutPage = lazy(() => import("@/pages/AboutPage"));
+const MenuPage = lazy(() => import("@/pages/MenuPage"));
+const WhatsOnPage = lazy(() => import("@/pages/WhatsOnPage"));
+const ArticleDetailPage = lazy(() => import("@/pages/ArticleDetailPage"));
+const FaqPage = lazy(() => import("@/pages/FaqPage"));
+const TermsPage = lazy(() => import("@/pages/TermsPage"));
+const PrivacyPage = lazy(() => import("@/pages/PrivacyPage"));
+const ReservationPage = lazy(() => import("@/pages/ReservationPage"));
+const UniPage = lazy(() => import("@/components/UniPage"));
+const OutletPage = lazy(() => import("@/components/services/OutletPage"));
+const DeliveryPage = lazy(() => import("@/components/services/DeliveryPage"));
+const PartnershipPage = lazy(() => import("@/components/services/PartnershipPage"));
+const CateringPage = lazy(() => import("@/components/services/CateringPage"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const AdminCampaigns = lazy(() => import("@/pages/AdminCampaigns"));
+const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
+const AdminReservations = lazy(() => import("@/pages/AdminReservations"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+
 type AdminRole = "admin_main" | "admin_cikarang" | "admin_bintaro";
+
+function withSuspense(Component: ComponentType) {
+  return function SuspendedRoute() {
+    return (
+      <Suspense fallback={<RouteFallback />}>
+        <Component />
+      </Suspense>
+    );
+  };
+}
 
 function ProtectedAdminRoute({
   component: Component,
   allowedRoles,
 }: {
-  component: React.ComponentType;
+  component: ComponentType;
   allowedRoles?: AdminRole[];
 }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -68,22 +80,30 @@ function ProtectedAdminRoute({
 
   const handleLogin = () => setRecheckTrigger((prev) => prev + 1);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <RouteFallback />;
   if (!isAuthenticated) return <LoginAdmin onLogin={handleLogin} />;
-  return <Component />;
+  return (
+    <Suspense fallback={<RouteFallback />}>
+      <Component />
+    </Suspense>
+  );
 }
 
-function AdminRoute({ component: Component }: { component: React.ComponentType }) {
+function AdminRoute({ component: Component }: { component: ComponentType }) {
   return <ProtectedAdminRoute component={Component} />;
 }
 
-function MainAdminRoute({ component: Component }: { component: React.ComponentType }) {
+function MainAdminRoute({ component: Component }: { component: ComponentType }) {
   return <ProtectedAdminRoute component={Component} allowedRoles={["admin_main"]} />;
 }
 
 function ArticleRoute() {
   const [, params] = useRoute("/whats-on/:id");
-  return <ArticleDetailPage articleId={params?.id ?? ""} />;
+  return (
+    <Suspense fallback={<RouteFallback />}>
+      <ArticleDetailPage articleId={params?.id ?? ""} />
+    </Suspense>
+  );
 }
 
 function Router() {
@@ -96,21 +116,24 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={WelcomePage} />
-      <Route path="/about" component={AboutPage} />
-      <Route path="/menu" component={MenuPage} />
-      <Route path="/catering" component={CateringPage} />
-      <Route path="/reservasi" component={ReservationPage} />
-      <Route path="/whats-on" component={WhatsOnPage} />
+      <Route path="/about" component={withSuspense(AboutPage)} />
+      <Route path="/menu" component={withSuspense(MenuPage)} />
+      <Route path="/catering" component={withSuspense(CateringPage)} />
+      <Route path="/reservasi" component={withSuspense(ReservationPage)} />
+      <Route path="/whats-on" component={withSuspense(WhatsOnPage)} />
       <Route path="/whats-on/:id" component={ArticleRoute} />
-      <Route path="/faq" component={FaqPage} />
-      <Route path="/terms" component={TermsPage} />
-      <Route path="/privacy" component={PrivacyPage} />
-      <Route path="/uni" component={UniPage} />
-      <Route path="/services/outlet" component={OutletPage} />
-      <Route path="/services/delivery" component={DeliveryPage} />
-      <Route path="/services/partnership" component={PartnershipPage} />
-      <Route path="/services/catering" component={CateringPage} />
-      <Route path="/admin" component={() => <AdminRoute component={AdminDashboard} />} />
+      <Route path="/faq" component={withSuspense(FaqPage)} />
+      <Route path="/terms" component={withSuspense(TermsPage)} />
+      <Route path="/privacy" component={withSuspense(PrivacyPage)} />
+      <Route path="/uni" component={withSuspense(UniPage)} />
+      <Route path="/services/outlet" component={withSuspense(OutletPage)} />
+      <Route path="/services/delivery" component={withSuspense(DeliveryPage)} />
+      <Route path="/services/partnership" component={withSuspense(PartnershipPage)} />
+      <Route path="/services/catering" component={withSuspense(CateringPage)} />
+      <Route
+        path="/admin"
+        component={() => <AdminRoute component={AdminDashboard} />}
+      />
       <Route
         path="/admin/reservations"
         component={() => <AdminRoute component={AdminReservations} />}
@@ -119,8 +142,11 @@ function Router() {
         path="/admin/campaigns"
         component={() => <MainAdminRoute component={AdminCampaigns} />}
       />
-      <Route path="/admin/users" component={() => <MainAdminRoute component={AdminUsers} />} />
-      <Route component={NotFound} />
+      <Route
+        path="/admin/users"
+        component={() => <MainAdminRoute component={AdminUsers} />}
+      />
+      <Route component={withSuspense(NotFound)} />
     </Switch>
   );
 }

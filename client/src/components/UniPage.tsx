@@ -1,12 +1,10 @@
 import { useLocation } from 'wouter';
-import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { trackContactMethod, trackServiceView } from '@/lib/analytics';
 import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft, ShoppingBag } from 'lucide-react';
 import Logo from './Logo';
 import SEOHead from './SEOHead';
-import Mascot from './Mascot';
 import { BacklinksFooter } from './BacklinksFooter';
 import { StructuredData } from './StructuredData';
 import { useSiteLanguage } from '@/lib/language';
@@ -124,25 +122,20 @@ export default function UniPage() {
             
           </div>
           
-          {/* Mascot Section with Background */}
-          <div 
-            className="relative rounded-2xl overflow-hidden bg-cover bg-center shadow-2xl mb-16"
+          <div
+            className="relative mb-16 overflow-hidden rounded-2xl bg-cover bg-center shadow-2xl"
             style={{ backgroundImage: `url(${restaurantBgImage})` }}
           >
-            <div className="absolute inset-0 bg-black/40"></div>
-            <div className="relative z-10 p-8 sm:p-12 text-center">
-              <div className="max-w-2xl mx-auto">
-                <Mascot 
-                  isAnimating={false}
-                  message={
-                    lang === 'ID'
-                      ? 'Selamat datang di Gadang Barubah - rumah makan Padang Indonesia! Saya Uni, siap membantu Anda menemukan pengalaman kuliner nasi padang dan masakan Minang yang tak tertandingi.'
-                      : 'Welcome to Gadang Barubah - an Indonesian Padang restaurant! I am Uni, ready to help you discover an exceptional Minang culinary experience.'
-                  }
-                />
-              </div>
+            <div className="absolute inset-0 bg-black/40" />
+            <div className="relative z-10 p-8 text-center sm:p-12">
+              <p className="mx-auto max-w-2xl text-base leading-relaxed text-white/95 sm:text-lg">
+                {lang === 'ID'
+                  ? 'Selamat datang di Gadang Barubah — rumah makan Padang autentik. Jelajahi layanan kami di bawah untuk reservasi, delivery, catering, dan lainnya.'
+                  : 'Welcome to Gadang Barubah — an authentic Padang restaurant. Explore our services below for reservations, delivery, catering, and more.'}
+              </p>
             </div>
           </div>
+
           
           {/* Services Grid */}
           <div className="mb-16">
