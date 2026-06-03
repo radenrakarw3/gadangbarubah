@@ -13,6 +13,7 @@ import { CATERING_TYPES, COMPANY } from "@/lib/siteContent";
 import cateringImage from "@assets/DSC07153_1758564588952.jpg";
 import { useSiteLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
+import PrivacyConsentField from "@/components/PrivacyConsentField";
 
 const CATERING_FIELD =
   "h-11 sm:h-[52px] lg:h-14 w-full rounded-lg border border-[#3F0000]/14 bg-white px-3.5 sm:px-4 font-[var(--font-form)] text-[15px] sm:text-base text-[#1a0a0a] shadow-[0_2px_10px_-4px_rgba(63,0,0,0.14)] " +
@@ -58,6 +59,9 @@ function CateringForm({
   copy,
   loading,
   onSubmit,
+  privacyAccepted,
+  onPrivacyChange,
+  lang,
   className,
 }: {
   form: { nama: string; telepon: string; email: string; tipe: string; pax: string };
@@ -65,6 +69,9 @@ function CateringForm({
   copy: Record<string, string>;
   loading: boolean;
   onSubmit: (e: React.FormEvent) => void;
+  privacyAccepted: boolean;
+  onPrivacyChange: (v: boolean) => void;
+  lang: "ID" | "EN";
   className?: string;
 }) {
   return (
@@ -148,7 +155,15 @@ function CateringForm({
           </CateringField>
         </div>
 
-        <div className="mt-5 flex flex-col items-stretch gap-2.5 border-t border-[#3F0000]/8 pt-4 sm:mt-6 sm:gap-3 sm:pt-5 min-[480px]:flex-row min-[480px]:items-center min-[480px]:justify-between lg:mt-8 lg:pt-6">
+        <PrivacyConsentField
+          checked={privacyAccepted}
+          onCheckedChange={onPrivacyChange}
+          lang={lang}
+          id="catering-privacy-consent"
+          className="mt-4"
+        />
+
+        <div className="mt-5 flex flex-col items-stretch gap-2.5 border-t border-[#3F0000]/8 pt-4 sm:mt-6 sm:gap-3 sm:pt-5 min-[480px]:flex-row min-[480px]:items-end min-[480px]:justify-between lg:mt-6 lg:pt-6">
           <p className="font-[var(--font-form)] text-xs sm:text-sm italic text-[#6b4f4f]/85 min-[480px]:max-w-[240px]">
             {copy.hint}
           </p>
@@ -183,6 +198,7 @@ export default function CateringInquirySection() {
     tipe: CATERING_TYPES[0].value as string,
     pax: "50",
   });
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const copy = {
     eyebrow: lang === "ID" ? "Konsultasi Katering" : "Catering Inquiry",
@@ -210,6 +226,18 @@ export default function CateringInquirySection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!privacyAccepted) {
+      toast({
+        title: lang === "ID" ? "Persetujuan diperlukan" : "Consent required",
+        description:
+          lang === "ID"
+            ? "Centang Syarat & Ketentuan serta Kebijakan Privasi."
+            : "Please accept the Terms and Privacy Policy.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!form.nama.trim() || form.telepon.length < 10) {
       toast({
         title: lang === "ID" ? "Data belum lengkap" : "Incomplete data",
@@ -249,6 +277,9 @@ export default function CateringInquirySection() {
             copy={copy}
             loading={loading}
             onSubmit={handleSubmit}
+            privacyAccepted={privacyAccepted}
+            onPrivacyChange={setPrivacyAccepted}
+            lang={lang}
           />
         </div>
         <div className="relative h-[300px] sm:h-[400px] overflow-hidden">
@@ -272,15 +303,18 @@ export default function CateringInquirySection() {
             copy={copy}
             loading={loading}
             onSubmit={handleSubmit}
+            privacyAccepted={privacyAccepted}
+            onPrivacyChange={setPrivacyAccepted}
+            lang={lang}
             className="w-full max-w-[651px]"
           />
         </div>
 
-        <div className="relative h-full min-h-[900px] overflow-hidden bg-neutral-100">
+        <div className="relative min-h-[560px] overflow-hidden bg-neutral-100">
           <img
             src={cateringImage}
             alt="Layanan catering Gadang Barubah"
-            className="absolute right-0 top-[-219px] h-[1199px] w-[800px] max-w-none object-cover object-center"
+            className="absolute inset-0 h-full w-full object-cover object-center"
             loading="lazy"
             decoding="async"
             draggable={false}

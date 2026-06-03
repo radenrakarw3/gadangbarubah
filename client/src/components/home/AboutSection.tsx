@@ -31,11 +31,10 @@ function AboutSection() {
   return (
     <section
       id="about-section"
-      className="relative bg-[#f5ebe6] scroll-mt-20 sm:scroll-mt-24 overflow-hidden"
+      className="relative bg-[#f5ebe6] scroll-mt-20 sm:scroll-mt-24 overflow-hidden pt-4 sm:pt-6 xl:pt-12"
     >
-      {/* Mobile / tablet: stack */}
       <div className="xl:hidden">
-        <div className="relative h-[32vh] min-h-[200px] max-h-[280px] overflow-hidden sm:h-[42vh] sm:max-h-none sm:min-h-[280px]">
+        <div className="relative h-[28vh] min-h-[180px] max-h-[240px] overflow-hidden sm:h-[36vh] sm:max-h-[320px] sm:min-h-[240px]">
           <img
             src={aboutImage}
             alt="Interior Gadang Barubah"
@@ -46,7 +45,7 @@ function AboutSection() {
           />
           <div className="absolute inset-0 bg-black/[0.13]" aria-hidden />
         </div>
-        <div className="px-4 py-8 sm:px-8 sm:py-12">
+        <div className="px-4 py-10 sm:px-8 sm:py-14">
           <h2 className="mb-4 max-w-[92vw] sm:mb-6">
             <AboutTitleGraphic />
           </h2>
@@ -65,8 +64,8 @@ function AboutSection() {
       </div>
 
       {/* Desktop: layout absolut sesuai Figma (800px foto + panel kanan 900px) */}
-      <div className="hidden xl:grid xl:grid-cols-[minmax(0,800px)_1fr] relative min-h-[min(900px,90svh)] max-w-[1920px] mx-auto">
-        <div className="relative min-h-[640px] overflow-hidden">
+      <div className="relative mx-auto hidden min-h-[min(820px,88svh)] max-w-[1920px] xl:grid xl:grid-cols-[minmax(0,680px)_1fr]">
+        <div className="relative min-h-[560px] overflow-hidden">
           <img
             src={aboutImage}
             alt="Interior Gadang Barubah"
@@ -78,8 +77,8 @@ function AboutSection() {
           <div className="absolute inset-0 bg-black/[0.13] pointer-events-none" aria-hidden />
         </div>
 
-        <div className="relative flex min-h-[640px] flex-col justify-center px-8 py-12 2xl:px-16">
-          <h2 className="mb-6 w-full max-w-[564px]">
+        <div className="relative flex min-h-[560px] flex-col justify-center px-8 py-16 2xl:px-16 2xl:py-20">
+          <h2 className="mb-8 w-full max-w-[564px]">
             <AboutTitleGraphic />
           </h2>
 
@@ -90,7 +89,7 @@ function AboutSection() {
           <button
             type="button"
             onClick={() => navigate("/about")}
-            className="mt-8 inline-flex h-[52px] w-full max-w-[215px] items-center justify-between rounded-lg bg-[#3F0000] px-6 font-heroCta text-base font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors 2xl:h-[60px] 2xl:text-[18px]"
+            className="mt-10 ml-auto inline-flex h-[52px] w-full max-w-[215px] items-center justify-between rounded-lg bg-[#3F0000] px-6 font-heroCta text-base font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors 2xl:h-[60px] 2xl:text-[18px]"
           >
             <span>{storyLabel}</span>
             <span className="w-[25px] border-t-2 border-white shrink-0" aria-hidden />

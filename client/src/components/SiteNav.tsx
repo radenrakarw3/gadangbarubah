@@ -3,6 +3,9 @@ import { Link } from "wouter";
 import { X } from "lucide-react";
 import logoImage from "@assets/padang gadang barubah logo_1758561601552.webp";
 import { MAIN_NAV } from "@/lib/siteContent";
+
+/** Logo header: icon saja (tanpa wordmark), sesuai revisi Figma */
+const NAV_LOGO_ICON = "/favicon.webp";
 import { useSiteLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
 
@@ -195,8 +198,20 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
   const navText = cn(
     "text-figma-nav uppercase transition-opacity hover:opacity-85",
     isTransparent
-      ? "text-white [text-shadow:0_0_4.3px_rgba(0,0,0,0.79)]"
+      ? "text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.85)]"
       : "text-foreground/90 hover:text-[#3F0000]",
+  );
+
+  const navLogo = (className?: string) => (
+    <img
+      src={NAV_LOGO_ICON}
+      alt="Gadang Barubah"
+      className={cn("object-contain drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)]", className)}
+      width={48}
+      height={48}
+      loading="eager"
+      decoding="async"
+    />
   );
 
   const langBtn = (code: "ID" | "EN", mobileDark = false) => {
@@ -277,51 +292,13 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
                 "fixed top-0 left-0 right-0",
                 scrolled
                   ? "border-b border-white/10 bg-[#1a0505]/92 shadow-[0_4px_24px_rgba(0,0,0,0.28)] backdrop-blur-md supports-[backdrop-filter]:bg-[#1a0505]/85"
-                  : "border-b border-white/10 bg-[#140404]/80 backdrop-blur-md supports-[backdrop-filter]:bg-[#140404]/72 max-lg:bg-[#140404]/88",
+                  : "border-b border-transparent bg-transparent shadow-none backdrop-blur-none",
               )
             : "sticky top-0 border-b border-border/40 bg-ivory/[0.98] shadow-sm",
         )}
       >
-        <div className="relative hidden min-[1920px]:block h-[100px] max-w-[1920px] mx-auto">
-          {FIGMA_LEFT_NAV.map((item, i) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(navText, "absolute top-[45px]")}
-              style={{ left: i === 0 ? 125 : 293 }}
-            >
-              {lang === "ID" ? item.labelID : item.labelEN}
-            </Link>
-          ))}
-
-          <div className="absolute left-[457px] top-[49px]">{menuTrigger()}</div>
-
-          <Link
-            href="/"
-            className="absolute left-1/2 top-[30px] -translate-x-1/2 w-[63px] hover:opacity-90 transition-opacity"
-          >
-            <img
-              src={logoImage}
-              alt="Gadang Barubah"
-              className="w-[63px] h-auto object-contain"
-              width={63}
-              loading="eager"
-            />
-          </Link>
-
-          <a href="#contact-section" className={cn(navText, "absolute top-[45px] left-[1439px]")}>
-            {lang === "ID" ? "KONTAK" : "CONTACT"}
-          </a>
-
-          <Link href="/reservasi" className={cn(navText, "absolute top-[45px] right-[255px]")}>
-            {lang === "ID" ? "RESERVASI" : "RESERVE"}
-          </Link>
-
-          <div className="absolute right-[125px] top-[40px]">{langToggle()}</div>
-        </div>
-
-        <div className="hidden lg:flex min-[1920px]:hidden h-[100px] max-w-[1920px] mx-auto items-center justify-between px-8 xl:px-16 gap-4">
-          <div className="flex items-center gap-6 xl:gap-10">
+        <div className="relative mx-auto hidden h-[84px] max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 lg:grid xl:px-16">
+          <div className="flex items-center justify-self-start gap-5 xl:gap-8">
             {FIGMA_LEFT_NAV.map((item) => (
               <Link key={item.href} href={item.href} className={navText}>
                 {lang === "ID" ? item.labelID : item.labelEN}
@@ -330,17 +307,15 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
             {menuTrigger()}
           </div>
 
-          <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
-            <img
-              src={logoImage}
-              alt="Gadang Barubah"
-              className="w-[63px] h-auto object-contain"
-              width={63}
-              loading="eager"
-            />
+          <Link
+            href="/"
+            className="justify-self-center hover:opacity-90 transition-opacity"
+            aria-label="Gadang Barubah"
+          >
+            {navLogo("h-11 w-11 xl:h-12 xl:w-12")}
           </Link>
 
-          <div className="flex items-center gap-5 xl:gap-8">
+          <div className="flex items-center justify-self-end gap-5 xl:gap-8">
             <a href="#contact-section" className={navText}>
               {lang === "ID" ? "KONTAK" : "CONTACT"}
             </a>
@@ -354,14 +329,8 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
         <div className="safe-top lg:hidden">
           <div className="grid h-12 grid-cols-[2.25rem_1fr_auto] items-center gap-2 px-4">
             {menuTrigger(undefined, true)}
-            <Link href="/" className="justify-self-center hover:opacity-90">
-              <img
-                src={logoImage}
-                alt="Gadang Barubah"
-                className="mx-auto h-8 w-auto max-w-[52px] object-contain drop-shadow-md"
-                width={63}
-                loading="eager"
-              />
+            <Link href="/" className="justify-self-center hover:opacity-90" aria-label="Gadang Barubah">
+              {navLogo("mx-auto h-9 w-9")}
             </Link>
             <div className="flex items-center justify-end gap-1.5">
               <Link

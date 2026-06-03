@@ -29,6 +29,7 @@ const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 const AdminCampaigns = lazy(() => import("@/pages/AdminCampaigns"));
 const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
 const AdminReservations = lazy(() => import("@/pages/AdminReservations"));
+const AdminEmails = lazy(() => import("@/pages/AdminEmails"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 type AdminRole = "admin_main" | "admin_cikarang" | "admin_bintaro";
@@ -145,6 +146,10 @@ function Router() {
       <Route
         path="/admin/users"
         component={() => <MainAdminRoute component={AdminUsers} />}
+      />
+      <Route
+        path="/admin/emails"
+        component={() => <MainAdminRoute component={AdminEmails} />}
       />
       <Route component={withSuspense(NotFound)} />
     </Switch>

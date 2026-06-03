@@ -10,6 +10,7 @@ import {
   Loader2,
   Utensils,
   ArrowRight,
+  Mail,
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import AdminShell from "@/components/admin/AdminShell";
@@ -87,6 +88,14 @@ export default function AdminDashboard() {
       icon: UserCog,
       route: "/admin/users",
       color: "bg-slate-600",
+    },
+    {
+      id: "emails",
+      title: "Portal Email",
+      description: "Buka email resmi Gadang Barubah",
+      icon: Mail,
+      route: "/admin/emails",
+      color: "bg-amber-700",
     },
   ].filter(() => adminRole === "admin_main");
 

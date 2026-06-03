@@ -14,10 +14,11 @@ import { apiRequest, parseApiError } from "@/lib/queryClient";
 import { OUTLETS, RESERVATION_TIME_SLOTS, todayISO } from "@/lib/siteContent";
 import { cn } from "@/lib/utils";
 import { useSiteLanguage } from "@/lib/language";
+import PrivacyConsentField from "@/components/PrivacyConsentField";
 
-/** Field glass — mobile 40px, desktop Figma 60px */
+/** Field glass — lebih tipis sesuai revisi Figma */
 const FIGMA_CONTROL =
-  "h-10 sm:h-11 md:h-[52px] xl:h-[60px] w-full min-w-0 rounded-lg border-0 bg-[rgba(82,82,82,0.39)] font-[var(--font-form)] text-sm sm:text-[15px] font-normal italic tracking-[0.03em] text-[#D2D2D2] shadow-none " +
+  "h-9 sm:h-10 xl:h-11 w-full min-w-0 rounded-lg border-0 bg-[rgba(82,82,82,0.39)] font-[var(--font-form)] text-sm font-normal italic tracking-[0.03em] text-[#D2D2D2] shadow-none " +
   "placeholder:text-[#D2D2D2]/90 placeholder:italic placeholder:text-sm sm:placeholder:text-[15px] focus-visible:ring-1 focus-visible:ring-white/30 focus-visible:ring-offset-0 [color-scheme:dark] " +
   "px-3 sm:px-3.5 xl:px-3";
 
@@ -29,7 +30,7 @@ const FIGMA_SELECT_TRIGGER = cn(
 );
 
 const FIGMA_DATE_SHELL =
-  "relative h-10 sm:h-11 md:h-[52px] xl:h-[60px] w-full min-w-0 overflow-hidden rounded-lg border-0 bg-[rgba(82,82,82,0.39)] transition-[box-shadow,background-color] duration-200";
+  "relative h-9 sm:h-10 xl:h-11 w-full min-w-0 overflow-hidden rounded-lg border-0 bg-[rgba(82,82,82,0.39)] transition-[box-shadow,background-color] duration-200";
 
 const FIGMA_DATE_SHELL_TODAY =
   "bg-[rgba(82,82,82,0.48)] ring-1 ring-white/20";
@@ -159,6 +160,7 @@ function QuickReservationBarInner() {
   const [waktu, setWaktu] = useState("18:00");
   const [outlet, setOutlet] = useState(OUTLETS[0].id as string);
   const [pax, setPax] = useState("2");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const formKey = useRef(0);
   const minDate = useMemo(() => todayISO(), []);
 
@@ -202,6 +204,7 @@ function QuickReservationBarInner() {
     setWaktu("18:00");
     setOutlet(OUTLETS[0].id as string);
     setPax("2");
+    setPrivacyAccepted(false);
     setMobileOpen(false);
   };
 
@@ -219,6 +222,18 @@ function QuickReservationBarInner() {
           lang === "ID"
             ? "Isi nama dan nomor telepon minimal 10 digit."
             : "Please provide name and at least 10-digit phone number.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!privacyAccepted) {
+      toast({
+        title: lang === "ID" ? "Persetujuan diperlukan" : "Consent required",
+        description:
+          lang === "ID"
+            ? "Centang Syarat & Ketentuan serta Kebijakan Privasi."
+            : "Please accept the Terms and Privacy Policy.",
         variant: "destructive",
       });
       return;
@@ -396,11 +411,20 @@ function QuickReservationBarInner() {
             />
           </div>
 
+          <PrivacyConsentField
+            checked={privacyAccepted}
+            onCheckedChange={setPrivacyAccepted}
+            lang={lang}
+            variant="dark"
+            id="hero-privacy-consent"
+            className="max-w-3xl mx-auto w-full"
+          />
+
           <div className="flex shrink-0 justify-center pt-1 lg:pt-2">
             <Button
               type="submit"
               disabled={loading}
-              className="h-10 w-full max-w-[290px] rounded-lg border-0 bg-[rgba(89,0,0,0.9)] px-4 font-heroCta text-sm font-bold italic tracking-[0.03em] text-[rgba(210,210,210,0.95)] shadow-none hover:bg-[rgba(89,0,0,1)] sm:h-11 sm:text-[15px] md:h-[52px] md:text-base xl:h-[60px] xl:text-lg"
+              className="h-9 w-full max-w-[290px] rounded-lg border-0 bg-[rgba(89,0,0,0.9)] px-4 font-heroCta text-sm font-bold italic tracking-[0.03em] text-[rgba(210,210,210,0.95)] shadow-none hover:bg-[rgba(89,0,0,1)] sm:h-10 xl:h-11"
             >
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : placeholders.reserve}
             </Button>

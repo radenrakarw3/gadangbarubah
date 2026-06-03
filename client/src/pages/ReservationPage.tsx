@@ -29,6 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, parseApiError } from "@/lib/queryClient";
 import { COMPANY, OUTLETS, RESERVATION_TIME_SLOTS, todayISO } from "@/lib/siteContent";
 import { useSiteLanguage } from "@/lib/language";
+import PrivacyConsentField from "@/components/PrivacyConsentField";
 
 const TIME_SLOTS = RESERVATION_TIME_SLOTS;
 
@@ -70,6 +71,8 @@ export default function ReservationPage() {
     },
   });
 
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+
   const mutation = useMutation({
     mutationFn: async (data: ReservationFormData) => {
       const emailTrimmed = data.email?.trim() ?? "";
@@ -104,6 +107,7 @@ export default function ReservationPage() {
           tipeMeja: "reguler",
           catatan: "",
         });
+        setPrivacyAccepted(false);
       } else {
         toast({
           title: "Gagal",
@@ -178,7 +182,20 @@ export default function ReservationPage() {
               <CardContent className="p-6 sm:p-8">
                 <Form {...form}>
                   <form
-                    onSubmit={form.handleSubmit((data) => mutation.mutate(data))}
+                    onSubmit={form.handleSubmit((data) => {
+                      if (!privacyAccepted) {
+                        toast({
+                          title: lang === "ID" ? "Persetujuan diperlukan" : "Consent required",
+                          description:
+                            lang === "ID"
+                              ? "Centang Syarat & Ketentuan serta Kebijakan Privasi."
+                              : "Please accept the Terms and Privacy Policy.",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      mutation.mutate(data);
+                    })}
                     className="space-y-5"
                   >
                     <FormField
@@ -334,6 +351,14 @@ export default function ReservationPage() {
                           <FormMessage />
                         </FormItem>
                       )}
+                    />
+
+                    <PrivacyConsentField
+                      checked={privacyAccepted}
+                      onCheckedChange={setPrivacyAccepted}
+                      lang={lang}
+                      id="reservation-privacy-consent"
+                      className="pt-2"
                     />
 
                     <Button type="submit" size="lg" className="w-full" disabled={mutation.isPending}>
