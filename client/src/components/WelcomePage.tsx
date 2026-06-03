@@ -9,14 +9,13 @@ const loadSignatureMenu = () => import("./home/SignatureMenuSection");
 const loadAbout = () => import("./home/AboutSection");
 const loadCateringService = () => import("./home/CateringServiceSection");
 const loadCateringInquiry = () => import("./home/CateringInquirySection");
-const loadContact = () => import("./home/ContactSection");
 
 export default function WelcomePage() {
   return (
     <>
       <SEOHead pageKey="home" />
 
-      <div className="home-page-root flex min-h-[100svh] flex-col supports-[height:100dvh]:min-h-[100dvh] overflow-x-hidden bg-[#300505]">
+      <div className="home-page-root home-desktop-compact flex min-h-[100svh] w-full max-w-full flex-col supports-[height:100dvh]:min-h-[100dvh] overflow-x-clip bg-[#300505]">
         <div className="flex flex-1 flex-col">
           <div className="relative">
             <SiteNav variant="transparent" />
@@ -36,10 +35,6 @@ export default function WelcomePage() {
               <SectionSeam variant="maroon-to-inquiry" />
 
               <LazyWhenVisible load={loadCateringInquiry} minHeight="640px" />
-
-              <SectionSeam variant="inquiry-to-contact" />
-
-              <LazyWhenVisible load={loadContact} minHeight="360px" />
             </main>
           </div>
         </div>

@@ -11,7 +11,7 @@ const SEAM_GRADIENTS = {
   "inquiry-to-contact":
     "linear-gradient(180deg, #FFFCF8 0%, #ead9cf 40%, #e0cfc5 70%, #f3efe8 100%)",
   "contact-to-footer":
-    "linear-gradient(180deg, #f3efe8 0%, #e8ddd6 45%, #efe8e3 75%, #f7f4f2 100%)",
+    "linear-gradient(180deg, #DBDBDB 0%, #e8ddd6 45%, #efe8e3 75%, #f7f4f2 100%)",
 } as const;
 
 export type SectionSeamVariant = keyof typeof SEAM_GRADIENTS;

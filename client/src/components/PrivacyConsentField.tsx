@@ -10,6 +10,8 @@ interface PrivacyConsentFieldProps {
   className?: string;
   /** Untuk form hero di atas foto gelap */
   variant?: "dark" | "light";
+  /** Ukuran lebih kecil untuk bar hero */
+  compact?: boolean;
 }
 
 export default function PrivacyConsentField({
@@ -19,17 +21,19 @@ export default function PrivacyConsentField({
   id = "privacy-consent",
   className,
   variant = "light",
+  compact = false,
 }: PrivacyConsentFieldProps) {
   const isDark = variant === "dark";
 
   return (
-    <div className={cn("flex items-start gap-2.5", className)}>
+    <div className={cn("flex", compact ? "items-center gap-2" : "items-start gap-2.5", className)}>
       <Checkbox
         id={id}
         checked={checked}
         onCheckedChange={(v) => onCheckedChange(v === true)}
         className={cn(
-          "mt-0.5 shrink-0 border-white/40 data-[state=checked]:bg-[rgba(89,0,0,0.95)] data-[state=checked]:border-[rgba(89,0,0,0.95)]",
+          "shrink-0 border-white/40 data-[state=checked]:bg-[rgba(89,0,0,0.95)] data-[state=checked]:border-[rgba(89,0,0,0.95)]",
+          compact ? "h-3.5 w-3.5" : "mt-0.5",
           !isDark && "border-[#3F0000]/30 data-[state=checked]:bg-[#3F0000] data-[state=checked]:border-[#3F0000]",
         )}
         aria-required
@@ -37,7 +41,8 @@ export default function PrivacyConsentField({
       <label
         htmlFor={id}
         className={cn(
-          "cursor-pointer font-[var(--font-form)] text-xs leading-snug sm:text-[13px]",
+          "cursor-pointer font-[var(--font-form)]",
+          compact ? "whitespace-nowrap text-[10px] leading-none sm:text-[11px]" : "text-xs leading-snug sm:text-[13px]",
           isDark ? "text-[#D2D2D2]/90" : "text-[#5c4040]/90",
         )}
       >

@@ -1,15 +1,17 @@
 import { memo } from "react";
-import { useLocation } from "wouter";
-import aboutImage from "@assets/DSC07220_1758565473982.jpg";
+import { ChevronRight } from "lucide-react";
+import { useLocation } from "wouter";import aboutImage from "@assets/DSC07220_1758565473982.jpg";
 import aboutTitle from "@assets/about-title-gadang-barubah.svg";
 import { useSiteLanguage } from "@/lib/language";
 
-function AboutTitleGraphic() {
+import { cn } from "@/lib/utils";
+
+function AboutTitleGraphic({ className }: { className?: string }) {
   return (
     <img
       src={aboutTitle}
       alt="Gadang Barubah"
-      className="h-auto w-full max-w-[564px]"
+      className={cn("h-auto w-full max-w-[564px]", className)}
       width={562}
       height={74}
       draggable={false}
@@ -26,12 +28,12 @@ const ABOUT_COPY = {
 function AboutSection() {
   const [, navigate] = useLocation();
   const { lang } = useSiteLanguage();
-  const storyLabel = lang === "ID" ? "Cerita Kami" : "Our Story";
+  const outletLabel = lang === "ID" ? "Outlet Kami" : "Our Outlet";
 
   return (
     <section
       id="about-section"
-      className="relative bg-[#f5ebe6] scroll-mt-20 sm:scroll-mt-24 overflow-hidden pt-4 sm:pt-6 xl:pt-12"
+      className="relative scroll-mt-20 overflow-hidden bg-white sm:scroll-mt-24"
     >
       <div className="xl:hidden">
         <div className="relative h-[28vh] min-h-[180px] max-h-[240px] overflow-hidden sm:h-[36vh] sm:max-h-[320px] sm:min-h-[240px]">
@@ -45,27 +47,27 @@ function AboutSection() {
           />
           <div className="absolute inset-0 bg-black/[0.13]" aria-hidden />
         </div>
-        <div className="px-4 py-10 sm:px-8 sm:py-14">
-          <h2 className="mb-4 max-w-[92vw] sm:mb-6">
-            <AboutTitleGraphic />
+        <div className="bg-[#f5ebe6] px-4 py-10 sm:px-8 sm:py-14">
+          <h2 className="mb-4 flex justify-center sm:mb-6">
+            <AboutTitleGraphic className="max-w-[min(92vw,420px)]" />
           </h2>
-          <p className="text-figma-body text-black">
+          <p className="text-figma-body text-justify text-black">
             {ABOUT_COPY[lang]}
           </p>
           <button
             type="button"
-            onClick={() => navigate("/about")}
-            className="mt-6 inline-flex h-11 w-full max-w-[215px] items-center justify-between rounded-lg bg-[#3F0000] px-5 font-heroCta text-base font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors sm:mt-8 sm:h-[60px] sm:text-lg"
+            onClick={() => navigate("/services/outlet")}
+            className="mt-8 inline-flex h-11 w-full max-w-[215px] items-center justify-between rounded-lg bg-[#3F0000] px-5 font-heroCta text-base font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors sm:mt-10 sm:h-[52px]"
           >
-            <span>{storyLabel}</span>
-            <span className="w-[25px] border-t-2 border-white" aria-hidden />
+            <span>{outletLabel}</span>
+            <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
           </button>
         </div>
       </div>
 
-      {/* Desktop: layout absolut sesuai Figma (800px foto + panel kanan 900px) */}
-      <div className="relative mx-auto hidden min-h-[min(820px,88svh)] max-w-[1920px] xl:grid xl:grid-cols-[minmax(0,680px)_1fr]">
-        <div className="relative min-h-[560px] overflow-hidden">
+      {/* Desktop — mengikuti mockup: foto kiri penuh, teks kanan centered + justify */}
+      <div className="relative mx-auto hidden max-w-[1920px] xl:grid xl:min-h-[min(720px,88svh)] xl:grid-cols-[minmax(0,46%)_minmax(0,54%)] xl:items-stretch">
+        <div className="relative min-h-[min(560px,72svh)] overflow-hidden xl:min-h-[min(640px,75svh)] 2xl:min-h-[min(720px,78svh)]">
           <img
             src={aboutImage}
             alt="Interior Gadang Barubah"
@@ -74,26 +76,27 @@ function AboutSection() {
             decoding="async"
             draggable={false}
           />
-          <div className="absolute inset-0 bg-black/[0.13] pointer-events-none" aria-hidden />
         </div>
 
-        <div className="relative flex min-h-[560px] flex-col justify-center px-8 py-16 2xl:px-16 2xl:py-20">
-          <h2 className="mb-8 w-full max-w-[564px]">
-            <AboutTitleGraphic />
-          </h2>
+        <div className="flex flex-col justify-start px-[clamp(2.5rem,6vw,96px)] pb-[clamp(3rem,6vh,5rem)] pt-[clamp(5.5rem,14vh,10rem)] 2xl:px-[clamp(3rem,7vw,112px)] 2xl:pt-[clamp(6.5rem,16vh,11rem)]">
+          <div className="mx-auto flex w-full max-w-[460px] flex-col 2xl:max-w-[500px]">
+            <h2 className="mb-[clamp(1.25rem,2.5vh,2rem)] flex justify-center">
+              <AboutTitleGraphic className="max-w-[min(100%,340px)] 2xl:max-w-[380px]" />
+            </h2>
 
-          <p className="text-figma-body max-w-[768px] text-black">
-            {ABOUT_COPY[lang]}
-          </p>
+            <p className="font-heroCta text-justify text-[12px] font-normal leading-[1.6] tracking-[0.015em] text-black 2xl:text-[13px] 2xl:leading-[1.65]">
+              {ABOUT_COPY[lang]}
+            </p>
 
-          <button
-            type="button"
-            onClick={() => navigate("/about")}
-            className="mt-10 ml-auto inline-flex h-[52px] w-full max-w-[215px] items-center justify-between rounded-lg bg-[#3F0000] px-6 font-heroCta text-base font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors 2xl:h-[60px] 2xl:text-[18px]"
-          >
-            <span>{storyLabel}</span>
-            <span className="w-[25px] border-t-2 border-white shrink-0" aria-hidden />
-          </button>
+            <button
+              type="button"
+              onClick={() => navigate("/services/outlet")}
+              className="mt-[clamp(1.75rem,3.5vh,2.5rem)] ml-auto inline-flex h-11 min-w-[170px] items-center justify-between gap-3 rounded-lg bg-[#3F0000] px-5 font-heroCta text-sm font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors 2xl:h-12 2xl:min-w-[190px] 2xl:px-6 2xl:text-[15px]"
+            >
+              <span>{outletLabel}</span>
+              <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+            </button>
+          </div>
         </div>
       </div>
     </section>

@@ -36,7 +36,7 @@ function HeroSectionInner() {
 
         {/* Mobile: headline + reservasi di tengah layar. Desktop: posisi Figma absolut */}
         <div className="relative z-10 flex min-h-[100dvh] flex-col items-center justify-center gap-5 px-4 pb-8 pt-[calc(3rem+env(safe-area-inset-top))] sm:gap-6 sm:px-6 lg:px-10 xl:absolute xl:inset-0 xl:block xl:min-h-0 xl:p-0">
-          <h1 className="w-full max-w-[min(92vw,340px)] shrink-0 sm:max-w-[420px] lg:max-w-[min(88vw,520px)] xl:pointer-events-none xl:absolute xl:left-1/2 xl:top-[335px] xl:max-w-[690px] xl:-translate-x-1/2">
+          <h1 className="w-full max-w-[min(92vw,340px)] shrink-0 sm:max-w-[420px] lg:max-w-[min(88vw,520px)] xl:pointer-events-none xl:absolute xl:left-1/2 xl:top-[clamp(11rem,32vh,335px)] xl:max-w-[min(690px,88vw)] xl:-translate-x-1/2">
             <img
               src={heroHeadline}
               alt={headlineAlt}
@@ -47,7 +47,7 @@ function HeroSectionInner() {
             />
           </h1>
 
-          <div className="w-full max-w-[min(100%,420px)] sm:max-w-[480px] lg:max-w-[min(100%,720px)] xl:absolute xl:inset-x-0 xl:bottom-[42px] xl:max-w-none xl:px-[clamp(2rem,6vw,115px)]">
+          <div className="w-full max-w-[min(100%,420px)] sm:max-w-[480px] lg:max-w-[min(100%,720px)] xl:absolute xl:inset-x-0 xl:bottom-[clamp(1.25rem,3.5vh,42px)] xl:max-w-none xl:px-[clamp(1.5rem,5vw,115px)]">
             <QuickReservationBar />
           </div>
         </div>

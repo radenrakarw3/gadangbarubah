@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "wouter";
 import { X } from "lucide-react";
-import logoImage from "@assets/padang gadang barubah logo_1758561601552.webp";
-import { MAIN_NAV } from "@/lib/siteContent";
+import navLogoIcon from "@assets/gadang-barubah-logo-icon.png";
+import { MAIN_NAV, COMPANY } from "@/lib/siteContent";
 
-/** Logo header: icon saja (tanpa wordmark), sesuai revisi Figma */
-const NAV_LOGO_ICON = "/favicon.webp";
 import { useSiteLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
 
@@ -25,13 +23,41 @@ const EXTRA_NAV = MAIN_NAV.filter(
   (n) => !FIGMA_LEFT_NAV.some((l) => l.href === n.href),
 );
 
+function whatsappContactHref(lang: "ID" | "EN") {
+  const text = encodeURIComponent(
+    lang === "ID" ? "Halo Gadang Barubah! Saya ingin bertanya." : "Hello Gadang Barubah! I have a question.",
+  );
+  return `https://wa.me/${COMPANY.whatsapp}?text=${text}`;
+}
+
 interface SiteNavProps {
   variant?: "default" | "transparent";
 }
 
+/** Shadow tipis agar nav tetap terbaca di hero gelap maupun section terang */
+const TRANSPARENT_NAV_TEXT_SHADOW =
+  "[text-shadow:0_1px_2px_rgba(0,0,0,0.92),0_0_12px_rgba(0,0,0,0.55)]";
+
+const TRANSPARENT_NAV_ICON_SHADOW =
+  "drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] drop-shadow-[0_0_10px_rgba(0,0,0,0.5)]";
+
+function NavLogoMark({ className }: { className?: string }) {
+  return (
+    <img
+      src={navLogoIcon}
+      alt=""
+      className={cn("shrink-0 object-contain", TRANSPARENT_NAV_ICON_SHADOW, className)}
+      width={48}
+      height={48}
+      loading="eager"
+      decoding="async"
+    />
+  );
+}
+
 function HamburgerIcon({ className }: { className?: string }) {
   return (
-    <span className={cn("flex flex-col justify-between w-5 h-2.5", className)} aria-hidden>
+    <span className={cn("flex h-2 w-4 flex-col justify-between", className)} aria-hidden>
       <span className="block h-px w-full bg-current" />
       <span className="block h-px w-full bg-current" />
       <span className="block h-px w-full bg-current" />
@@ -78,13 +104,8 @@ function NavFullscreenMenu({
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col safe-top safe-bottom">
         <div className="flex h-[72px] sm:h-[100px] shrink-0 items-center justify-between px-5 sm:px-8">
-          <Link href="/" onClick={onClose} className="hover:opacity-90 transition-opacity">
-            <img
-              src={logoImage}
-              alt="Gadang Barubah"
-              className="h-11 w-auto sm:h-14 object-contain drop-shadow-md"
-              width={63}
-            />
+          <Link href="/" onClick={onClose} className="hover:opacity-90 transition-opacity" aria-label="Gadang Barubah">
+            <NavLogoMark className="h-11 w-11 sm:h-14 sm:w-14" />
           </Link>
           <button
             type="button"
@@ -112,7 +133,9 @@ function NavFullscreenMenu({
             ))}
             <li>
               <a
-                href="#contact-section"
+                href={whatsappContactHref(lang)}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={onClose}
                 className="group flex items-center py-3 sm:py-4 font-heroCta text-2xl sm:text-3xl font-normal uppercase tracking-[0.06em] text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.45)] transition-all hover:translate-x-1 hover:text-[#FFEEDD]"
               >
@@ -163,23 +186,11 @@ function NavFullscreenMenu({
 
 export default function SiteNav({ variant = "default" }: SiteNavProps) {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const { lang, setLang } = useSiteLanguage();
   const isTransparent = variant === "transparent";
 
   const closeMenu = useCallback(() => setOpen(false), []);
   const toggleMenu = useCallback(() => setOpen((v) => !v), []);
-
-  useEffect(() => {
-    if (!isTransparent) {
-      setScrolled(false);
-      return;
-    }
-    const onScroll = () => setScrolled(window.scrollY > 32);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [isTransparent]);
 
   useEffect(() => {
     if (!open) return;
@@ -196,22 +207,10 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
   }, [open, closeMenu]);
 
   const navText = cn(
-    "text-figma-nav uppercase transition-opacity hover:opacity-85",
+    "font-heroCta text-[10px] font-normal uppercase leading-[14px] tracking-[0.05em] transition-opacity hover:opacity-85 xl:text-[11px] xl:leading-[15px]",
     isTransparent
-      ? "text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.85)]"
+      ? cn("text-white", TRANSPARENT_NAV_TEXT_SHADOW)
       : "text-foreground/90 hover:text-[#3F0000]",
-  );
-
-  const navLogo = (className?: string) => (
-    <img
-      src={NAV_LOGO_ICON}
-      alt="Gadang Barubah"
-      className={cn("object-contain drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)]", className)}
-      width={48}
-      height={48}
-      loading="eager"
-      decoding="async"
-    />
   );
 
   const langBtn = (code: "ID" | "EN", mobileDark = false) => {
@@ -238,11 +237,11 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
         type="button"
         onClick={() => setLang(code)}
         className={cn(
-          "font-sans text-[15px] leading-[18px]",
+          "font-sans text-[11px] leading-[13px]",
           active
-            ? "min-w-[26px] rounded-[5px] bg-[#F6F6F6] px-1.5 py-1 font-bold text-[#2C2C2C]"
+            ? "min-w-[22px] rounded-[4px] bg-[#F6F6F6] px-1 py-0.5 font-bold text-[#2C2C2C] shadow-[0_1px_4px_rgba(0,0,0,0.35)]"
             : isTransparent
-              ? "font-normal text-white [text-shadow:0_0_4.3px_rgba(0,0,0,0.79)]"
+              ? cn("font-normal text-white", TRANSPARENT_NAV_TEXT_SHADOW)
               : "font-normal text-muted-foreground hover:text-foreground",
         )}
         aria-pressed={active}
@@ -256,7 +255,7 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
     <div
       className={cn(
         "flex shrink-0 items-center",
-        mobileDark ? "gap-1 rounded-md border border-white/15 bg-black/20 p-0.5" : "flex-row-reverse gap-[10px]",
+        mobileDark ? "gap-1 rounded-md border border-white/15 bg-black/20 p-0.5" : "flex-row-reverse gap-1.5",
       )}
     >
       {langBtn("EN", mobileDark)}
@@ -271,14 +270,23 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
         "transition-colors",
         mobileGlass
           ? "flex h-9 w-9 items-center justify-center rounded-md border border-white/20 bg-black/30 text-white hover:bg-black/45"
-          : cn("p-2", isTransparent ? "text-white" : "text-foreground"),
+          : cn(
+              "p-1.5",
+              isTransparent
+                ? cn("text-white", TRANSPARENT_NAV_ICON_SHADOW)
+                : "text-foreground",
+            ),
         className,
       )}
       onClick={toggleMenu}
       aria-label={lang === "ID" ? "Menu navigasi" : "Navigation menu"}
       aria-expanded={open}
     >
-      {open ? <X className="h-4 w-4 sm:h-5 sm:w-5" /> : <HamburgerIcon />}
+      {open ? (
+        <X className={cn("h-4 w-4 sm:h-5 sm:w-5", isTransparent && TRANSPARENT_NAV_ICON_SHADOW)} />
+      ) : (
+        <HamburgerIcon className={isTransparent ? TRANSPARENT_NAV_ICON_SHADOW : undefined} />
+      )}
     </button>
   );
 
@@ -288,17 +296,12 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
         className={cn(
           "z-50 w-full transition-[background-color,box-shadow,border-color] duration-300",
           isTransparent
-            ? cn(
-                "fixed top-0 left-0 right-0",
-                scrolled
-                  ? "border-b border-white/10 bg-[#1a0505]/92 shadow-[0_4px_24px_rgba(0,0,0,0.28)] backdrop-blur-md supports-[backdrop-filter]:bg-[#1a0505]/85"
-                  : "border-b border-transparent bg-transparent shadow-none backdrop-blur-none",
-              )
+            ? "fixed top-0 left-0 right-0 border-b border-transparent bg-transparent shadow-none backdrop-blur-none"
             : "sticky top-0 border-b border-border/40 bg-ivory/[0.98] shadow-sm",
         )}
       >
-        <div className="relative mx-auto hidden h-[84px] max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 lg:grid xl:px-16">
-          <div className="flex items-center justify-self-start gap-5 xl:gap-8">
+        <div className="relative mx-auto hidden h-[72px] max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-6 xl:grid xl:gap-5 xl:px-16">
+          <div className="flex items-center justify-self-start gap-4 xl:gap-5">
             {FIGMA_LEFT_NAV.map((item) => (
               <Link key={item.href} href={item.href} className={navText}>
                 {lang === "ID" ? item.labelID : item.labelEN}
@@ -312,11 +315,16 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
             className="justify-self-center hover:opacity-90 transition-opacity"
             aria-label="Gadang Barubah"
           >
-            {navLogo("h-11 w-11 xl:h-12 xl:w-12")}
+            <NavLogoMark className="h-11 w-11 xl:h-12 xl:w-12" />
           </Link>
 
-          <div className="flex items-center justify-self-end gap-5 xl:gap-8">
-            <a href="#contact-section" className={navText}>
+          <div className="flex items-center justify-self-end gap-4 xl:gap-5">
+            <a
+              href={whatsappContactHref(lang)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={navText}
+            >
               {lang === "ID" ? "KONTAK" : "CONTACT"}
             </a>
             <Link href="/reservasi" className={navText}>
@@ -326,11 +334,11 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
           </div>
         </div>
 
-        <div className="safe-top lg:hidden">
+        <div className="safe-top xl:hidden">
           <div className="grid h-12 grid-cols-[2.25rem_1fr_auto] items-center gap-2 px-4">
             {menuTrigger(undefined, true)}
             <Link href="/" className="justify-self-center hover:opacity-90" aria-label="Gadang Barubah">
-              {navLogo("mx-auto h-9 w-9")}
+              <NavLogoMark className="mx-auto h-9 w-9" />
             </Link>
             <div className="flex items-center justify-end gap-1.5">
               <Link

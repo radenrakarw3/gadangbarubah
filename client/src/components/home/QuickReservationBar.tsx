@@ -16,35 +16,35 @@ import { cn } from "@/lib/utils";
 import { useSiteLanguage } from "@/lib/language";
 import PrivacyConsentField from "@/components/PrivacyConsentField";
 
-/** Field glass — lebih tipis sesuai revisi Figma */
+/** Field glass — compact sesuai revisi Figma */
 const FIGMA_CONTROL =
-  "h-9 sm:h-10 xl:h-11 w-full min-w-0 rounded-lg border-0 bg-[rgba(82,82,82,0.39)] font-[var(--font-form)] text-sm font-normal italic tracking-[0.03em] text-[#D2D2D2] shadow-none " +
-  "placeholder:text-[#D2D2D2]/90 placeholder:italic placeholder:text-sm sm:placeholder:text-[15px] focus-visible:ring-1 focus-visible:ring-white/30 focus-visible:ring-offset-0 [color-scheme:dark] " +
-  "px-3 sm:px-3.5 xl:px-3";
+  "h-8 sm:h-8 xl:h-9 w-full min-w-0 rounded-lg border-0 bg-[rgba(82,82,82,0.39)] font-[var(--font-form)] text-xs font-normal italic tracking-[0.03em] text-[#D2D2D2] shadow-none " +
+  "placeholder:text-[#D2D2D2]/90 placeholder:italic placeholder:text-xs sm:placeholder:text-[13px] focus-visible:ring-1 focus-visible:ring-white/30 focus-visible:ring-offset-0 [color-scheme:dark] " +
+  "px-2.5 sm:px-3 xl:px-2.5";
 
 const FIGMA_SELECT_TRIGGER = cn(
   FIGMA_CONTROL,
   "focus:ring-1 focus:ring-white/30 focus:ring-offset-0",
-  "[&>span]:text-[#D2D2D2] [&>span]:line-clamp-1 [&>span]:text-sm sm:[&>span]:text-[15px]",
-  "[&_svg]:h-4 [&_svg]:w-4 [&_svg]:text-[#D2D2D2]/70",
+  "[&>span]:text-[#D2D2D2] [&>span]:line-clamp-1 [&>span]:text-xs sm:[&>span]:text-[13px]",
+  "[&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:text-[#D2D2D2]/70",
 );
 
 const FIGMA_DATE_SHELL =
-  "relative h-9 sm:h-10 xl:h-11 w-full min-w-0 overflow-hidden rounded-lg border-0 bg-[rgba(82,82,82,0.39)] transition-[box-shadow,background-color] duration-200";
+  "relative h-8 sm:h-8 xl:h-9 w-full min-w-0 overflow-hidden rounded-lg border-0 bg-[rgba(82,82,82,0.39)] transition-[box-shadow,background-color] duration-200";
 
 const FIGMA_DATE_SHELL_TODAY =
   "bg-[rgba(82,82,82,0.48)] ring-1 ring-white/20";
 
 const FIGMA_DATE_INPUT =
-  "h-full w-full min-w-0 rounded-lg border-0 bg-transparent px-3 pr-[5rem] sm:px-4 sm:pr-[6.25rem] font-[var(--font-form)] text-sm sm:text-[15px] font-normal italic tracking-[0.03em] text-[#D2D2D2] shadow-none uppercase " +
-  "focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none [color-scheme:dark] xl:px-3 xl:pr-[5.75rem] " +
+  "h-full w-full min-w-0 rounded-lg border-0 bg-transparent px-2.5 pr-[4.35rem] sm:px-3 sm:pr-[5.35rem] font-[var(--font-form)] text-xs sm:text-[13px] font-normal italic tracking-[0.03em] text-[#D2D2D2] shadow-none uppercase " +
+  "focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none [color-scheme:dark] xl:px-2.5 xl:pr-[4.85rem] " +
   "[&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-50 hover:[&::-webkit-calendar-picker-indicator]:opacity-80";
 
 const FIGMA_DATE_INPUT_TODAY =
   "text-white [&::-webkit-calendar-picker-indicator]:opacity-90";
 
 const FIGMA_DATE_TODAY_BTN_BASE =
-  "absolute right-1 top-1/2 z-10 h-7 sm:h-9 xl:h-[40px] -translate-y-1/2 rounded-md border-0 px-1.5 sm:px-2.5 font-[var(--font-form)] text-[11px] sm:text-sm font-normal italic tracking-[0.02em] transition-all duration-200 xl:right-1.5 xl:px-2 " +
+  "absolute right-1 top-1/2 z-10 h-6 sm:h-7 xl:h-8 -translate-y-1/2 rounded-md border-0 px-1.5 sm:px-2 font-[var(--font-form)] text-[10px] sm:text-[11px] font-normal italic tracking-[0.02em] transition-all duration-200 xl:right-1 xl:px-1.5 " +
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 focus-visible:ring-offset-0";
 
 const FIGMA_DATE_TODAY_BTN_IDLE =
@@ -131,7 +131,7 @@ const ReservationDateField = memo(function ReservationDateField({
       />
       <span
         className={cn(
-          "pointer-events-none absolute inset-y-2 right-[4.35rem] w-px transition-colors duration-200 sm:right-[5.65rem] lg:right-[5.25rem]",
+          "pointer-events-none absolute inset-y-1.5 right-[3.85rem] w-px transition-colors duration-200 sm:right-[4.85rem] lg:right-[4.55rem]",
           isTodaySelected ? "bg-white/25" : "bg-white/10",
         )}
         aria-hidden
@@ -302,7 +302,7 @@ function QuickReservationBarInner() {
   };
 
   return (
-    <div className="max-w-[1460px] mx-auto w-full">
+    <div className="max-w-[min(100%,1460px)] mx-auto w-full min-w-0">
       {mobileOpen && (
         <button
           type="button"
@@ -351,8 +351,8 @@ function QuickReservationBarInner() {
           </button>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto overscroll-contain p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:gap-3 sm:p-3.5 lg:overflow-visible lg:p-0 lg:pb-0">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-4 lg:items-center lg:gap-2.5 xl:grid-cols-7 xl:gap-3">
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:gap-2.5 sm:p-3.5 lg:overflow-visible lg:p-0 lg:pb-0">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2 lg:grid-cols-4 lg:items-center lg:gap-2 xl:grid-cols-7 xl:gap-2.5">
             <Input
               name="nama"
               placeholder={placeholders.nama}
@@ -411,22 +411,22 @@ function QuickReservationBarInner() {
             />
           </div>
 
-          <PrivacyConsentField
-            checked={privacyAccepted}
-            onCheckedChange={setPrivacyAccepted}
-            lang={lang}
-            variant="dark"
-            id="hero-privacy-consent"
-            className="max-w-3xl mx-auto w-full"
-          />
-
-          <div className="flex shrink-0 justify-center pt-1 lg:pt-2">
+          <div className="mx-auto flex w-full flex-col items-center gap-1.5 pt-0.5 lg:pt-1">
+            <PrivacyConsentField
+              checked={privacyAccepted}
+              onCheckedChange={setPrivacyAccepted}
+              lang={lang}
+              variant="dark"
+              compact
+              id="hero-privacy-consent"
+              className="w-auto justify-center"
+            />
             <Button
               type="submit"
               disabled={loading}
-              className="h-9 w-full max-w-[290px] rounded-lg border-0 bg-[rgba(89,0,0,0.9)] px-4 font-heroCta text-sm font-bold italic tracking-[0.03em] text-[rgba(210,210,210,0.95)] shadow-none hover:bg-[rgba(89,0,0,1)] sm:h-10 xl:h-11"
+              className="h-8 w-full max-w-[280px] rounded-lg border-0 bg-[rgba(89,0,0,0.9)] px-6 font-heroCta text-xs font-bold italic tracking-[0.03em] text-[rgba(210,210,210,0.95)] shadow-none hover:bg-[rgba(89,0,0,1)] sm:h-9 sm:text-[13px] xl:h-9 xl:w-auto xl:min-w-[200px] xl:max-w-[280px]"
             >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : placeholders.reserve}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : placeholders.reserve}
             </Button>
           </div>
         </div>

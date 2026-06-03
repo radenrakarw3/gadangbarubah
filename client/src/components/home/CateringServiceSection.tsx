@@ -37,7 +37,7 @@ function CateringServiceSection() {
   return (
     <section
       id="catering-section"
-      className="relative scroll-mt-16 overflow-hidden bg-[#300505] py-10 sm:scroll-mt-24 sm:py-12 xl:min-h-[800px] xl:py-0"
+      className="home-section-fluid relative scroll-mt-16 overflow-hidden bg-[#300505] py-10 sm:scroll-mt-24 sm:py-12 xl:min-h-[min(800px,85svh)] xl:py-0"
     >
       {/* Mobile / tablet */}
       <div className="xl:hidden">
@@ -91,35 +91,33 @@ function CateringServiceSection() {
         </div>
       </div>
 
-      {/* Desktop: layout Figma */}
-      <div className="relative hidden min-h-[min(800px,85svh)] xl:block">
-        <h2 className="absolute right-[85px] top-[209px] z-10 whitespace-nowrap text-right font-heroCta text-[28px] font-normal leading-[50px] tracking-[0.01em] text-white">
+      {/* Desktop — grid fluid, tanpa posisi absolut Figma */}
+      <div className="mx-auto hidden max-w-[1920px] flex-col px-4 py-[clamp(2.5rem,6vh,4rem)] sm:px-8 lg:px-10 xl:flex xl:min-h-[min(800px,85svh)] xl:justify-center xl:px-[clamp(2rem,5vw,85px)] xl:py-[clamp(3rem,8vh,5rem)]">
+        <h2 className="text-figma-section-title mb-[clamp(1.5rem,3vh,2.5rem)] text-right text-white">
           {title}
         </h2>
 
-        <div className="absolute inset-x-0 bottom-[258px] top-[292px] flex items-stretch">
-          <div className="grid w-full grid-cols-4 gap-[50px] px-[85px]">
-            {FIGMA_CATERING_ITEMS.map((item) => {
-              const label = lang === "ID" ? item.nameID : item.nameEN;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => navigate("/catering")}
-                  className="h-[250px] w-full overflow-hidden bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
-                >
-                  <img
-                    src={item.image}
-                    alt={label}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
-                  />
-                </button>
-              );
-            })}
-          </div>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4 xl:gap-[clamp(1.25rem,2.5vw,50px)]">
+          {FIGMA_CATERING_ITEMS.map((item) => {
+            const label = lang === "ID" ? item.nameID : item.nameEN;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => navigate("/catering")}
+                className="aspect-[8/5] w-full max-h-[250px] overflow-hidden bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+              >
+                <img
+                  src={item.image}
+                  alt={label}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                />
+              </button>
+            );
+          })}
         </div>
       </div>
     </section>
