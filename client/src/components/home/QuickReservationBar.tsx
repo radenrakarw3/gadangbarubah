@@ -156,13 +156,12 @@ function QuickReservationBarInner() {
   const { lang } = useSiteLanguage();
   const [loading, setLoading] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [tanggal, setTanggal] = useState(todayISO);
+  const [tanggal, setTanggal] = useState(() => todayISO());
   const [waktu, setWaktu] = useState("18:00");
   const [outlet, setOutlet] = useState(OUTLETS[0].id as string);
   const [pax, setPax] = useState("2");
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const formKey = useRef(0);
-  const minDate = useMemo(() => todayISO(), []);
 
   const placeholders = {
     nama: lang === "ID" ? "(Nama Anda)" : "(Your Name)",
@@ -178,6 +177,7 @@ function QuickReservationBarInner() {
   };
 
   const isTodaySelected = tanggal === todayISO();
+  const minDate = todayISO();
 
   const paxOptions = useMemo(
     () =>
@@ -246,6 +246,28 @@ function QuickReservationBarInner() {
           lang === "ID"
             ? "Pilih tanggal dan waktu reservasi."
             : "Please select reservation date and time.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (tanggal < todayISO()) {
+      toast({
+        title: lang === "ID" ? "Tanggal tidak valid" : "Invalid date",
+        description:
+          lang === "ID"
+            ? "Tanggal reservasi tidak boleh di masa lalu."
+            : "Reservation date cannot be in the past.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!RESERVATION_TIME_SLOTS.includes(waktu as (typeof RESERVATION_TIME_SLOTS)[number])) {
+      toast({
+        title: lang === "ID" ? "Jam tidak valid" : "Invalid time",
+        description:
+          lang === "ID" ? "Pilih jam reservasi yang tersedia." : "Please select an available time slot.",
         variant: "destructive",
       });
       return;
@@ -351,7 +373,7 @@ function QuickReservationBarInner() {
           </button>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:gap-5 sm:p-3.5 lg:overflow-visible lg:gap-5 lg:p-0 lg:pb-0">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:gap-5 sm:p-3.5 lg:overflow-visible lg:gap-0 lg:p-0 lg:pb-0">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2 lg:grid-cols-4 lg:items-center lg:gap-2 xl:grid-cols-7 xl:gap-2.5">
             <Input
               name="nama"
@@ -411,7 +433,7 @@ function QuickReservationBarInner() {
             />
           </div>
 
-          <div className="mx-auto flex w-full flex-col items-center gap-3 pt-2 lg:gap-4 lg:pt-4">
+          <div className="mx-auto flex w-full max-w-[min(100%,920px)] flex-col items-center gap-5 pt-3 sm:pt-4 lg:gap-5 lg:pt-4 xl:pt-5">
             <PrivacyConsentField
               checked={privacyAccepted}
               onCheckedChange={setPrivacyAccepted}
@@ -419,7 +441,7 @@ function QuickReservationBarInner() {
               variant="dark"
               compact
               id="hero-privacy-consent"
-              className="w-auto justify-center"
+              className="w-auto max-w-full justify-center"
             />
             <Button
               type="submit"

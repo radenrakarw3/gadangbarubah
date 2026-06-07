@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import type { AdminRole } from "@shared/schema";
+import {
+  type AdminPortal,
+  roleAllowedForPortal,
+} from "@shared/admin-portals";
 
 export type SessionAdminRole = AdminRole | "admin";
 
@@ -55,4 +59,17 @@ export function requireMainAdmin(req: Request, res: Response, next: NextFunction
     });
   }
   next();
+}
+
+export function requirePortalAdmin(portal: AdminPortal) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const role = normalizeAdminRole(req.session.role);
+    if (!req.session.userId || !role || !roleAllowedForPortal(role, portal)) {
+      return res.status(403).json({
+        success: false,
+        message: "Anda tidak memiliki akses ke panel admin ini",
+      });
+    }
+    next();
+  };
 }

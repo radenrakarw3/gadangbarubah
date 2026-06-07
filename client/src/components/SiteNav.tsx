@@ -102,9 +102,14 @@ function NavFullscreenMenu({
         aria-label={lang === "ID" ? "Tutup menu" : "Close menu"}
       />
 
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col safe-top safe-bottom">
-        <div className="flex h-[72px] sm:h-[100px] shrink-0 items-center justify-between px-5 sm:px-8">
-          <Link href="/" onClick={onClose} className="hover:opacity-90 transition-opacity" aria-label="Gadang Barubah">
+        <div className="relative z-10 flex min-h-0 flex-1 flex-col safe-top safe-bottom">
+        <div className="relative flex h-[72px] shrink-0 items-center justify-end px-5 sm:h-[100px] sm:px-8">
+          <Link
+            href="/"
+            onClick={onClose}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hover:opacity-90 transition-opacity"
+            aria-label="Gadang Barubah"
+          >
             <NavLogoMark className="h-11 w-11 sm:h-14 sm:w-14" />
           </Link>
           <button
@@ -186,11 +191,30 @@ function NavFullscreenMenu({
 
 export default function SiteNav({ variant = "default" }: SiteNavProps) {
   const [open, setOpen] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
   const { lang, setLang } = useSiteLanguage();
   const isTransparent = variant === "transparent";
 
   const closeMenu = useCallback(() => setOpen(false), []);
   const toggleMenu = useCallback(() => setOpen((v) => !v), []);
+
+  useEffect(() => {
+    if (!isTransparent) {
+      setPastHero(false);
+      return;
+    }
+
+    const hero = document.getElementById("hero-section");
+    if (!hero) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setPastHero(!entry.isIntersecting),
+      { threshold: 0, rootMargin: "-1px 0px 0px 0px" },
+    );
+
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, [isTransparent]);
 
   useEffect(() => {
     if (!open) return;
@@ -294,13 +318,23 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
     <>
       <header
         className={cn(
-          "z-50 w-full transition-[background-color,box-shadow,border-color] duration-300",
+          "relative z-50 w-full transition-[background-color,box-shadow,border-color] duration-300",
           isTransparent
             ? "fixed top-0 left-0 right-0 border-b border-transparent bg-transparent shadow-none backdrop-blur-none"
             : "sticky top-0 border-b border-border/40 bg-ivory/[0.98] shadow-sm",
         )}
       >
-        <div className="relative mx-auto hidden h-[72px] max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-6 xl:grid xl:gap-5 xl:px-16">
+        {isTransparent ? (
+          <div
+            className={cn(
+              "pointer-events-none absolute inset-x-0 top-0 z-0 h-[calc(100%+4.5rem)] bg-gradient-to-b from-black/95 via-black/65 to-transparent transition-opacity duration-500 ease-out",
+              pastHero ? "opacity-100" : "opacity-0",
+            )}
+            aria-hidden
+          />
+        ) : null}
+
+        <div className="relative z-10 mx-auto hidden h-[72px] max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-6 xl:grid xl:gap-5 xl:px-16">
           <div className="flex items-center justify-self-start gap-4 xl:gap-5">
             {FIGMA_LEFT_NAV.map((item) => (
               <Link key={item.href} href={item.href} className={navText}>
@@ -334,20 +368,25 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
           </div>
         </div>
 
-        <div className="safe-top xl:hidden">
-          <div className="grid h-12 grid-cols-[2.25rem_1fr_auto] items-center gap-2 px-4">
-            {menuTrigger(undefined, true)}
-            <Link href="/" className="justify-self-center hover:opacity-90" aria-label="Gadang Barubah">
-              <NavLogoMark className="mx-auto h-9 w-9" />
+        <div className="relative z-10 safe-top xl:hidden">
+          <div className="relative flex h-12 items-center justify-between gap-2 px-4">
+            <div className="z-10 flex shrink-0 items-center">{menuTrigger(undefined, true)}</div>
+            <Link
+              href="/"
+              className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 hover:opacity-90"
+              aria-label="Gadang Barubah"
+            >
+              <NavLogoMark className="h-9 w-9" />
             </Link>
-            <div className="flex items-center justify-end gap-1.5">
+            <div className="z-10 flex shrink-0 items-center gap-1 rounded-md border border-white/15 bg-black/20 p-0.5">
               <Link
                 href="/reservasi"
-                className="inline-flex h-8 shrink-0 items-center rounded-md bg-[rgba(89,0,0,0.92)] px-2 font-heroCta text-[10px] font-bold italic tracking-[0.04em] text-[#F0E6E6] hover:bg-[#6a0000]"
+                className="inline-flex min-w-[32px] items-center justify-center rounded-md px-2 py-1 font-sans text-[11px] font-semibold leading-none text-[#F2E8E8] transition-colors bg-[#590000] shadow-sm hover:bg-[#6a0000]"
               >
                 {lang === "ID" ? "BOOK" : "BOOK"}
               </Link>
-              {langToggle(true)}
+              {langBtn("EN", true)}
+              {langBtn("ID", true)}
             </div>
           </div>
         </div>

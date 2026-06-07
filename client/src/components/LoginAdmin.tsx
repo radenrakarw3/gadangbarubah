@@ -7,13 +7,21 @@ import { useToast } from '@/hooks/use-toast';
 import { Shield, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useSiteLanguage } from '@/lib/language';
+import {
+  ADMIN_PORTAL_CONFIG,
+  roleAllowedForPortal,
+  type AdminPortal,
+} from '@shared/admin-portals';
+import type { AdminRole } from '@shared/schema';
 
 interface LoginAdminProps {
+  portal: AdminPortal;
   onLogin: () => void;
 }
 
-export default function LoginAdmin({ onLogin }: LoginAdminProps) {
+export default function LoginAdmin({ portal, onLogin }: LoginAdminProps) {
   const { lang } = useSiteLanguage();
+  const portalConfig = ADMIN_PORTAL_CONFIG[portal];
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -35,30 +43,32 @@ export default function LoginAdmin({ onLogin }: LoginAdminProps) {
         body: JSON.stringify({
           username,
           password,
-          role: 'admin'
+          portal,
         }),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        const error = await response.json();
-        
-        // Handle different error types
-        if (error.locked) {
-          const minutes = Math.ceil(error.lockTimeRemaining / 60000);
+        if (data.locked) {
+          const minutes = Math.ceil(data.lockTimeRemaining / 60000);
           setErrorMessage(`Akun terkunci. Coba lagi dalam ${minutes} menit.`);
-        } else if (error.attemptsRemaining !== undefined) {
-          setErrorMessage(`Login gagal. ${error.attemptsRemaining} percobaan tersisa.`);
+        } else if (data.attemptsRemaining !== undefined) {
+          setErrorMessage(`Login gagal. ${data.attemptsRemaining} percobaan tersisa.`);
         } else {
-          setErrorMessage(error.message || 'Username atau password salah');
+          setErrorMessage(data.message || 'Username atau password salah');
         }
         setIsLoading(false);
         return;
       }
 
-      const data = await response.json();
-      
-      if (!["admin_main", "admin_cikarang", "admin_bintaro", "admin"].includes(data.user.role)) {
-        setErrorMessage('Akses ditolak. Akun ini bukan admin.');
+      const role = data.user?.role as AdminRole | undefined;
+      if (!role || !roleAllowedForPortal(role, portal)) {
+        setErrorMessage(
+          lang === 'ID'
+            ? 'Akses ditolak. Akun tidak sesuai dengan portal admin ini.'
+            : 'Access denied. This account cannot sign in to this admin portal.',
+        );
         setIsLoading(false);
         return;
       }
@@ -68,6 +78,7 @@ export default function LoginAdmin({ onLogin }: LoginAdminProps) {
         description: lang === 'ID' ? `Selamat datang, ${data.user.username}` : `Welcome, ${data.user.username}`,
       });
       
+      setIsLoading(false);
       onLogin();
     } catch (error) {
       console.error('Login error:', error);
@@ -76,6 +87,8 @@ export default function LoginAdmin({ onLogin }: LoginAdminProps) {
     }
   };
 
+  const portalTitle = lang === 'ID' ? portalConfig.labelID : portalConfig.labelEN;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-900 to-red-800 p-4">
       <Card className="w-full max-w-md">
@@ -83,11 +96,11 @@ export default function LoginAdmin({ onLogin }: LoginAdminProps) {
           <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">{lang === 'ID' ? 'Login Admin' : 'Admin Login'}</CardTitle>
+          <CardTitle className="text-2xl">{portalTitle}</CardTitle>
           <CardDescription>
             {lang === 'ID'
-              ? 'Masukkan username dan password untuk mengakses dashboard admin'
-              : 'Enter username and password to access the admin dashboard'}
+              ? `Masuk ke panel ${portalConfig.labelID} dengan username dan password cabang`
+              : `Sign in to the ${portalConfig.labelEN} panel with your branch credentials`}
           </CardDescription>
         </CardHeader>
         <CardContent>

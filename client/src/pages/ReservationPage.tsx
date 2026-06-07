@@ -33,6 +33,8 @@ import PrivacyConsentField from "@/components/PrivacyConsentField";
 
 const TIME_SLOTS = RESERVATION_TIME_SLOTS;
 
+const outletIds = OUTLETS.map((o) => o.id) as [string, ...string[]];
+
 const reservationFormSchema = z.object({
   namaLengkap: z.string().min(2, "Nama lengkap wajib diisi"),
   noWhatsApp: z.string().min(10, "Nomor WhatsApp minimal 10 digit"),
@@ -43,7 +45,13 @@ const reservationFormSchema = z.object({
       (val) => !val || val.trim() === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim()),
       { message: "Email tidak valid" },
     ),
-  tanggalReservasi: z.string().min(1, "Tanggal reservasi wajib diisi"),
+  outlet: z.enum(outletIds, { errorMap: () => ({ message: "Pilih outlet" }) }),
+  tanggalReservasi: z
+    .string()
+    .min(1, "Tanggal reservasi wajib diisi")
+    .refine((val) => val >= todayISO(), {
+      message: "Tanggal reservasi tidak boleh di masa lalu",
+    }),
   waktuReservasi: z.string().min(1, "Pilih waktu reservasi"),
   jumlahTamu: z.coerce.number().int().min(1, "Minimal 1 tamu").max(50, "Maksimal 50 tamu"),
   tipeMeja: z.enum(["reguler", "vip"], { errorMap: () => ({ message: "Pilih tipe meja" }) }),
@@ -63,6 +71,7 @@ export default function ReservationPage() {
       namaLengkap: "",
       noWhatsApp: "",
       email: "",
+      outlet: OUTLETS[0].id,
       tanggalReservasi: todayISO(),
       waktuReservasi: "",
       jumlahTamu: 2,
@@ -79,7 +88,7 @@ export default function ReservationPage() {
       const payload = {
         namaLengkap: data.namaLengkap.trim(),
         noWhatsApp: data.noWhatsApp.trim(),
-        outlet: OUTLETS[0].id,
+        outlet: data.outlet,
         tanggalReservasi: data.tanggalReservasi,
         waktuReservasi: data.waktuReservasi,
         jumlahTamu: data.jumlahTamu,
@@ -101,6 +110,7 @@ export default function ReservationPage() {
           namaLengkap: "",
           noWhatsApp: "",
           email: "",
+          outlet: OUTLETS[0].id,
           tanggalReservasi: todayISO(),
           waktuReservasi: "",
           jumlahTamu: 2,
@@ -240,6 +250,31 @@ export default function ReservationPage() {
                         )}
                       />
                     </div>
+
+                    <FormField
+                      control={form.control}
+                      name="outlet"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{lang === "ID" ? "Outlet" : "Outlet"}</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={lang === "ID" ? "Pilih outlet" : "Select outlet"} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {OUTLETS.map((o) => (
+                                <SelectItem key={o.id} value={o.id}>
+                                  {o.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <FormField

@@ -1,20 +1,12 @@
-import { memo, useState } from "react";
-import { Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import {
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { ChevronLeft, Loader2, X } from "lucide-react";
+import { Input } from "@/components/ui/input";import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
   CATERING_TYPES,
@@ -58,6 +50,49 @@ const FIGMA_SELECT_ITEM =
   "rounded-md focus:bg-white/15 focus:text-white data-[highlighted]:bg-white/15";
 
 type Service = (typeof HOME_CATERING_SERVICES)[number];
+
+type ServiceOriginRect = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
+
+const EXPAND_MS = 1200;
+const COLLAPSE_MS = 1000;
+const CONTENT_MS = 650;
+const EXIT_MS = 260;
+const CONTENT_DELAY_MS = 820;
+const EASE = "cubic-bezier(0.19, 1, 0.22, 1)";
+const EASE_OUT = "cubic-bezier(0.4, 0, 0.2, 1)";
+
+function tileToContainerTransform(
+  origin: ServiceOriginRect,
+  containerWidth: number,
+  containerHeight: number,
+): string {
+  const sx = origin.width / containerWidth;
+  const sy = origin.height / containerHeight;
+  return `translate3d(${origin.left}px, ${origin.top}px, 0) scale(${sx}, ${sy})`;
+}
+
+function slideStyle(visible: boolean, delayMs: number, fromY = 12) {
+  return {
+    transition: visible
+      ? `opacity ${CONTENT_MS}ms ${EASE} ${delayMs}ms, transform ${CONTENT_MS}ms ${EASE} ${delayMs}ms`
+      : `opacity ${EXIT_MS}ms ${EASE_OUT}, transform ${EXIT_MS}ms ${EASE_OUT}`,
+    opacity: visible ? 1 : 0,
+    transform: visible ? "translate3d(0, 0, 0)" : `translate3d(0, ${fromY}px, 0)`,
+    pointerEvents: visible ? "auto" : "none",
+  } satisfies CSSProperties;
+}
+
+function overlayFadeStyle(visible: boolean) {
+  return {
+    opacity: visible ? 1 : 0,
+    transition: visible ? `opacity ${CONTENT_MS}ms ${EASE}` : `opacity ${EXIT_MS}ms ${EASE_OUT}`,
+  } satisfies CSSProperties;
+}
 
 function CateringForm({
   form,
@@ -163,15 +198,16 @@ function CateringForm({
   );
 }
 
-function ServiceTile({
-  service,
+const MOBILE_COLLAGE_H = "h-[480px] sm:h-[560px]";
+
+function ServiceTile({  service,
   lang,
   onSelect,
   className,
 }: {
   service: Service;
   lang: "ID" | "EN";
-  onSelect: (service: Service) => void;
+  onSelect: (service: Service, event: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
 }) {
   const name = lang === "ID" ? service.nameID : service.nameEN;
@@ -180,14 +216,13 @@ function ServiceTile({
   return (
     <button
       type="button"
-      onClick={() => onSelect(service)}
+      onClick={(event) => onSelect(service, event)}
       className={cn(
-        "group relative min-h-[140px] overflow-hidden text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white/60 sm:min-h-[180px]",
+        "group relative min-h-0 touch-manipulation overflow-hidden text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white/60 [-webkit-tap-highlight-color:transparent]",
         className,
       )}
       aria-label={name}
-    >
-      <img
+    >      <img
         src={image}
         alt=""
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
@@ -209,17 +244,26 @@ function ServiceTile({
 function ServiceCollage({
   lang,
   onSelect,
+  layout = "mobile",
   className,
 }: {
   lang: "ID" | "EN";
-  onSelect: (service: Service) => void;
+  onSelect: (service: Service, event: React.MouseEvent<HTMLButtonElement>) => void;
+  layout?: "mobile" | "desktop";
   className?: string;
 }) {
   const topRow = HOME_CATERING_SERVICES.filter((s) => s.row === "top");
   const bottomRow = HOME_CATERING_SERVICES.filter((s) => s.row === "bottom");
+  const isDesktop = layout === "desktop";
 
   return (
-    <div className={cn("grid min-h-0 w-full grid-cols-3 grid-rows-[11fr_10fr]", className)}>
+    <div
+      className={cn(
+        "grid h-full w-full grid-cols-3 grid-rows-[11fr_10fr]",
+        isDesktop ? "min-h-[900px]" : MOBILE_COLLAGE_H,
+        className,
+      )}
+    >
       {topRow.map((service) => (
         <ServiceTile
           key={service.id}
@@ -241,73 +285,298 @@ function ServiceCollage({
     </div>
   );
 }
-
-function ServiceDialog({
+function ServiceExpandedPanel({
   service,
   lang,
-  open,
-  onOpenChange,
+  layout,
+  originRect,
+  containerRef,
+  onClose,
   onChooseService,
 }: {
-  service: Service | null;
+  service: Service;
   lang: "ID" | "EN";
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  layout: "mobile" | "desktop";
+  originRect: ServiceOriginRect | null;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  onClose: () => void;
   onChooseService: (cateringType: string) => void;
 }) {
-  if (!service) return null;
+  const innerRef = useRef<HTMLDivElement>(null);
+  const containerSizeRef = useRef<{ width: number; height: number } | null>(null);
+  const closingRef = useRef(false);
+  const [expanded, setExpanded] = useState(!originRect);
+  const [contentVisible, setContentVisible] = useState(!originRect);
 
   const name = lang === "ID" ? service.nameID : service.nameEN;
   const description = lang === "ID" ? service.descriptionID : service.descriptionEN;
-  const chooseLabel =
-    lang === "ID" ? "Pilih layanan ini" : "Choose this service";
+  const chooseLabel = lang === "ID" ? "Pilih layanan ini" : "Choose this service";
+  const closeLabel = lang === "ID" ? "Kembali ke layanan" : "Back to services";
   const image = SERVICE_IMAGES[service.id];
+  const isDesktop = layout === "desktop";
+
+  const measureContainer = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return null;
+    const { width, height } = el.getBoundingClientRect();
+    return { width, height };
+  }, [containerRef]);
+
+  const handleClose = useCallback(() => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+
+    const inner = innerRef.current;
+    const size = containerSizeRef.current ?? measureContainer();
+
+    setContentVisible(false);
+
+    if (!inner || !originRect || !size) {
+      onClose();
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      inner.style.transition = `transform ${COLLAPSE_MS}ms ${EASE_OUT}`;
+      inner.style.transform = tileToContainerTransform(
+        originRect,
+        size.width,
+        size.height,
+      );
+
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        inner.removeEventListener("transitionend", onTransitionEnd);
+        onClose();
+      };
+
+      const onTransitionEnd = (event: TransitionEvent) => {
+        if (event.target !== inner || event.propertyName !== "transform") return;
+        finish();
+      };
+
+      inner.addEventListener("transitionend", onTransitionEnd);
+      window.setTimeout(finish, COLLAPSE_MS + 40);
+    });
+  }, [measureContainer, onClose, originRect]);
+
+  useLayoutEffect(() => {
+    closingRef.current = false;
+  }, [service.id]);
+
+  useLayoutEffect(() => {
+    const inner = innerRef.current;
+    const size = measureContainer();
+
+    if (!inner || !size || !originRect) {
+      if (size) containerSizeRef.current = size;
+      setExpanded(true);
+      setContentVisible(true);
+      return;
+    }
+
+    containerSizeRef.current = size;
+
+    let cancelled = false;
+    const collapsed = tileToContainerTransform(originRect, size.width, size.height);
+
+    inner.style.transition = "none";
+    inner.style.transform = collapsed;
+    void inner.offsetHeight;
+
+    const enterFrame = requestAnimationFrame(() => {
+      if (cancelled) return;
+      requestAnimationFrame(() => {
+        if (cancelled) return;
+        inner.style.transition = `transform ${EXPAND_MS}ms ${EASE}`;
+        inner.style.transform = "translate3d(0, 0, 0) scale(1, 1)";
+        setExpanded(true);
+      });
+    });
+
+    const contentTimer = window.setTimeout(() => {
+      if (!cancelled) setContentVisible(true);
+    }, CONTENT_DELAY_MS);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(enterFrame);
+      window.clearTimeout(contentTimer);
+    };
+  }, [measureContainer, originRect, service.id]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [handleClose]);
+
+  const overlayFade = overlayFadeStyle(contentVisible);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md gap-0 overflow-hidden p-0 sm:max-w-lg">
-        <div className="relative h-48 w-full overflow-hidden sm:h-56">
-          <img
-            src={image}
-            alt={name}
-            className="h-full w-full object-cover"
-            draggable={false}
-          />
-          <div
-            className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent"
-            aria-hidden
-          />
+    <div
+      className="pointer-events-none absolute inset-0 z-10 h-full w-full overflow-hidden"
+      role="region"
+      aria-label={name}
+    >
+      <div
+        ref={innerRef}
+        className="pointer-events-auto absolute inset-0 origin-top-left overflow-hidden bg-[#1a0808] will-change-transform transform-gpu"
+        style={
+          originRect
+            ? undefined
+            : { transform: "translate3d(0, 0, 0) scale(1, 1)" }
+        }
+      >        <img
+          src={image}
+          alt={name}
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{
+            transform: expanded ? "scale(1)" : "scale(1.1)",
+            transition: `transform ${EXPAND_MS}ms ${EASE}`,
+          }}
+          draggable={false}
+        />
+
+        <div className="absolute inset-0 bg-black/35" style={overlayFade} aria-hidden />
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/65"
+          style={overlayFade}
+          aria-hidden
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/20"
+          style={overlayFade}
+          aria-hidden
+        />
+
+        <button
+          type="button"
+          onClick={handleClose}
+          className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-black/45 text-white backdrop-blur-sm transition-colors hover:bg-black/60 sm:right-5 sm:top-5"
+          style={slideStyle(contentVisible, 60, 8)}
+          aria-label={closeLabel}
+        >
+          <X className="h-5 w-5" strokeWidth={1.75} />
+        </button>
+
+        <div
+          className="absolute inset-x-0 bottom-0 z-10 flex flex-col justify-end p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:p-8"
+          style={slideStyle(contentVisible, isDesktop ? 120 : 80, 24)}
+        >
+          <h3 className="font-heroCta text-[clamp(1.5rem,5vw,2.75rem)] font-normal leading-tight tracking-[0.01em] text-white">
+            {name}
+          </h3>
+          <p className="mt-2 max-w-xl font-[var(--font-inquiry)] text-sm leading-relaxed text-white/90 sm:mt-3 sm:text-lg">
+            {description}
+          </p>
+          <div className="mt-4 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-center sm:gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                onChooseService(service.cateringType);
+                handleClose();
+              }}
+              className="h-11 min-h-[44px] rounded-lg bg-[rgba(89,0,0,0.9)] px-6 font-heroCta text-sm font-bold italic tracking-[0.03em] text-[rgba(210,210,210,0.95)] transition-colors hover:bg-[rgba(89,0,0,1)] sm:h-12 sm:text-base"
+            >
+              {chooseLabel}
+            </button>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="inline-flex min-h-[44px] items-center gap-2 font-heroCta text-sm text-white/80 transition-colors hover:text-white sm:text-base"
+            >              <ChevronLeft className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+              {closeLabel}
+            </button>
+          </div>
         </div>
-        <div className="space-y-4 p-6">
-          <DialogHeader className="space-y-2 text-left">
-            <DialogTitle className="font-heroCta text-xl text-[#3D0C0C]">
-              {name}
-            </DialogTitle>
-            <DialogDescription className="font-[var(--font-inquiry)] text-base leading-relaxed text-black/80">
-              {description}
-            </DialogDescription>
-          </DialogHeader>
-          <button
-            type="button"
-            onClick={() => {
-              onChooseService(service.cateringType);
-              onOpenChange(false);
-            }}
-            className="h-11 w-full rounded-lg bg-[rgba(89,0,0,0.9)] font-heroCta text-sm font-bold italic tracking-[0.03em] text-[rgba(210,210,210,0.95)] transition-colors hover:bg-[rgba(89,0,0,1)]"
-          >
-            {chooseLabel}
-          </button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }
 
+function CateringServiceSlot({
+  lang,
+  layout,
+  onChooseService,
+  className,
+}: {
+  lang: "ID" | "EN";
+  layout: "mobile" | "desktop";
+  onChooseService: (cateringType: string) => void;
+  className?: string;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeService, setActiveService] = useState<Service | null>(null);
+  const [originRect, setOriginRect] = useState<ServiceOriginRect | null>(null);
+  const isDesktop = layout === "desktop";
+
+  const handleSelect = (
+    service: Service,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    const container = containerRef.current?.getBoundingClientRect();
+    const tile = event.currentTarget.getBoundingClientRect();
+
+    if (container) {
+      setOriginRect({
+        top: tile.top - container.top,
+        left: tile.left - container.left,
+        width: tile.width,
+        height: tile.height,
+      });
+    } else {
+      setOriginRect(null);
+    }
+
+    setActiveService(service);
+
+    if (!isDesktop) {
+      containerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  };
+  const handleClose = () => {
+    setActiveService(null);
+    setOriginRect(null);
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className={cn(
+        "relative w-full overflow-hidden",
+        isDesktop ? "min-h-[900px]" : MOBILE_COLLAGE_H,
+        className,
+      )}
+    >
+      <ServiceCollage
+        lang={lang}
+        onSelect={handleSelect}
+        layout={layout}
+        className={cn("h-full", activeService ? "pointer-events-none" : undefined)}
+      />
+      {activeService ? (
+        <ServiceExpandedPanel
+          service={activeService}
+          lang={lang}
+          layout={layout}
+          originRect={originRect}
+          containerRef={containerRef}
+          onClose={handleClose}
+          onChooseService={onChooseService}
+        />
+      ) : null}
+    </div>
+  );
+}
 function CateringInquirySection() {
   const { toast } = useToast();
   const { lang } = useSiteLanguage();
   const [loading, setLoading] = useState(false);
-  const [activeService, setActiveService] = useState<Service | null>(null);
   const [form, setForm] = useState({
     nama: "",
     telepon: "",
@@ -356,20 +625,36 @@ function CateringInquirySection() {
       return;
     }
 
+    const emailTrimmed = form.email.trim();
+    if (emailTrimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+      toast({
+        title: lang === "ID" ? "Email tidak valid" : "Invalid email",
+        description:
+          lang === "ID"
+            ? "Kosongkan field email atau gunakan format email yang benar."
+            : "Leave email empty or use a valid email format.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
-    const tipeLabel = CATERING_TYPES.find((t) => t.value === form.tipe)?.label ?? form.tipe;
-    const message = encodeURIComponent(
-      lang === "ID"
-        ? `Halo Gadang Barubah, saya ingin konsultasi catering:\n\nNama: ${form.nama}\nTelepon: ${form.telepon}\nEmail: ${form.email || "-"}\nTipe: ${tipeLabel}\nPax: ${form.pax}`
-        : `Hello Gadang Barubah, I want to discuss catering:\n\nName: ${form.nama}\nPhone: ${form.telepon}\nEmail: ${form.email || "-"}\nType: ${tipeLabel}\nPax: ${form.pax}`,
-    );
-    window.open(`https://wa.me/${COMPANY.whatsapp}?text=${message}`, "_blank");
-    toast({
-      title: lang === "ID" ? "Membuka WhatsApp" : "Opening WhatsApp",
-      description:
-        lang === "ID" ? "Lanjutkan pesan catering di WhatsApp." : "Continue your catering message on WhatsApp.",
-    });
-    setLoading(false);
+    try {
+      const tipeLabel = CATERING_TYPES.find((t) => t.value === form.tipe)?.label ?? form.tipe;
+      const message = encodeURIComponent(
+        lang === "ID"
+          ? `Halo Gadang Barubah, saya ingin konsultasi catering:\n\nNama: ${form.nama}\nTelepon: ${form.telepon}\nEmail: ${emailTrimmed || "-"}\nTipe: ${tipeLabel}\nPax: ${form.pax}`
+          : `Hello Gadang Barubah, I want to discuss catering:\n\nName: ${form.nama}\nPhone: ${form.telepon}\nEmail: ${emailTrimmed || "-"}\nType: ${tipeLabel}\nPax: ${form.pax}`,
+      );
+      window.open(`https://wa.me/${COMPANY.whatsapp}?text=${message}`, "_blank");
+      toast({
+        title: lang === "ID" ? "Membuka WhatsApp" : "Opening WhatsApp",
+        description:
+          lang === "ID" ? "Lanjutkan pesan catering di WhatsApp." : "Continue your catering message on WhatsApp.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChooseService = (cateringType: string) => {
@@ -402,9 +687,10 @@ function CateringInquirySection() {
           <h3 className="mb-4 text-center font-heroCta text-lg tracking-[0.01em] text-[#3D0C0C]">
             {copy.collageTitle}
           </h3>
-          <ServiceCollage
+          <CateringServiceSlot
             lang={lang}
-            onSelect={setActiveService}
+            layout="mobile"
+            onChooseService={handleChooseService}
             className="overflow-hidden rounded-lg"
           />
         </div>
@@ -417,17 +703,9 @@ function CateringInquirySection() {
         </div>
 
         <div className="col-span-2 min-h-0">
-          <ServiceCollage lang={lang} onSelect={setActiveService} className="min-h-[900px]" />
+          <CateringServiceSlot lang={lang} layout="desktop" onChooseService={handleChooseService} />
         </div>
       </div>
-
-      <ServiceDialog
-        service={activeService}
-        lang={lang}
-        open={activeService !== null}
-        onOpenChange={(open) => !open && setActiveService(null)}
-        onChooseService={handleChooseService}
-      />
     </section>
   );
 }

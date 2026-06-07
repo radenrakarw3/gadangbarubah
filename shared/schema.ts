@@ -118,6 +118,8 @@ export const loginUserSchema = z.object({
 
   password: z.string().min(6, "Password minimal 6 karakter"),
 
+  portal: z.enum(["main", "cikarang", "bintaro"]).optional().default("main"),
+
 });
 
 

@@ -5,12 +5,20 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
 import { initializeAnalytics, trackPageView } from "@/lib/analytics";
-import { Suspense, lazy, useEffect, useState, type ComponentType } from "react";
+import { Suspense, lazy, useEffect, type ComponentType } from "react";
 import WelcomePage from "@/components/WelcomePage";
 import RouteFallback from "@/components/RouteFallback";
 import ScrollToTop from "@/components/ScrollToTop";
-import LoginAdmin from "@/components/LoginAdmin";
 import { LanguageProvider } from "@/lib/language";
+import {
+  BintaroAdminDashboard,
+  BintaroAdminReservations,
+  CikarangAdminDashboard,
+  CikarangAdminReservations,
+  MainAdminDashboard,
+  MainAdminOnlyPage,
+  MainAdminReservations,
+} from "@/components/admin/adminRoutes";
 
 const AboutPage = lazy(() => import("@/pages/AboutPage"));
 const MenuPage = lazy(() => import("@/pages/MenuPage"));
@@ -25,14 +33,10 @@ const OutletPage = lazy(() => import("@/components/services/OutletPage"));
 const DeliveryPage = lazy(() => import("@/components/services/DeliveryPage"));
 const PartnershipPage = lazy(() => import("@/components/services/PartnershipPage"));
 const CateringPage = lazy(() => import("@/components/services/CateringPage"));
-const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 const AdminCampaigns = lazy(() => import("@/pages/AdminCampaigns"));
 const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
-const AdminReservations = lazy(() => import("@/pages/AdminReservations"));
 const AdminEmails = lazy(() => import("@/pages/AdminEmails"));
 const NotFound = lazy(() => import("@/pages/not-found"));
-
-type AdminRole = "admin_main" | "admin_cikarang" | "admin_bintaro";
 
 function withSuspense(Component: ComponentType) {
   return function SuspendedRoute() {
@@ -42,60 +46,6 @@ function withSuspense(Component: ComponentType) {
       </Suspense>
     );
   };
-}
-
-function ProtectedAdminRoute({
-  component: Component,
-  allowedRoles,
-}: {
-  component: ComponentType;
-  allowedRoles?: AdminRole[];
-}) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [recheckTrigger, setRecheckTrigger] = useState(0);
-
-  useEffect(() => {
-    const checkSession = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch("/api/auth/session", { credentials: "include" });
-        if (response.ok) {
-          const data = await response.json();
-          const isAllowed =
-            data.authenticated &&
-            (allowedRoles ? allowedRoles.includes(data.role as AdminRole) : true);
-          setIsAuthenticated(isAllowed);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch {
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkSession();
-  }, [allowedRoles, recheckTrigger]);
-
-  const handleLogin = () => setRecheckTrigger((prev) => prev + 1);
-
-  if (isLoading) return <RouteFallback />;
-  if (!isAuthenticated) return <LoginAdmin onLogin={handleLogin} />;
-  return (
-    <Suspense fallback={<RouteFallback />}>
-      <Component />
-    </Suspense>
-  );
-}
-
-function AdminRoute({ component: Component }: { component: ComponentType }) {
-  return <ProtectedAdminRoute component={Component} />;
-}
-
-function MainAdminRoute({ component: Component }: { component: ComponentType }) {
-  return <ProtectedAdminRoute component={Component} allowedRoles={["admin_main"]} />;
 }
 
 function ArticleRoute() {
@@ -131,26 +81,24 @@ function Router() {
       <Route path="/services/delivery" component={withSuspense(DeliveryPage)} />
       <Route path="/services/partnership" component={withSuspense(PartnershipPage)} />
       <Route path="/services/catering" component={withSuspense(CateringPage)} />
-      <Route
-        path="/admin"
-        component={() => <AdminRoute component={AdminDashboard} />}
-      />
-      <Route
-        path="/admin/reservations"
-        component={() => <AdminRoute component={AdminReservations} />}
-      />
+      <Route path="/admin/cikarang/reservations" component={CikarangAdminReservations} />
+      <Route path="/admin/cikarang" component={CikarangAdminDashboard} />
+      <Route path="/admin/bintaro/reservations" component={BintaroAdminReservations} />
+      <Route path="/admin/bintaro" component={BintaroAdminDashboard} />
+      <Route path="/admin/reservations" component={MainAdminReservations} />
       <Route
         path="/admin/campaigns"
-        component={() => <MainAdminRoute component={AdminCampaigns} />}
+        component={() => <MainAdminOnlyPage component={AdminCampaigns} />}
       />
       <Route
         path="/admin/users"
-        component={() => <MainAdminRoute component={AdminUsers} />}
+        component={() => <MainAdminOnlyPage component={AdminUsers} />}
       />
       <Route
         path="/admin/emails"
-        component={() => <MainAdminRoute component={AdminEmails} />}
+        component={() => <MainAdminOnlyPage component={AdminEmails} />}
       />
+      <Route path="/admin" component={MainAdminDashboard} />
       <Route component={withSuspense(NotFound)} />
     </Switch>
   );

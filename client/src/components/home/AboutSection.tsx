@@ -1,9 +1,9 @@
 import { memo } from "react";
 import { ChevronRight } from "lucide-react";
-import { useLocation } from "wouter";
 import aboutImage from "@assets/DSC07220_1758565473982.jpg";
 import aboutTitle from "@assets/about-title-gadang-barubah.svg";
 import { useSiteLanguage } from "@/lib/language";
+import { useRevealOutlet, useOutletVisible } from "@/lib/outletReveal";
 
 import { cn } from "@/lib/utils";
 
@@ -27,9 +27,10 @@ const ABOUT_COPY = {
 } as const;
 
 function AboutSection() {
-  const [, navigate] = useLocation();
   const { lang } = useSiteLanguage();
   const outletLabel = lang === "ID" ? "Outlet Kami" : "Our Outlet";
+  const revealOutlet = useRevealOutlet();
+  const outletVisible = useOutletVisible();
 
   return (
     <section
@@ -57,8 +58,9 @@ function AboutSection() {
           </p>
           <button
             type="button"
-            onClick={() => navigate("/services/outlet")}
-            className="mt-8 inline-flex h-11 w-full max-w-[215px] items-center justify-between rounded-lg bg-[#3F0000] px-5 font-heroCta text-base font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors sm:mt-10 sm:h-[52px]"
+            onClick={revealOutlet}
+            aria-expanded={outletVisible}
+            className="mt-8 ml-auto inline-flex h-11 min-w-[170px] items-center justify-between gap-3 rounded-lg bg-[#3F0000] px-5 font-heroCta text-base font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors sm:mt-10 sm:h-[52px]"
           >
             <span>{outletLabel}</span>
             <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
@@ -80,7 +82,7 @@ function AboutSection() {
         </div>
 
         <div className="flex flex-col justify-center px-[clamp(2.5rem,6vw,96px)] py-[clamp(3rem,6vh,5rem)] 2xl:px-[clamp(3rem,7vw,112px)]">
-          <div className="flex w-full max-w-[520px] flex-col items-start 2xl:max-w-[560px]">
+          <div className="flex w-full max-w-[520px] flex-col items-stretch 2xl:max-w-[560px]">
             <h2 className="mb-[clamp(1.25rem,2.5vh,2rem)] w-full text-left">
               <AboutTitleGraphic className="max-w-[min(100%,340px)] 2xl:max-w-[380px]" />
             </h2>
@@ -91,8 +93,9 @@ function AboutSection() {
 
             <button
               type="button"
-              onClick={() => navigate("/services/outlet")}
-              className="mt-[clamp(1.75rem,3.5vh,2.5rem)] inline-flex h-11 min-w-[170px] items-center justify-between gap-3 self-start rounded-lg bg-[#3F0000] px-5 font-heroCta text-sm font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors 2xl:h-12 2xl:min-w-[190px] 2xl:px-6 2xl:text-[15px]"
+              onClick={revealOutlet}
+              aria-expanded={outletVisible}
+              className="mt-[clamp(1.75rem,3.5vh,2.5rem)] ml-auto inline-flex h-11 min-w-[170px] items-center justify-between gap-3 rounded-lg bg-[#3F0000] px-5 font-heroCta text-sm font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors 2xl:h-12 2xl:min-w-[190px] 2xl:px-6 2xl:text-[15px]"
             >
               <span>{outletLabel}</span>
               <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />

@@ -1,6 +1,5 @@
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -15,6 +14,7 @@ import {
 import { Helmet } from "react-helmet-async";
 import AdminShell from "@/components/admin/AdminShell";
 import { apiFetch } from "@/lib/api";
+import { ADMIN_PORTAL_CONFIG, type AdminPortal } from "@shared/admin-portals";
 
 type AdminStats = {
   totalReservations: number;
@@ -31,39 +31,18 @@ type AdminStats = {
   currentlyDining: number;
 };
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ portal }: { portal: AdminPortal }) {
   const [, navigate] = useLocation();
-  const [adminRole, setAdminRole] = useState<"admin_main" | "admin_cikarang" | "admin_bintaro">(
-    "admin_main",
-  );
-
-  useEffect(() => {
-    const loadSession = async () => {
-      try {
-        const res = await fetch("/api/auth/session", { credentials: "include" });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (
-          data?.role === "admin_main" ||
-          data?.role === "admin_cikarang" ||
-          data?.role === "admin_bintaro"
-        ) {
-          setAdminRole(data.role);
-        }
-      } catch {
-        // noop
-      }
-    };
-    loadSession();
-  }, []);
+  const portalConfig = ADMIN_PORTAL_CONFIG[portal];
+  const isMain = portal === "main";
 
   const { data: statsData, isLoading: statsLoading } = useQuery<{
     success: boolean;
     data: AdminStats;
   }>({
-    queryKey: ["/api/admin/stats"],
+    queryKey: [portalConfig.statsApi],
     queryFn: async () => {
-      const response = await apiFetch("/api/admin/stats");
+      const response = await apiFetch(portalConfig.statsApi);
       if (!response.ok) throw new Error("Gagal memuat ringkasan");
       return response.json();
     },
@@ -97,12 +76,12 @@ export default function AdminDashboard() {
       route: "/admin/emails",
       color: "bg-amber-700",
     },
-  ].filter(() => adminRole === "admin_main");
+  ].filter(() => isMain);
 
   const dashboardSubtitle =
-    adminRole === "admin_main"
+    portal === "main"
       ? "Pantau operasional semua cabang & kelola konten"
-      : adminRole === "admin_cikarang"
+      : portal === "cikarang"
         ? "Pantau operasional reservasi cabang Cikarang"
         : "Pantau operasional reservasi cabang Bintaro";
 
@@ -114,7 +93,7 @@ export default function AdminDashboard() {
       </Helmet>
 
       <AdminShell
-        title="Admin Panel"
+        title={portalConfig.labelID}
         subtitle="Dashboard operasional"
         backHref="/"
         showLogout
@@ -143,7 +122,7 @@ export default function AdminDashboard() {
                 </div>
                 <Button
                   className="btn-reserve rounded-none h-11 px-6 gap-2 shrink-0"
-                  onClick={() => navigate("/admin/reservations?filter=today")}
+                  onClick={() => navigate(`${portalConfig.reservationsPath}?filter=today`)}
                 >
                   <CalendarDays className="h-4 w-4" />
                   Buka Operasional Hari Ini
@@ -221,7 +200,7 @@ export default function AdminDashboard() {
               <CardTitle className="text-lg">Statistik Keseluruhan</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+              <div className={`grid gap-4 text-center ${isMain ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2 sm:grid-cols-3"}`}>
                 <div>
                   <p className="text-2xl font-bold text-primary">
                     {statsLoading ? "—" : (stats?.totalReservations ?? 0)}
@@ -240,14 +219,16 @@ export default function AdminDashboard() {
                   </p>
                   <p className="text-sm text-muted-foreground">Dikonfirmasi (semua)</p>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-primary">
-                    {statsLoading ? "—" : (stats?.staffCount ?? 0)}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Admin</p>
-                </div>
+                {isMain ? (
+                  <div>
+                    <p className="text-2xl font-bold text-primary">
+                      {statsLoading ? "—" : (stats?.staffCount ?? 0)}
+                    </p>
+                    <p className="text-sm text-muted-foreground">Admin</p>
+                  </div>
+                ) : null}
               </div>
-              {stats && !statsLoading && (
+              {isMain && stats && !statsLoading && (
                 <p className="text-xs text-center text-muted-foreground mt-4">
                   Popup landing: {stats.hasActiveCampaign ? "aktif" : "tidak ada yang aktif"}
                 </p>

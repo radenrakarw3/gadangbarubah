@@ -12,11 +12,15 @@ import rateLimit from "express-rate-limit";
 import { memberEndpointSecurity } from "./security";
 import { isReservationStatus } from "@shared/reservation-status";
 import {
-  getRoleOutlet,
   normalizeAdminRole,
-  requireAdmin,
   requireMainAdmin,
+  requirePortalAdmin,
 } from "./auth-middleware";
+import {
+  portalLoginDeniedMessage,
+  roleAllowedForPortal,
+  type AdminPortal,
+} from "@shared/admin-portals";
 import { notifyReservationCustomerAsync } from "./reservation-notify";
 import { upload, validateImageDimensions } from "./upload-middleware";
 import fs from "fs";
@@ -67,6 +71,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      const portal = validatedData.portal as AdminPortal;
+      const userRole = normalizeAdminRole(result.user.role);
+      if (!userRole || !roleAllowedForPortal(userRole, portal)) {
+        return res.status(401).json({
+          success: false,
+          message: portalLoginDeniedMessage(portal),
+        });
+      }
+
       req.session.regenerate((err) => {
         if (err) {
           return res.status(500).json({ success: false, message: "Gagal membuat session" });
@@ -74,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         req.session.userId = result.user.id;
         req.session.username = result.user.username;
-        req.session.role = normalizeAdminRole(result.user.role) ?? "admin_main";
+        req.session.role = userRole;
 
         req.session.save((saveErr) => {
           if (saveErr) {
@@ -87,7 +100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             user: {
               id: result.user.id,
               username: result.user.username,
-              role: result.user.role,
+              role: userRole,
             },
           });
         });
@@ -163,10 +176,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/stats", requireAdmin, memberEndpointSecurity, async (req, res) => {
+  app.get("/api/admin/stats", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
     try {
-      const outlet = getRoleOutlet(req.session.role);
-      const stats = await storage.getAdminStats(outlet ?? undefined);
+      const stats = await storage.getAdminStats();
       res.json({ success: true, data: stats });
     } catch (error) {
       console.error("Get admin stats error:", error);
@@ -174,14 +186,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/reservations", requireAdmin, memberEndpointSecurity, async (req, res) => {
+  app.get("/api/admin/reservations", requireMainAdmin, memberEndpointSecurity, async (req, res) => {
     try {
       const date = typeof req.query.date === "string" ? req.query.date : undefined;
       const statusRaw = typeof req.query.status === "string" ? req.query.status : undefined;
       const status =
         statusRaw && isReservationStatus(statusRaw) ? statusRaw : undefined;
-      const outlet = getRoleOutlet(req.session.role);
-      const data = await storage.getReservations({ date, status, outlet: outlet ?? undefined });
+      const data = await storage.getReservations({ date, status });
       res.json({ success: true, data });
     } catch (error) {
       console.error("Get reservations error:", error);
@@ -189,18 +200,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/admin/reservations/:id/status", requireAdmin, memberEndpointSecurity, async (req, res) => {
+  app.patch("/api/admin/reservations/:id/status", requireMainAdmin, memberEndpointSecurity, async (req, res) => {
     try {
-      const outlet = getRoleOutlet(req.session.role);
-      if (outlet) {
-        const current = await storage.getReservationById(req.params.id);
-        if (!current || current.outlet !== outlet) {
-          return res.status(403).json({
-            success: false,
-            message: "Anda hanya dapat mengelola reservasi cabang Anda",
-          });
-        }
-      }
       const { status } = updateReservationStatusSchema.parse(req.body);
       const updated = await storage.updateReservationStatus(req.params.id, status);
       notifyReservationCustomerAsync(updated, status);
@@ -218,6 +219,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  const registerOutletAdminRoutes = (portal: "cikarang" | "bintaro", outletId: string) => {
+    app.get(
+      `/api/admin/${portal}/stats`,
+      requirePortalAdmin(portal),
+      memberEndpointSecurity,
+      async (_req, res) => {
+        try {
+          const stats = await storage.getAdminStats(outletId);
+          res.json({ success: true, data: stats });
+        } catch (error) {
+          console.error(`Get ${portal} admin stats error:`, error);
+          res.status(500).json({ success: false, message: "Gagal mengambil ringkasan cabang" });
+        }
+      },
+    );
+
+    app.get(
+      `/api/admin/${portal}/reservations`,
+      requirePortalAdmin(portal),
+      memberEndpointSecurity,
+      async (req, res) => {
+        try {
+          const date = typeof req.query.date === "string" ? req.query.date : undefined;
+          const statusRaw = typeof req.query.status === "string" ? req.query.status : undefined;
+          const status =
+            statusRaw && isReservationStatus(statusRaw) ? statusRaw : undefined;
+          const data = await storage.getReservations({ date, status, outlet: outletId });
+          res.json({ success: true, data });
+        } catch (error) {
+          console.error(`Get ${portal} reservations error:`, error);
+          res.status(500).json({ success: false, message: "Gagal mengambil data reservasi" });
+        }
+      },
+    );
+
+    app.patch(
+      `/api/admin/${portal}/reservations/:id/status`,
+      requirePortalAdmin(portal),
+      memberEndpointSecurity,
+      async (req, res) => {
+        try {
+          const current = await storage.getReservationById(req.params.id);
+          if (!current || current.outlet !== outletId) {
+            return res.status(403).json({
+              success: false,
+              message: "Anda hanya dapat mengelola reservasi cabang Anda",
+            });
+          }
+          const { status } = updateReservationStatusSchema.parse(req.body);
+          const updated = await storage.updateReservationStatus(req.params.id, status);
+          notifyReservationCustomerAsync(updated, status);
+
+          res.json({
+            success: true,
+            message: "Status reservasi diperbarui",
+            data: updated,
+          });
+        } catch (error: any) {
+          console.error(`Update ${portal} reservation status error:`, error);
+          res.status(400).json({
+            success: false,
+            message: error.errors ? "Data tidak valid" : error.message || "Gagal memperbarui status",
+          });
+        }
+      },
+    );
+  };
+
+  registerOutletAdminRoutes("cikarang", "pollux-cikarang");
+  registerOutletAdminRoutes("bintaro", "bintaro");
 
   app.get("/api/admin/users", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
     try {

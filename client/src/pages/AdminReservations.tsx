@@ -14,6 +14,7 @@ import { apiFetch } from "@/lib/api";
 import { todayISO } from "@/lib/siteContent";
 import type { ReservationRow } from "@/lib/reservation-admin";
 import type { ReservationStatus } from "@shared/reservation-status";
+import { ADMIN_PORTAL_CONFIG, type AdminPortal } from "@shared/admin-portals";
 
 type FilterTab = "today" | "tomorrow" | "all" | "cancelled";
 
@@ -26,13 +27,13 @@ function tomorrowISO() {
   return `${y}-${m}-${day}`;
 }
 
-function buildQueryUrl(tab: FilterTab): string {
+function buildQueryUrl(baseApi: string, tab: FilterTab): string {
   const params = new URLSearchParams();
   if (tab === "today") params.set("date", todayISO());
   else if (tab === "tomorrow") params.set("date", tomorrowISO());
   else if (tab === "cancelled") params.set("status", "cancelled");
   const qs = params.toString();
-  return qs ? `/api/admin/reservations?${qs}` : "/api/admin/reservations";
+  return qs ? `${baseApi}?${qs}` : baseApi;
 }
 
 const TABS: { id: FilterTab; label: string }[] = [
@@ -42,10 +43,11 @@ const TABS: { id: FilterTab; label: string }[] = [
   { id: "cancelled", label: "Batal" },
 ];
 
-export default function AdminReservations() {
+export default function AdminReservations({ portal }: { portal: AdminPortal }) {
   const [, navigate] = useLocation();
   const searchString = useSearch();
   const { toast } = useToast();
+  const portalConfig = ADMIN_PORTAL_CONFIG[portal];
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [detailRes, setDetailRes] = useState<ReservationRow | null>(null);
 
@@ -60,7 +62,7 @@ export default function AdminReservations() {
 
   const [tab, setTab] = useState<FilterTab>(initialTab);
 
-  const queryUrl = buildQueryUrl(tab);
+  const queryUrl = buildQueryUrl(portalConfig.reservationsApi, tab);
 
   const { data, isLoading, isFetching, refetch } = useQuery<{
     success: boolean;
@@ -76,9 +78,9 @@ export default function AdminReservations() {
   });
 
   const { data: statsData } = useQuery({
-    queryKey: ["/api/admin/stats"],
+    queryKey: [portalConfig.statsApi],
     queryFn: async () => {
-      const res = await apiFetch("/api/admin/stats");
+      const res = await apiFetch(portalConfig.statsApi);
       if (!res.ok) throw new Error("Gagal memuat statistik");
       return res.json();
     },
@@ -86,7 +88,7 @@ export default function AdminReservations() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: ReservationStatus }) => {
-      const res = await apiFetch(`/api/admin/reservations/${id}/status`, {
+      const res = await apiFetch(`${portalConfig.statusApiPrefix}/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
@@ -99,9 +101,9 @@ export default function AdminReservations() {
     },
     onSuccess: (result, vars) => {
       queryClient.invalidateQueries({ queryKey: [queryUrl] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
+      queryClient.invalidateQueries({ queryKey: [portalConfig.statsApi] });
       queryClient.invalidateQueries({
-        predicate: (q) => String(q.queryKey[0]).startsWith("/api/admin/reservations"),
+        predicate: (q) => String(q.queryKey[0]).startsWith(portalConfig.reservationsApi),
       });
       toast({ title: "Status diperbarui" });
       if (detailRes?.id === vars.id && result?.data) {
@@ -128,7 +130,11 @@ export default function AdminReservations() {
         <title>Operasional Reservasi - Admin Gadang Barubah</title>
       </Helmet>
 
-      <AdminShell title="Operasional Reservasi" subtitle="Kelola tamu & tracking kunjungan">
+      <AdminShell
+        title="Operasional Reservasi"
+        subtitle={portalConfig.labelID}
+        backHref={portalConfig.basePath}
+      >
         <div className="p-4 lg:p-6">
           <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-6">
             {/* Sidebar ringkasan — desktop */}
@@ -161,7 +167,7 @@ export default function AdminReservations() {
                   </p>
                 </CardContent>
               </Card>
-              <Button variant="outline" className="w-full" onClick={() => navigate("/admin")}>
+              <Button variant="outline" className="w-full" onClick={() => navigate(portalConfig.basePath)}>
                 Kembali ke Dashboard
               </Button>
             </aside>
