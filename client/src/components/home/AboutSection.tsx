@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { ChevronRight } from "lucide-react";
-import { useLocation } from "wouter";import aboutImage from "@assets/DSC07220_1758565473982.jpg";
+import { useLocation } from "wouter";
+import aboutImage from "@assets/DSC07220_1758565473982.jpg";
 import aboutTitle from "@assets/about-title-gadang-barubah.svg";
 import { useSiteLanguage } from "@/lib/language";
 
@@ -65,7 +66,7 @@ function AboutSection() {
         </div>
       </div>
 
-      {/* Desktop — mengikuti mockup: foto kiri penuh, teks kanan centered + justify */}
+      {/* Desktop — foto kiri, teks kanan vertikal center */}
       <div className="relative mx-auto hidden max-w-[1920px] xl:grid xl:min-h-[min(720px,88svh)] xl:grid-cols-[minmax(0,46%)_minmax(0,54%)] xl:items-stretch">
         <div className="relative min-h-[min(560px,72svh)] overflow-hidden xl:min-h-[min(640px,75svh)] 2xl:min-h-[min(720px,78svh)]">
           <img
@@ -78,20 +79,20 @@ function AboutSection() {
           />
         </div>
 
-        <div className="flex flex-col justify-start px-[clamp(2.5rem,6vw,96px)] pb-[clamp(3rem,6vh,5rem)] pt-[clamp(5.5rem,14vh,10rem)] 2xl:px-[clamp(3rem,7vw,112px)] 2xl:pt-[clamp(6.5rem,16vh,11rem)]">
-          <div className="mx-auto flex w-full max-w-[460px] flex-col 2xl:max-w-[500px]">
-            <h2 className="mb-[clamp(1.25rem,2.5vh,2rem)] flex justify-center">
+        <div className="flex flex-col justify-center px-[clamp(2.5rem,6vw,96px)] py-[clamp(3rem,6vh,5rem)] 2xl:px-[clamp(3rem,7vw,112px)]">
+          <div className="flex w-full max-w-[520px] flex-col items-start 2xl:max-w-[560px]">
+            <h2 className="mb-[clamp(1.25rem,2.5vh,2rem)] w-full text-left">
               <AboutTitleGraphic className="max-w-[min(100%,340px)] 2xl:max-w-[380px]" />
             </h2>
 
-            <p className="font-heroCta text-justify text-[12px] font-normal leading-[1.6] tracking-[0.015em] text-black 2xl:text-[13px] 2xl:leading-[1.65]">
+            <p className="font-heroCta text-justify text-base font-normal leading-snug tracking-[0.02em] text-black sm:text-lg xl:text-[clamp(1rem,1.1vw,1.25rem)] xl:leading-[1.45]">
               {ABOUT_COPY[lang]}
             </p>
 
             <button
               type="button"
               onClick={() => navigate("/services/outlet")}
-              className="mt-[clamp(1.75rem,3.5vh,2.5rem)] ml-auto inline-flex h-11 min-w-[170px] items-center justify-between gap-3 rounded-lg bg-[#3F0000] px-5 font-heroCta text-sm font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors 2xl:h-12 2xl:min-w-[190px] 2xl:px-6 2xl:text-[15px]"
+              className="mt-[clamp(1.75rem,3.5vh,2.5rem)] inline-flex h-11 min-w-[170px] items-center justify-between gap-3 self-start rounded-lg bg-[#3F0000] px-5 font-heroCta text-sm font-medium italic tracking-[0.03em] text-white hover:bg-[#520000] transition-colors 2xl:h-12 2xl:min-w-[190px] 2xl:px-6 2xl:text-[15px]"
             >
               <span>{outletLabel}</span>
               <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />

@@ -17,6 +17,48 @@ export const OUTLETS = [
   { id: "bintaro", label: "Bintaro (Jurang Mangu Barat)" },
 ] as const;
 
+/** Empat panel outlet homepage — Figma Frame 6 */
+export const HOME_OUTLET_PANELS = [
+  {
+    id: "cikarang",
+    nameID: "Cikarang",
+    nameEN: "Cikarang",
+    addressID: "Main Gate, Pollux Mall Cikarang",
+    addressEN: "Main Gate, Pollux Mall Cikarang",
+    tone: "gray" as const,
+    status: "open" as const,
+    href: "https://maps.app.goo.gl/jP1JMKQZBU9AXSLz5",
+  },
+  {
+    id: "bintaro",
+    nameID: "Bintaro",
+    nameEN: "Bintaro",
+    addressID: "Jl. Menteng Raya, no.28 (Sektor 7)",
+    addressEN: "Jl. Menteng Raya, no.28 (Sector 7)",
+    tone: "gray" as const,
+    status: "open" as const,
+    href: "https://maps.google.com/?q=Jl.+Menteng+Raya+No.28+Blok+FG+Jurang+Mangu+Barat",
+  },
+  {
+    id: "puri-indah",
+    nameID: "Puri Indah (Segera Hadir)",
+    nameEN: "Puri Indah (Coming Soon)",
+    addressID: "Jakarta Barat",
+    addressEN: "West Jakarta",
+    tone: "salmon" as const,
+    status: "coming-soon" as const,
+  },
+  {
+    id: "fourth-outlet",
+    nameID: "Outlet Ke-4 Kami",
+    nameEN: "Our 4th Outlet",
+    addressID: "Segera Diumumkan",
+    addressEN: "Announce Soon",
+    tone: "salmon" as const,
+    status: "coming-soon" as const,
+  },
+] as const;
+
 export const RESERVATION_TIME_SLOTS = [
   "11:00",
   "12:00",
@@ -71,7 +113,85 @@ export const CATERING_TYPES = [
   { value: "snack-box", label: "Snack Box" },
   { value: "buffet", label: "Buffet" },
   { value: "stall", label: "Stall" },
+  { value: "rental-room", label: "Rental Room / Sewa Ruang" },
+  { value: "home-delivery", label: "Home Delivery Service" },
   { value: "tumpeng", label: "Nasi Tumpeng" },
+] as const;
+
+/** Kolase layanan homepage — Figma Frame 7 (grid 3×2) */
+export const HOME_CATERING_SERVICES = [
+  {
+    id: "mealbox",
+    cateringType: "saji-gadang" as const,
+    nameID: "Mealbox (Saji Gadang)",
+    nameEN: "Mealbox (Saji Gadang)",
+    descriptionID:
+      "Nasi box premium dengan lauk pilihan masakan Padang — praktis untuk meeting, seminar, dan acara kantor. Menu dapat disesuaikan jumlah porsi dan komposisi lauk.",
+    descriptionEN:
+      "Premium rice boxes with selected Padang dishes — ideal for meetings, seminars, and office events. Menu and portion counts can be tailored to your needs.",
+    tone: "#C75757",
+    row: "top" as const,
+  },
+  {
+    id: "buffet",
+    cateringType: "buffet" as const,
+    nameID: "Buffet",
+    nameEN: "Buffet",
+    descriptionID:
+      "Prasmanan Padang lengkap dengan setup di venue Anda — cocok untuk pernikahan, corporate event, dan perayaan besar. Tim kami menangani persiapan, saji, hingga peralatan makan.",
+    descriptionEN:
+      "Full Padang buffet with on-site setup — perfect for weddings, corporate events, and large celebrations. Our team handles preparation, service, and dining equipment.",
+    tone: "#402C2C",
+    row: "top" as const,
+  },
+  {
+    id: "snackbox",
+    cateringType: "snack-box" as const,
+    nameID: "Snackbox",
+    nameEN: "Snackbox",
+    descriptionID:
+      "Camilan khas Minang dalam kemasan elegan untuk hospitality, goodie bag acara, atau suguhan tamu. Pilihan kudapan fresh dengan presentasi rapi.",
+    descriptionEN:
+      "Minang-style snacks in elegant packaging for hospitality, event goodie bags, or guest treats. Fresh selections with neat presentation.",
+    tone: "#3D0C0C",
+    row: "top" as const,
+  },
+  {
+    id: "rental-room",
+    cateringType: "rental-room" as const,
+    nameID: "Rental Room",
+    nameEN: "Rental Room",
+    descriptionID:
+      "Sewa ruang VIP di outlet Gadang Barubah untuk private dining, arisan, gathering keluarga, atau acara intim. Ruangan ber-AC dengan kapasitas fleksibel dan layanan penuh.",
+    descriptionEN:
+      "VIP room rental at Gadang Barubah outlets for private dining, gatherings, and intimate events. Air-conditioned space with flexible capacity and full service.",
+    tone: "#402C2C",
+    row: "bottom" as const,
+  },
+  {
+    id: "stall",
+    cateringType: "stall" as const,
+    nameID: "Stall",
+    nameEN: "Stall",
+    descriptionID:
+      "Gerai live cooking di lokasi acara Anda — hadirkan pengalaman masakan Padang langsung di depan tamu. Cocok untuk festival, bazaar, dan event outdoor.",
+    descriptionEN:
+      "Live cooking stall at your event venue — bring the Padang cooking experience directly to your guests. Ideal for festivals, bazaars, and outdoor events.",
+    tone: "#3D0C0C",
+    row: "bottom" as const,
+  },
+  {
+    id: "home-delivery",
+    cateringType: "home-delivery" as const,
+    nameID: "Home Delivery Service",
+    nameEN: "Home Delivery Service",
+    descriptionID:
+      "Antar hidangan Padang ke rumah atau kantor dengan packaging rapi dan pengiriman tepat waktu. Pesan via WhatsApp untuk menu harian atau pesanan besar.",
+    descriptionEN:
+      "Padang meals delivered to your home or office with neat packaging and on-time service. Order via WhatsApp for daily meals or large orders.",
+    tone: "#C75757",
+    row: "bottom" as const,
+  },
 ] as const;
 
 export const FOOTER_NAV_LEFT = [

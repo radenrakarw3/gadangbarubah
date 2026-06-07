@@ -351,7 +351,7 @@ function QuickReservationBarInner() {
           </button>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:gap-2.5 sm:p-3.5 lg:overflow-visible lg:p-0 lg:pb-0">
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:gap-5 sm:p-3.5 lg:overflow-visible lg:gap-5 lg:p-0 lg:pb-0">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2 lg:grid-cols-4 lg:items-center lg:gap-2 xl:grid-cols-7 xl:gap-2.5">
             <Input
               name="nama"
@@ -411,7 +411,7 @@ function QuickReservationBarInner() {
             />
           </div>
 
-          <div className="mx-auto flex w-full flex-col items-center gap-1.5 pt-0.5 lg:pt-1">
+          <div className="mx-auto flex w-full flex-col items-center gap-3 pt-2 lg:gap-4 lg:pt-4">
             <PrivacyConsentField
               checked={privacyAccepted}
               onCheckedChange={setPrivacyAccepted}

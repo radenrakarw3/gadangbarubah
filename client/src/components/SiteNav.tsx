@@ -207,7 +207,7 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
   }, [open, closeMenu]);
 
   const navText = cn(
-    "font-heroCta text-[10px] font-normal uppercase leading-[14px] tracking-[0.05em] transition-opacity hover:opacity-85 xl:text-[11px] xl:leading-[15px]",
+    "text-figma-nav font-normal uppercase transition-opacity hover:opacity-85",
     isTransparent
       ? cn("text-white", TRANSPARENT_NAV_TEXT_SHADOW)
       : "text-foreground/90 hover:text-[#3F0000]",

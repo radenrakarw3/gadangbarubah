@@ -187,6 +187,14 @@
     max-width: 100%;
   }
 
+  /* Safari/macOS: hindari teks nav terlalu kecil vs Windows */
+  @supports (-webkit-hyphens: none) {
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
+
   body {
     @apply font-sans antialiased bg-background text-foreground;
     overflow-x: clip;
@@ -341,6 +349,42 @@
       );
   }
 
+  /* Signature menu — tekstur halus; ganti URL saat asset bg siap di attached_assets */
+  .signature-menu-section {
+    background-color: #300505;
+  }
+
+  .signature-menu-section-bg {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    background-color: #300505;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 50% 40%, hsl(var(--minang-gold-primary) / 0.07) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 20% 80%, hsl(350 55% 22% / 0.45) 0%, transparent 50%),
+      repeating-linear-gradient(
+        45deg,
+        hsl(var(--minang-gold-primary) / 0.035) 0px,
+        hsl(var(--minang-gold-primary) / 0.035) 1px,
+        transparent 1px,
+        transparent 14px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        hsl(var(--minang-gold-primary) / 0.025) 0px,
+        hsl(var(--minang-gold-primary) / 0.025) 1px,
+        transparent 1px,
+        transparent 14px
+      );
+  }
+
+  .signature-menu-section-bg.has-image {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
   .section-heading {
     @apply font-display text-2xl sm:text-4xl lg:text-[2.75rem] font-semibold tracking-wide text-foreground;
   }
@@ -378,9 +422,9 @@
   .text-figma-nav {
     font-family: var(--font-hero-cta);
     font-weight: 400;
-    font-size: clamp(0.6875rem, 0.65rem + 0.12vw, 0.8125rem);
-    line-height: 1.2;
-    letter-spacing: 0.04em;
+    font-size: clamp(0.75rem, 0.7rem + 0.15vw, 0.875rem);
+    line-height: 1.25;
+    letter-spacing: 0.05em;
   }
 
   .text-figma-section-title {
@@ -403,9 +447,8 @@
     }
 
     .text-figma-nav {
-      font-size: 0.6875rem;
-      line-height: 1rem;
-      letter-spacing: 0.06em;
+      font-size: 0.75rem;
+      line-height: 1.25;
     }
   }
 

@@ -7,7 +7,7 @@ const SEAM_GRADIENTS = {
   "cream-to-maroon":
     "linear-gradient(180deg, #f5ebe6 0%, #a85850 12%, #7a2e2e 30%, #5c1818 48%, #4a1010 66%, #3a0808 84%, #300505 100%)",
   "maroon-to-inquiry":
-    "linear-gradient(180deg, #300505 0%, #3f0a0a 22%, #521212 44%, #6b2424 66%, #8f4a42 84%, #FFFCF8 100%)",
+    "linear-gradient(180deg, #300505 0%, #3a0c0c 20%, #521818 45%, #7a3830 70%, #c4a098 88%, #D9D9D9 100%)",
   "inquiry-to-contact":
     "linear-gradient(180deg, #FFFCF8 0%, #ead9cf 40%, #e0cfc5 70%, #f3efe8 100%)",
   "contact-to-footer":

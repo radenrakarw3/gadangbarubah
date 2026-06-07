@@ -7,7 +7,7 @@ import LazyWhenVisible from "./home/LazyWhenVisible";
 
 const loadSignatureMenu = () => import("./home/SignatureMenuSection");
 const loadAbout = () => import("./home/AboutSection");
-const loadCateringService = () => import("./home/CateringServiceSection");
+const loadOurOutlet = () => import("./home/OurOutletSection");
 const loadCateringInquiry = () => import("./home/CateringInquirySection");
 
 export default function WelcomePage() {
@@ -30,11 +30,9 @@ export default function WelcomePage() {
 
               <SectionSeam variant="cream-to-maroon" />
 
-              <LazyWhenVisible load={loadCateringService} minHeight="520px" />
+              <LazyWhenVisible load={loadOurOutlet} minHeight="800px" />
 
-              <SectionSeam variant="maroon-to-inquiry" />
-
-              <LazyWhenVisible load={loadCateringInquiry} minHeight="640px" />
+              <LazyWhenVisible load={loadCateringInquiry} minHeight="900px" />
             </main>
           </div>
         </div>

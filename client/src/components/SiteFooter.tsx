@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Instagram, Linkedin } from "lucide-react";
-import logoImage from "@assets/padang gadang barubah logo_1758561601552.webp";
+import navLogoIcon from "@assets/gadang-barubah-logo-icon.png";
 import { COMPANY, FOOTER_NAV_LEFT, SOCIAL_LINKS } from "@/lib/siteContent";
 import { useSiteLanguage } from "@/lib/language";
 
@@ -67,7 +67,7 @@ export default function SiteFooter() {
   return (
     <footer className="mt-auto w-full shrink-0 border-t border-black/5 bg-white text-black">
       <div className="mx-auto flex w-full max-w-[1920px] flex-col px-4 sm:px-8 lg:px-10 xl:min-h-[520px] xl:px-[clamp(2.5rem,7.5vw,144px)]">
-        <div className="flex items-center justify-between border-b border-black/5 py-6 sm:py-8 xl:border-0 xl:pt-[88px] xl:pb-0">
+        <div className="flex items-center justify-between border-b border-black/5 py-6 sm:py-8 xl:border-0 xl:pb-0 xl:pt-[88px]">
           <div className="flex items-center gap-5 sm:gap-8">
             <SocialIcon href={SOCIAL_LINKS.tiktok} label="TikTok">
               <TikTokIcon className="h-[22px] w-[22px]" />
@@ -80,17 +80,18 @@ export default function SiteFooter() {
             </SocialIcon>
           </div>
           <img
-            src={logoImage}
+            src={navLogoIcon}
             alt="Gadang Barubah"
-            className="h-10 w-[72px] object-contain object-right sm:h-12 sm:w-[86px]"
-            width={86}
-            height={64}
+            className="h-16 w-16 shrink-0 object-contain sm:h-20 sm:w-20 xl:h-[88px] xl:w-[88px]"
+            width={88}
+            height={88}
             loading="lazy"
+            decoding="async"
           />
         </div>
 
-        <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-6 py-8 sm:gap-x-12 lg:grid-cols-[auto_auto_1fr] lg:items-start lg:gap-x-16 xl:py-14">
-          <nav className="flex flex-col gap-1">
+        <div className="mt-auto grid grid-cols-2 gap-x-8 gap-y-6 py-8 sm:gap-x-12 lg:grid-cols-[auto_auto_1fr] lg:items-end lg:gap-x-16 xl:gap-x-[clamp(3rem,8vw,120px)] xl:py-0 xl:pb-[88px] xl:pt-10">
+          <nav className="flex flex-col gap-0">
             <p className="mb-1 font-heroCta text-xs uppercase tracking-widest text-black/40 xl:hidden">
               {lang === "ID" ? "Navigasi" : "Navigate"}
             </p>
@@ -101,7 +102,7 @@ export default function SiteFooter() {
             ))}
           </nav>
 
-          <nav className="flex flex-col gap-1">
+          <nav className="flex flex-col gap-0">
             <p className="mb-1 font-heroCta text-xs uppercase tracking-widest text-black/40 xl:hidden">
               Member
             </p>
@@ -116,8 +117,8 @@ export default function SiteFooter() {
             ))}
           </nav>
 
-          <div className="col-span-2 text-left lg:col-span-1 lg:ml-auto lg:max-w-[497px] lg:text-right">
-            <p className="mb-1 font-heroCta text-[15px] font-normal text-black sm:text-base xl:text-[18px] xl:leading-[40px]">
+          <div className="col-span-2 flex flex-col justify-end text-left lg:col-span-1 lg:ml-auto lg:max-w-[497px] lg:self-end lg:text-right">
+            <p className="font-heroCta text-[15px] font-normal text-black sm:text-base xl:text-[18px] xl:leading-[40px]">
               {COMPANY.name}
             </p>
             <p className="font-heroCta text-sm font-light leading-relaxed text-black sm:text-[15px] xl:text-[18px] xl:leading-[40px]">
