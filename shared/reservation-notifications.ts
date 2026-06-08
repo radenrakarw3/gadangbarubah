@@ -103,6 +103,27 @@ export function shouldNotifyReservationStatus(status: ReservationStatus): boolea
   return NOTIFIABLE_STATUSES.includes(status);
 }
 
+/** Pesan WA ke staff operasional saat ada reservasi baru */
+export function buildStaffNewReservationMessage(reservation: Reservation): string {
+  const tanggal = formatDateId(String(reservation.tanggalReservasi));
+  const outlet = outletLabel(reservation.outlet);
+  const meja = mejaLabel(reservation.tipeMeja);
+  const catatan = reservation.catatan?.trim();
+  const emailLine = reservation.email?.trim() ? `📧 ${reservation.email.trim()}\n` : "";
+
+  return (
+    `🔔 *Reservasi Baru* — ${outlet}\n\n` +
+    `👤 ${reservation.namaLengkap}\n` +
+    `📱 ${reservation.noWhatsApp}\n` +
+    emailLine +
+    `📅 ${tanggal}\n` +
+    `🕐 ${reservation.waktuReservasi} WIB\n` +
+    `👥 ${reservation.jumlahTamu} tamu | Meja ${meja}\n` +
+    (catatan ? `📝 ${catatan}\n` : "") +
+    `\nStatus: Menunggu konfirmasi. Silakan buka panel admin.`
+  );
+}
+
 export function notificationStatusLabel(status: ReservationStatus): string {
   return RESERVATION_STATUS_LABELS[status];
 }

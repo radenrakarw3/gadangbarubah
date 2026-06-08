@@ -4,6 +4,9 @@ export const COMPANY = {
     "Jl. Menteng Raya No.28 Blok FG, Jurang Mangu Barat, Kec. Pd. Aren, Kota Tangerang Selatan, Banten 15412",
   whatsapp: "6289509766739",
   phoneDisplay: "089509766739",
+  /** Nomor WA khusus inquiry & reservasi catering (homepage + halaman catering) */
+  cateringWhatsapp: "6289601039424",
+  cateringPhoneDisplay: "0896-0103-9424",
 };
 
 export const SOCIAL_LINKS = {

@@ -15,9 +15,7 @@ function stepTime(res: ReservationRow, step: string): string | null {
     case "pending":
       return formatTimeShort(res.createdAt);
     case "confirmed":
-      return res.status !== "pending" && res.status !== "cancelled"
-        ? formatTimeShort(res.updatedAt)
-        : null;
+      return formatTimeShort(res.confirmedAt);
     case "arrived":
       return formatTimeShort(res.arrivedAt);
     case "dining":
@@ -47,8 +45,12 @@ export default function ReservationTimeline({
   const isCancelled = reservation.status === "cancelled";
 
   if (isCancelled) {
+    const cancelledAt = formatTimeShort(reservation.cancelledAt);
     return (
-      <p className="text-xs text-red-600 font-medium">Reservasi dibatalkan</p>
+      <p className="text-xs text-red-600 font-medium">
+        Reservasi dibatalkan
+        {cancelledAt ? ` · ${cancelledAt}` : ""}
+      </p>
     );
   }
 

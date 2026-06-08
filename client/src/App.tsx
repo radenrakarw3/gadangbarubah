@@ -10,12 +10,14 @@ import WelcomePage from "@/components/WelcomePage";
 import RouteFallback from "@/components/RouteFallback";
 import ScrollToTop from "@/components/ScrollToTop";
 import { LanguageProvider } from "@/lib/language";
+import { AdminAuthProvider } from "@/lib/admin-auth";
 import {
+  BintaroAdminDashboard,
   BintaroReservationStaff,
+  CikarangAdminDashboard,
   CikarangReservationStaff,
   MainAdminDashboard,
   MainAdminOnlyPage,
-  MainAdminReservations,
 } from "@/components/admin/adminRoutes";
 
 const AboutPage = lazy(() => import("@/pages/AboutPage"));
@@ -34,6 +36,8 @@ const CateringPage = lazy(() => import("@/components/services/CateringPage"));
 const AdminCampaigns = lazy(() => import("@/pages/AdminCampaigns"));
 const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
 const AdminEmails = lazy(() => import("@/pages/AdminEmails"));
+const AdminMenu = lazy(() => import("@/pages/AdminMenu"));
+const AdminLoginPage = lazy(() => import("@/pages/AdminLoginPage"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 function withSuspense(Component: ComponentType) {
@@ -87,6 +91,9 @@ function Router() {
       <Route path="/services/delivery" component={withSuspense(DeliveryPage)} />
       <Route path="/services/partnership" component={withSuspense(PartnershipPage)} />
       <Route path="/services/catering" component={withSuspense(CateringPage)} />
+      <Route path="/admin/login" component={withSuspense(AdminLoginPage)} />
+      <Route path="/kelola-reservasi/cikarang/dashboard" component={CikarangAdminDashboard} />
+      <Route path="/kelola-reservasi/bintaro/dashboard" component={BintaroAdminDashboard} />
       <Route path="/kelola-reservasi/cikarang" component={CikarangReservationStaff} />
       <Route path="/kelola-reservasi/bintaro" component={BintaroReservationStaff} />
       <Route path="/admin/cikarang/reservations">
@@ -101,7 +108,9 @@ function Router() {
       <Route path="/admin/bintaro">
         <AdminRedirect to="/kelola-reservasi/bintaro" />
       </Route>
-      <Route path="/admin/reservations" component={MainAdminReservations} />
+      <Route path="/admin/reservations">
+        <AdminRedirect to="/admin" />
+      </Route>
       <Route
         path="/admin/campaigns"
         component={() => <MainAdminOnlyPage component={AdminCampaigns} />}
@@ -113,6 +122,10 @@ function Router() {
       <Route
         path="/admin/emails"
         component={() => <MainAdminOnlyPage component={AdminEmails} />}
+      />
+      <Route
+        path="/admin/menu"
+        component={() => <MainAdminOnlyPage component={AdminMenu} />}
       />
       <Route path="/admin" component={MainAdminDashboard} />
       <Route component={withSuspense(NotFound)} />
@@ -138,9 +151,11 @@ function App() {
       <TooltipProvider>
         <HelmetProvider>
           <LanguageProvider>
-            <ScrollToTop />
-            <Toaster />
-            <Router />
+            <AdminAuthProvider>
+              <ScrollToTop />
+              <Toaster />
+              <Router />
+            </AdminAuthProvider>
           </LanguageProvider>
         </HelmetProvider>
       </TooltipProvider>

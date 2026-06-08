@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useLocation, useSearch } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { CalendarDays, Loader2, RefreshCw } from "lucide-react";
@@ -69,7 +69,30 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
 
   const [tab, setTab] = useState<FilterTab>(initialTab);
 
-  const queryUrl = buildQueryUrl(portalConfig.reservationsApi, tab);
+  useEffect(() => {
+    setTab(initialTab);
+  }, [initialTab]);
+
+  const handleTabChange = (next: FilterTab) => {
+    setTab(next);
+    const params = new URLSearchParams();
+    if (next !== "today") params.set("filter", next);
+    const qs = params.toString();
+    const path = portalConfig.reservationsPath ?? portalConfig.dashboardPath;
+    navigate(`${path}${qs ? `?${qs}` : ""}`, { replace: true });
+  };
+
+  const reservationsApi = portalConfig.reservationsApi;
+  const statusApiPrefix = portalConfig.statusApiPrefix;
+  const hasReservationAccess = Boolean(reservationsApi && statusApiPrefix);
+
+  useEffect(() => {
+    if (!hasReservationAccess) {
+      navigate(portalConfig.dashboardPath, { replace: true });
+    }
+  }, [hasReservationAccess, navigate, portalConfig.dashboardPath]);
+
+  const queryUrl = reservationsApi ? buildQueryUrl(reservationsApi, tab) : "";
 
   const { data, isLoading, isFetching, refetch } = useQuery<{
     success: boolean;
@@ -81,6 +104,7 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
       if (!res.ok) throw new Error("Gagal memuat reservasi");
       return res.json();
     },
+    enabled: hasReservationAccess,
     refetchInterval: tab === "today" ? 45_000 : false,
   });
 
@@ -91,11 +115,12 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
       if (!res.ok) throw new Error("Gagal memuat statistik");
       return res.json();
     },
+    enabled: hasReservationAccess,
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: ReservationStatus }) => {
-      const res = await apiFetch(`${portalConfig.statusApiPrefix}/${id}/status`, {
+      const res = await apiFetch(`${statusApiPrefix}/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
@@ -110,7 +135,8 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
       queryClient.invalidateQueries({ queryKey: [queryUrl] });
       queryClient.invalidateQueries({ queryKey: [portalConfig.statsApi] });
       queryClient.invalidateQueries({
-        predicate: (q) => String(q.queryKey[0]).startsWith(portalConfig.reservationsApi),
+        predicate: (q) =>
+          reservationsApi ? String(q.queryKey[0]).startsWith(reservationsApi) : false,
       });
       toast({ title: "Status diperbarui" });
       if (detailRes?.id === vars.id && result?.data) {
@@ -126,6 +152,10 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
   const reservations = data?.data ?? [];
   const stats = statsData?.data;
 
+  if (!hasReservationAccess) {
+    return null;
+  }
+
   const handleStatusChange = (id: string, status: ReservationStatus) => {
     setUpdatingId(id);
     updateMutation.mutate({ id, status });
@@ -140,8 +170,8 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
       <AdminShell
         title={staffOnly ? portalConfig.staffLabelID : "Operasional Reservasi"}
         subtitle={staffOnly ? outletLabel : portalConfig.labelID}
-        backHref={staffOnly ? "/" : portalConfig.basePath}
-        showLogout={staffOnly}
+        backHref={portalConfig.dashboardPath}
+        showLogout
       >
         <div className="p-4 lg:p-6">
           <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-6">
@@ -175,11 +205,13 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
                   </p>
                 </CardContent>
               </Card>
-              {!staffOnly ? (
-                <Button variant="outline" className="w-full" onClick={() => navigate(portalConfig.basePath)}>
-                  Kembali ke Dashboard
-                </Button>
-              ) : null}
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => navigate(portalConfig.dashboardPath)}
+              >
+                Kembali ke Dashboard
+              </Button>
             </aside>
 
             <div className="space-y-4">
@@ -211,7 +243,7 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
                     variant={tab === t.id ? "default" : "outline"}
                     size="sm"
                     className={tab === t.id ? "btn-reserve" : "rounded-none"}
-                    onClick={() => setTab(t.id)}
+                    onClick={() => handleTabChange(t.id)}
                   >
                     {t.label}
                   </Button>

@@ -2,13 +2,24 @@ import {
   users,
   campaigns,
   reservations,
+  cateringInquiries,
+  menuCategories,
+  menuItems,
   type User,
   type InsertUser,
   type InsertReservation,
   type Reservation,
   type InsertCampaign,
   type Campaign,
+  type CateringInquiry,
+  type InsertMenuCategory,
+  type UpdateMenuCategory,
+  type MenuCategory,
+  type InsertMenuItem,
+  type UpdateMenuItem,
+  type MenuItem,
 } from "@shared/schema";
+import type { CateringInquiryType } from "@shared/catering";
 import {
   canTransition,
   isReservationStatus,
@@ -17,6 +28,7 @@ import {
 import { requireDb } from "./db";
 import { eq, and, desc, asc, gte, lte, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
+import { todayISOInWIB } from "@shared/reservation-utils";
 
 export type ReservationFilters = {
   date?: string;
@@ -45,6 +57,26 @@ export interface IStorage {
   getReservations(filters?: ReservationFilters): Promise<Reservation[]>;
   getReservationById(id: string): Promise<Reservation | undefined>;
   updateReservationStatus(id: string, status: ReservationStatus): Promise<Reservation>;
+  updateReservationNotification(
+    id: string,
+    patch: {
+      customerNotifyOk?: boolean | null;
+      customerNotifyError?: string | null;
+      customerNotifyAt?: Date;
+      staffNotifyOk?: boolean | null;
+      staffNotifyError?: string | null;
+      staffNotifyAt?: Date;
+    },
+  ): Promise<void>;
+
+  createCateringInquiry(data: {
+    nama: string;
+    noWhatsApp: string;
+    email?: string;
+    tipeLayanan: CateringInquiryType;
+    pax: number;
+  }): Promise<CateringInquiry>;
+  getCateringInquiries(): Promise<CateringInquiry[]>;
 
   createCampaign(campaign: InsertCampaign, imagePath: string, createdBy: string): Promise<Campaign>;
   getCampaigns(): Promise<Campaign[]>;
@@ -52,6 +84,27 @@ export interface IStorage {
   updateCampaignStatus(id: string, status: "active" | "inactive"): Promise<Campaign>;
   deleteCampaign(id: string): Promise<void>;
   incrementCampaignViewCount(id: string): Promise<void>;
+
+  getMenuCategories(): Promise<MenuCategory[]>;
+  createMenuCategory(data: InsertMenuCategory): Promise<MenuCategory>;
+  updateMenuCategory(id: string, data: UpdateMenuCategory): Promise<MenuCategory>;
+  deleteMenuCategory(id: string): Promise<void>;
+  getMenuCategoryItemCount(categoryId: string): Promise<number>;
+
+  getMenuItems(): Promise<(MenuItem & { categoryNameId: string; categoryNameEn: string })[]>;
+  getPublicMenu(): Promise<
+    Array<MenuCategory & { items: MenuItem[] }>
+  >;
+  getFeaturedMenuItems(limit?: number): Promise<MenuItem[]>;
+  createMenuItem(data: InsertMenuItem, imagePath: string): Promise<MenuItem>;
+  updateMenuItem(id: string, data: UpdateMenuItem): Promise<MenuItem>;
+  updateMenuItemImage(id: string, imagePath: string): Promise<MenuItem>;
+  updateMenuItemStatus(
+    id: string,
+    patch: { isActive?: boolean; isFeatured?: boolean },
+  ): Promise<MenuItem>;
+  deleteMenuItem(id: string): Promise<MenuItem | undefined>;
+  getMenuItemById(id: string): Promise<MenuItem | undefined>;
 
   getAdminStats(outlet?: string): Promise<{
     totalReservations: number;
@@ -164,7 +217,7 @@ export class DatabaseStorage implements IStorage {
         namaLengkap: data.namaLengkap,
         noWhatsApp: data.noWhatsApp,
         email: data.email || null,
-        outlet: data.outlet || null,
+        outlet: data.outlet,
         tanggalReservasi: data.tanggalReservasi,
         waktuReservasi: data.waktuReservasi,
         jumlahTamu: data.jumlahTamu,
@@ -211,6 +264,48 @@ export class DatabaseStorage implements IStorage {
     return row || undefined;
   }
 
+  async updateReservationNotification(
+    id: string,
+    patch: {
+      customerNotifyOk?: boolean | null;
+      customerNotifyError?: string | null;
+      customerNotifyAt?: Date;
+      staffNotifyOk?: boolean | null;
+      staffNotifyError?: string | null;
+      staffNotifyAt?: Date;
+    },
+  ): Promise<void> {
+    await requireDb().update(reservations).set(patch).where(eq(reservations.id, id));
+  }
+
+  async createCateringInquiry(data: {
+    nama: string;
+    noWhatsApp: string;
+    email?: string;
+    tipeLayanan: CateringInquiryType;
+    pax: number;
+  }): Promise<CateringInquiry> {
+    const [row] = await requireDb()
+      .insert(cateringInquiries)
+      .values({
+        nama: data.nama,
+        noWhatsApp: data.noWhatsApp,
+        email: data.email || null,
+        tipeLayanan: data.tipeLayanan,
+        pax: data.pax,
+        status: "pending",
+      })
+      .returning();
+    return row;
+  }
+
+  async getCateringInquiries(): Promise<CateringInquiry[]> {
+    return requireDb()
+      .select()
+      .from(cateringInquiries)
+      .orderBy(desc(cateringInquiries.createdAt));
+  }
+
   async updateReservationStatus(id: string, status: ReservationStatus): Promise<Reservation> {
     const [existing] = await requireDb()
       .select()
@@ -238,6 +333,9 @@ export class DatabaseStorage implements IStorage {
       updatedAt: now,
     };
 
+    if (status === "confirmed" && !existing.confirmedAt) {
+      updates.confirmedAt = now;
+    }
     if (status === "arrived" && !existing.arrivedAt) {
       updates.arrivedAt = now;
     }
@@ -246,6 +344,9 @@ export class DatabaseStorage implements IStorage {
     }
     if (status === "completed" && !existing.completedAt) {
       updates.completedAt = now;
+    }
+    if (status === "cancelled" && !existing.cancelledAt) {
+      updates.cancelledAt = now;
     }
 
     const [updated] = await requireDb()
@@ -322,12 +423,195 @@ export class DatabaseStorage implements IStorage {
       .where(eq(campaigns.id, id));
   }
 
+  async getMenuCategories(): Promise<MenuCategory[]> {
+    return requireDb()
+      .select()
+      .from(menuCategories)
+      .orderBy(asc(menuCategories.sortOrder), asc(menuCategories.nameId));
+  }
+
+  async createMenuCategory(data: InsertMenuCategory): Promise<MenuCategory> {
+    const [created] = await requireDb()
+      .insert(menuCategories)
+      .values({
+        nameId: data.nameId,
+        nameEn: data.nameEn,
+        slug: data.slug,
+        sortOrder: data.sortOrder ?? 0,
+        isActive: data.isActive ?? true,
+      })
+      .returning();
+    return created;
+  }
+
+  async updateMenuCategory(id: string, data: UpdateMenuCategory): Promise<MenuCategory> {
+    const [updated] = await requireDb()
+      .update(menuCategories)
+      .set({
+        ...(data.nameId !== undefined && { nameId: data.nameId }),
+        ...(data.nameEn !== undefined && { nameEn: data.nameEn }),
+        ...(data.slug !== undefined && { slug: data.slug }),
+        ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
+        ...(data.isActive !== undefined && { isActive: data.isActive }),
+      })
+      .where(eq(menuCategories.id, id))
+      .returning();
+    if (!updated) throw new Error("Kategori tidak ditemukan");
+    return updated;
+  }
+
+  async getMenuCategoryItemCount(categoryId: string): Promise<number> {
+    const [row] = await requireDb()
+      .select({ count: sql<number>`count(*)::int` })
+      .from(menuItems)
+      .where(eq(menuItems.categoryId, categoryId));
+    return row?.count ?? 0;
+  }
+
+  async deleteMenuCategory(id: string): Promise<void> {
+    const count = await this.getMenuCategoryItemCount(id);
+    if (count > 0) {
+      throw new Error("Kategori masih memiliki item menu. Hapus item terlebih dahulu.");
+    }
+    const result = await requireDb().delete(menuCategories).where(eq(menuCategories.id, id));
+    if (!result.rowCount) throw new Error("Kategori tidak ditemukan");
+  }
+
+  async getMenuItems(): Promise<(MenuItem & { categoryNameId: string; categoryNameEn: string })[]> {
+    const rows = await requireDb()
+      .select({
+        id: menuItems.id,
+        categoryId: menuItems.categoryId,
+        nameId: menuItems.nameId,
+        nameEn: menuItems.nameEn,
+        descriptionId: menuItems.descriptionId,
+        descriptionEn: menuItems.descriptionEn,
+        imagePath: menuItems.imagePath,
+        tag: menuItems.tag,
+        isFeatured: menuItems.isFeatured,
+        isActive: menuItems.isActive,
+        sortOrder: menuItems.sortOrder,
+        createdAt: menuItems.createdAt,
+        updatedAt: menuItems.updatedAt,
+        categoryNameId: menuCategories.nameId,
+        categoryNameEn: menuCategories.nameEn,
+      })
+      .from(menuItems)
+      .innerJoin(menuCategories, eq(menuItems.categoryId, menuCategories.id))
+      .orderBy(asc(menuCategories.sortOrder), asc(menuItems.sortOrder), asc(menuItems.nameId));
+    return rows;
+  }
+
+  async getPublicMenu(): Promise<Array<MenuCategory & { items: MenuItem[] }>> {
+    const categories = await requireDb()
+      .select()
+      .from(menuCategories)
+      .where(eq(menuCategories.isActive, true))
+      .orderBy(asc(menuCategories.sortOrder), asc(menuCategories.nameId));
+
+    const items = await requireDb()
+      .select()
+      .from(menuItems)
+      .where(eq(menuItems.isActive, true))
+      .orderBy(asc(menuItems.sortOrder), asc(menuItems.nameId));
+
+    return categories.map((category) => ({
+      ...category,
+      items: items.filter((item) => item.categoryId === category.id),
+    }));
+  }
+
+  async getFeaturedMenuItems(limit = 8): Promise<MenuItem[]> {
+    return requireDb()
+      .select()
+      .from(menuItems)
+      .where(and(eq(menuItems.isFeatured, true), eq(menuItems.isActive, true)))
+      .orderBy(asc(menuItems.sortOrder), asc(menuItems.nameId))
+      .limit(limit);
+  }
+
+  async getMenuItemById(id: string): Promise<MenuItem | undefined> {
+    const [item] = await requireDb().select().from(menuItems).where(eq(menuItems.id, id)).limit(1);
+    return item;
+  }
+
+  async createMenuItem(data: InsertMenuItem, imagePath: string): Promise<MenuItem> {
+    const [created] = await requireDb()
+      .insert(menuItems)
+      .values({
+        categoryId: data.categoryId,
+        nameId: data.nameId,
+        nameEn: data.nameEn,
+        descriptionId: data.descriptionId,
+        descriptionEn: data.descriptionEn,
+        imagePath,
+        tag: data.tag || null,
+        isFeatured: data.isFeatured ?? false,
+        isActive: data.isActive ?? true,
+        sortOrder: data.sortOrder ?? 0,
+      })
+      .returning();
+    return created;
+  }
+
+  async updateMenuItem(id: string, data: UpdateMenuItem): Promise<MenuItem> {
+    const [updated] = await requireDb()
+      .update(menuItems)
+      .set({
+        ...(data.categoryId !== undefined && { categoryId: data.categoryId }),
+        ...(data.nameId !== undefined && { nameId: data.nameId }),
+        ...(data.nameEn !== undefined && { nameEn: data.nameEn }),
+        ...(data.descriptionId !== undefined && { descriptionId: data.descriptionId }),
+        ...(data.descriptionEn !== undefined && { descriptionEn: data.descriptionEn }),
+        ...(data.tag !== undefined && { tag: data.tag || null }),
+        ...(data.isFeatured !== undefined && { isFeatured: data.isFeatured }),
+        ...(data.isActive !== undefined && { isActive: data.isActive }),
+        ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
+        updatedAt: new Date(),
+      })
+      .where(eq(menuItems.id, id))
+      .returning();
+    if (!updated) throw new Error("Item menu tidak ditemukan");
+    return updated;
+  }
+
+  async updateMenuItemImage(id: string, imagePath: string): Promise<MenuItem> {
+    const [updated] = await requireDb()
+      .update(menuItems)
+      .set({ imagePath, updatedAt: new Date() })
+      .where(eq(menuItems.id, id))
+      .returning();
+    if (!updated) throw new Error("Item menu tidak ditemukan");
+    return updated;
+  }
+
+  async updateMenuItemStatus(
+    id: string,
+    patch: { isActive?: boolean; isFeatured?: boolean },
+  ): Promise<MenuItem> {
+    const [updated] = await requireDb()
+      .update(menuItems)
+      .set({
+        ...(patch.isActive !== undefined && { isActive: patch.isActive }),
+        ...(patch.isFeatured !== undefined && { isFeatured: patch.isFeatured }),
+        updatedAt: new Date(),
+      })
+      .where(eq(menuItems.id, id))
+      .returning();
+    if (!updated) throw new Error("Item menu tidak ditemukan");
+    return updated;
+  }
+
+  async deleteMenuItem(id: string): Promise<MenuItem | undefined> {
+    const [deleted] = await requireDb()
+      .delete(menuItems)
+      .where(eq(menuItems.id, id))
+      .returning();
+    return deleted;
+  }
+
   async getAdminStats(outlet?: string) {
-    const today = new Date();
-    const y = today.getFullYear();
-    const m = String(today.getMonth() + 1).padStart(2, "0");
-    const d = String(today.getDate()).padStart(2, "0");
-    const todayStr = `${y}-${m}-${d}`;
+    const todayStr = todayISOInWIB();
 
     const countForToday = (status?: ReservationStatus) => {
       const conditions = [eq(reservations.tanggalReservasi, todayStr)];

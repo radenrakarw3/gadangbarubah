@@ -1,6 +1,7 @@
 import { memo, useRef, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { HOME_OUTLET_PANELS } from "@/lib/siteContent";
+import { DESKTOP_OUTLET_MIN_H } from "@/lib/outletReveal";
 import { useSiteLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
 import OutletDetailView, { type OpenPanel, type OutletOriginRect } from "./OutletDetailView";
@@ -178,11 +179,11 @@ function OurOutletSection() {
         </div>
       ) : null}
 
-      <div ref={containerRef} className="relative w-full xl:min-h-[800px]">
+      <div ref={containerRef} className={cn("relative w-full", DESKTOP_OUTLET_MIN_H)}>
         <div
           className={cn(
             detailPanel ? "pointer-events-none" : undefined,
-            "xl:min-h-[800px]",
+            DESKTOP_OUTLET_MIN_H,
           )}
         >
           <div className="grid grid-cols-1 gap-4 px-4 pb-10 sm:grid-cols-2 sm:px-8 xl:hidden">
@@ -197,7 +198,7 @@ function OurOutletSection() {
             ))}
           </div>
 
-          <div className="mx-auto hidden w-full max-w-[1920px] xl:grid xl:min-h-[800px] xl:grid-cols-4 xl:gap-px xl:bg-black/30">
+          <div className={cn("mx-auto hidden w-full max-w-[1920px] xl:grid xl:grid-cols-4 xl:gap-px xl:bg-black/30", DESKTOP_OUTLET_MIN_H)}>
             {HOME_OUTLET_PANELS.map((panel) => (
               <OutletCard
                 key={panel.id}

@@ -1,14 +1,21 @@
-import { memo, useEffect, useState, type ReactNode } from "react";
+import { memo, useEffect, type ReactNode } from "react";
 import { useLocation } from "wouter";
 import LoginAdmin from "@/components/LoginAdmin";
 import RouteFallback from "@/components/RouteFallback";
+import { useAdminAuth } from "@/lib/admin-auth";
 import {
-  ADMIN_PORTAL_CONFIG,
-  portalForRole,
+  homePathForRole,
+  loginPathForPortal,
   roleAllowedForPortal,
   type AdminPortal,
 } from "@shared/admin-portals";
-import type { AdminRole } from "@shared/schema";
+
+function safeAdminNextPath(path: string): string {
+  if (!path.startsWith("/admin") || path.startsWith("/admin/login")) {
+    return "/admin";
+  }
+  return path;
+}
 
 export function ProtectedAdminRoute({
   portal,
@@ -17,55 +24,41 @@ export function ProtectedAdminRoute({
   portal: AdminPortal;
   children: ReactNode;
 }) {
-  const [, navigate] = useLocation();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [recheckTrigger, setRecheckTrigger] = useState(0);
+  const [location, navigate] = useLocation();
+  const { loading, user, role } = useAdminAuth();
 
   useEffect(() => {
-    const checkSession = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch("/api/auth/session", { credentials: "include" });
-        if (!response.ok) {
-          setIsAuthenticated(false);
-          return;
-        }
+    if (loading) return;
 
-        const data = await response.json();
-        const role = data.role as AdminRole | undefined;
+    if (user && role && !roleAllowedForPortal(role, portal)) {
+      navigate(homePathForRole(role), { replace: true });
+      return;
+    }
 
-        if (!data.authenticated || !role) {
-          setIsAuthenticated(false);
-          return;
-        }
+    if (!user && portal === "main") {
+      const next = encodeURIComponent(safeAdminNextPath(location));
+      navigate(`${loginPathForPortal("main")}?next=${next}`, { replace: true });
+    }
+  }, [loading, user, role, portal, location, navigate]);
 
-        if (roleAllowedForPortal(role, portal)) {
-          setIsAuthenticated(true);
-          return;
-        }
+  if (loading) return <RouteFallback />;
 
-        const userPortal = portalForRole(role);
-        if (userPortal) {
-          navigate(ADMIN_PORTAL_CONFIG[userPortal].basePath);
-          return;
-        }
+  if (!user || !role) {
+    if (portal === "main") return <RouteFallback />;
+    return (
+      <LoginAdmin
+        portal={portal}
+        onSuccess={() => {
+          /* session sudah di-set — render ulang menampilkan children */
+        }}
+      />
+    );
+  }
 
-        setIsAuthenticated(false);
-      } catch {
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  if (!roleAllowedForPortal(role, portal)) {
+    return <RouteFallback />;
+  }
 
-    checkSession();
-  }, [portal, recheckTrigger, navigate]);
-
-  const handleLogin = () => setRecheckTrigger((prev) => prev + 1);
-
-  if (isLoading) return <RouteFallback />;
-  if (!isAuthenticated) return <LoginAdmin portal={portal} onLogin={handleLogin} />;
   return <>{children}</>;
 }
 

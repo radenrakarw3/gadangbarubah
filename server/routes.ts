@@ -5,11 +5,21 @@ import {
   loginUserSchema,
   insertUserSchema,
   insertReservationSchema,
+  insertCateringInquirySchema,
   updateReservationStatusSchema,
   insertCampaignSchema,
+  insertMenuCategorySchema,
+  updateMenuCategorySchema,
+  insertMenuItemSchema,
+  updateMenuItemSchema,
+  updateMenuItemStatusSchema,
 } from "@shared/schema";
+import {
+  isReservationPublicId,
+  toPublicReservationStatus,
+} from "@shared/public-reservation";
 import rateLimit from "express-rate-limit";
-import { memberEndpointSecurity } from "./security";
+import { honeypot, memberEndpointSecurity } from "./security";
 import { isReservationStatus } from "@shared/reservation-status";
 import {
   normalizeAdminRole,
@@ -21,15 +31,27 @@ import {
   roleAllowedForPortal,
   type AdminPortal,
 } from "@shared/admin-portals";
-import { notifyReservationCustomerAsync } from "./reservation-notify";
+import {
+  notifyReservationCustomerAsync,
+  notifyStaffNewReservationAsync,
+} from "./reservation-notify";
+import { notifyStaffNewCateringAsync } from "./catering-notify";
 import {
   isValidWhatsApp,
   normalizeWhatsAppInput,
   validateReservationDateTime,
 } from "@shared/reservation-utils";
 import { upload, validateImageDimensions } from "./upload-middleware";
+import { menuUpload } from "./menu-upload-middleware";
 import fs from "fs";
 import path from "path";
+
+function deleteUploadedFile(imagePath: string) {
+  const fullPath = path.join(process.cwd(), imagePath.replace(/^\//, ""));
+  if (fs.existsSync(fullPath)) {
+    fs.unlinkSync(fullPath);
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const loginRateLimit = rateLimit({
@@ -49,6 +71,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     message: {
       success: false,
       message: "Terlalu banyak permintaan reservasi. Coba lagi nanti.",
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  const cateringInquiryRateLimit = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 10,
+    message: {
+      success: false,
+      message: "Terlalu banyak permintaan catering. Coba lagi nanti.",
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  const reservationStatusRateLimit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 60,
+    message: {
+      success: false,
+      message: "Terlalu banyak pengecekan status. Coba lagi nanti.",
     },
     standardHeaders: true,
     legacyHeaders: false,
@@ -147,7 +191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true, authenticated: false });
   });
 
-  app.post("/api/reservations", reservationRateLimit, async (req, res) => {
+  app.post("/api/reservations", reservationRateLimit, honeypot, async (req, res) => {
     try {
       const validated = insertReservationSchema.parse({
         ...req.body,
@@ -172,6 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const reservation = await storage.createReservation(validated);
       notifyReservationCustomerAsync(reservation, "pending");
+      notifyStaffNewReservationAsync(reservation);
 
       res.json({
         success: true,
@@ -194,47 +239,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/stats", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
+  app.get("/api/reservations/:id/status", reservationStatusRateLimit, async (req, res) => {
     try {
-      const stats = await storage.getAdminStats();
-      res.json({ success: true, data: stats });
+      const { id } = req.params;
+      if (!isReservationPublicId(id)) {
+        return res.status(400).json({ success: false, message: "ID reservasi tidak valid" });
+      }
+
+      const reservation = await storage.getReservationById(id);
+      if (!reservation) {
+        return res.status(404).json({ success: false, message: "Reservasi tidak ditemukan" });
+      }
+
+      const payload = toPublicReservationStatus(reservation);
+      if (!payload) {
+        return res.status(500).json({ success: false, message: "Status reservasi tidak valid" });
+      }
+
+      res.json({ success: true, data: payload });
     } catch (error) {
-      console.error("Get admin stats error:", error);
-      res.status(500).json({ success: false, message: "Gagal mengambil ringkasan sistem" });
+      console.error("Get public reservation status error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil status reservasi" });
     }
   });
 
-  app.get("/api/admin/reservations", requireMainAdmin, memberEndpointSecurity, async (req, res) => {
+  app.post("/api/catering-inquiries", cateringInquiryRateLimit, honeypot, async (req, res) => {
     try {
-      const date = typeof req.query.date === "string" ? req.query.date : undefined;
-      const statusRaw = typeof req.query.status === "string" ? req.query.status : undefined;
-      const status =
-        statusRaw && isReservationStatus(statusRaw) ? statusRaw : undefined;
-      const data = await storage.getReservations({ date, status });
-      res.json({ success: true, data });
-    } catch (error) {
-      console.error("Get reservations error:", error);
-      res.status(500).json({ success: false, message: "Gagal mengambil data reservasi" });
-    }
-  });
+      const validated = insertCateringInquirySchema.parse(req.body);
+      const telepon = normalizeWhatsAppInput(validated.telepon);
 
-  app.patch("/api/admin/reservations/:id/status", requireMainAdmin, memberEndpointSecurity, async (req, res) => {
-    try {
-      const { status } = updateReservationStatusSchema.parse(req.body);
-      const updated = await storage.updateReservationStatus(req.params.id, status);
-      notifyReservationCustomerAsync(updated, status);
+      if (!isValidWhatsApp(telepon)) {
+        return res.status(400).json({
+          success: false,
+          message: "Nomor WhatsApp tidak valid. Gunakan format 08xxxxxxxxxx",
+        });
+      }
+
+      const inquiry = await storage.createCateringInquiry({
+        nama: validated.nama.trim(),
+        noWhatsApp: telepon,
+        email: validated.email,
+        tipeLayanan: validated.tipe,
+        pax: validated.pax,
+      });
+
+      notifyStaffNewCateringAsync(inquiry);
 
       res.json({
         success: true,
-        message: "Status reservasi diperbarui",
-        data: updated,
+        message: "Permintaan catering berhasil dikirim. Tim kami akan menghubungi Anda.",
+        data: { id: inquiry.id, shortId: inquiry.id.slice(0, 8) },
       });
     } catch (error: any) {
-      console.error("Update reservation status error:", error);
+      console.error("Create catering inquiry error:", error);
+      if (error?.code === "42P01") {
+        return res.status(503).json({
+          success: false,
+          message:
+            "Tabel inquiry catering belum tersedia. Jalankan migrasi database terlebih dahulu.",
+        });
+      }
       res.status(400).json({
         success: false,
-        message: error.errors ? "Data tidak valid" : error.message || "Gagal memperbarui status",
+        message: error.errors?.[0]?.message || error.message || "Gagal mengirim inquiry catering",
       });
+    }
+  });
+
+  app.get("/api/admin/catering-inquiries", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
+    try {
+      const data = await storage.getCateringInquiries();
+      res.json({ success: true, data });
+    } catch (error) {
+      console.error("Get catering inquiries error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil data inquiry catering" });
+    }
+  });
+
+  app.get("/api/admin/stats", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
+    try {
+      const stats = await storage.getAdminStats();
+      res.json({
+        success: true,
+        data: {
+          staffCount: stats.staffCount,
+          hasActiveCampaign: stats.hasActiveCampaign,
+        },
+      });
+    } catch (error) {
+      console.error("Get admin stats error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil ringkasan sistem" });
     }
   });
 
@@ -474,6 +568,214 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  app.get("/api/menu", async (_req, res) => {
+    try {
+      const categories = await storage.getPublicMenu();
+      res.json({ success: true, categories });
+    } catch (error) {
+      console.error("Get public menu error:", error);
+      res.status(400).json({ success: false, message: "Gagal mengambil data menu" });
+    }
+  });
+
+  app.get("/api/menu/featured", async (_req, res) => {
+    try {
+      const items = await storage.getFeaturedMenuItems(8);
+      res.json({ success: true, items });
+    } catch (error) {
+      console.error("Get featured menu error:", error);
+      res.status(400).json({ success: false, message: "Gagal mengambil menu unggulan" });
+    }
+  });
+
+  app.get("/api/admin/menu/categories", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
+    try {
+      const categories = await storage.getMenuCategories();
+      res.json({ success: true, categories });
+    } catch (error) {
+      console.error("Get menu categories error:", error);
+      res.status(400).json({ success: false, message: "Gagal mengambil kategori menu" });
+    }
+  });
+
+  app.post("/api/admin/menu/categories", requireMainAdmin, memberEndpointSecurity, async (req, res) => {
+    try {
+      const data = insertMenuCategorySchema.parse(req.body);
+      const category = await storage.createMenuCategory(data);
+      res.json({ success: true, message: "Kategori berhasil ditambahkan", category });
+    } catch (error: any) {
+      console.error("Create menu category error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.errors ? "Data tidak valid" : error.message || "Gagal menambah kategori",
+      });
+    }
+  });
+
+  app.patch(
+    "/api/admin/menu/categories/:id",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    async (req, res) => {
+      try {
+        const data = updateMenuCategorySchema.parse(req.body);
+        const category = await storage.updateMenuCategory(req.params.id, data);
+        res.json({ success: true, message: "Kategori berhasil diperbarui", category });
+      } catch (error: any) {
+        console.error("Update menu category error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.errors ? "Data tidak valid" : error.message || "Gagal memperbarui kategori",
+        });
+      }
+    },
+  );
+
+  app.delete(
+    "/api/admin/menu/categories/:id",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    async (req, res) => {
+      try {
+        await storage.deleteMenuCategory(req.params.id);
+        res.json({ success: true, message: "Kategori berhasil dihapus" });
+      } catch (error: any) {
+        console.error("Delete menu category error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.message || "Gagal menghapus kategori",
+        });
+      }
+    },
+  );
+
+  app.get("/api/admin/menu/items", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
+    try {
+      const items = await storage.getMenuItems();
+      res.json({ success: true, items });
+    } catch (error) {
+      console.error("Get menu items error:", error);
+      res.status(400).json({ success: false, message: "Gagal mengambil item menu" });
+    }
+  });
+
+  app.post(
+    "/api/admin/menu/items",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    menuUpload.single("image"),
+    async (req, res) => {
+      try {
+        if (!req.file) {
+          return res.status(400).json({ success: false, message: "Foto menu harus diupload" });
+        }
+
+        const data = insertMenuItemSchema.parse(req.body);
+        const imagePath = `/uploads/menu/${req.file.filename}`;
+        const item = await storage.createMenuItem(data, imagePath);
+        res.json({ success: true, message: "Item menu berhasil ditambahkan", item });
+      } catch (error: any) {
+        if (req.file) fs.unlinkSync(req.file.path);
+        console.error("Create menu item error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.errors ? "Data tidak valid" : error.message || "Gagal menambah item menu",
+        });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/admin/menu/items/:id",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    async (req, res) => {
+      try {
+        const data = updateMenuItemSchema.parse(req.body);
+        const item = await storage.updateMenuItem(req.params.id, data);
+        res.json({ success: true, message: "Item menu berhasil diperbarui", item });
+      } catch (error: any) {
+        console.error("Update menu item error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.errors ? "Data tidak valid" : error.message || "Gagal memperbarui item menu",
+        });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/admin/menu/items/:id/image",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    menuUpload.single("image"),
+    async (req, res) => {
+      try {
+        if (!req.file) {
+          return res.status(400).json({ success: false, message: "Foto menu harus diupload" });
+        }
+
+        const existing = await storage.getMenuItemById(req.params.id);
+        if (!existing) {
+          fs.unlinkSync(req.file.path);
+          return res.status(404).json({ success: false, message: "Item menu tidak ditemukan" });
+        }
+
+        const imagePath = `/uploads/menu/${req.file.filename}`;
+        const item = await storage.updateMenuItemImage(req.params.id, imagePath);
+        deleteUploadedFile(existing.imagePath);
+        res.json({ success: true, message: "Foto menu berhasil diperbarui", item });
+      } catch (error: any) {
+        if (req.file) fs.unlinkSync(req.file.path);
+        console.error("Update menu item image error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.message || "Gagal memperbarui foto menu",
+        });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/admin/menu/items/:id/status",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    async (req, res) => {
+      try {
+        const patch = updateMenuItemStatusSchema.parse(req.body);
+        const item = await storage.updateMenuItemStatus(req.params.id, patch);
+        res.json({ success: true, message: "Status item menu berhasil diperbarui", item });
+      } catch (error: any) {
+        console.error("Update menu item status error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.errors ? "Data tidak valid" : error.message || "Gagal memperbarui status",
+        });
+      }
+    },
+  );
+
+  app.delete(
+    "/api/admin/menu/items/:id",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    async (req, res) => {
+      try {
+        const deleted = await storage.deleteMenuItem(req.params.id);
+        if (deleted) {
+          deleteUploadedFile(deleted.imagePath);
+        }
+        res.json({ success: true, message: "Item menu berhasil dihapus" });
+      } catch (error: any) {
+        console.error("Delete menu item error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.message || "Gagal menghapus item menu",
+        });
+      }
+    },
+  );
 
   app.get("/sitemap.xml", (_req, res) => {
     const baseUrl = "https://gadangbarubahindonesia.id";

@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ReservationHoneypot, RESERVATION_HONEYPOT_FIELD } from "@/components/ReservationHoneypot";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest, parseApiError } from "@/lib/queryClient";
 import {
   CATERING_TYPES,
   COMPANY,
@@ -116,7 +118,8 @@ function CateringForm({
   className?: string;
 }) {
   return (
-    <form onSubmit={onSubmit} className={cn("w-full max-w-[651px]", className)}>
+    <form onSubmit={onSubmit} className={cn("relative w-full max-w-[651px]", className)}>
+      <ReservationHoneypot />
       <header className="mb-8 text-center xl:mb-10">
         <h2 className="font-[var(--font-inquiry)] text-[clamp(1.75rem,2.2vw,2.625rem)] font-medium leading-[1.2] tracking-[0.01em] text-black">
           {copy.title}
@@ -199,6 +202,8 @@ function CateringForm({
 }
 
 const MOBILE_COLLAGE_H = "h-[480px] sm:h-[560px]";
+/** Tinggi kolase layanan desktop (grid 3×2) — diselaraskan dengan kolom form */
+const DESKTOP_COLLAGE_MIN_H = "min-h-[700px]";
 
 function ServiceTile({  service,
   lang,
@@ -260,7 +265,7 @@ function ServiceCollage({
     <div
       className={cn(
         "grid h-full w-full grid-cols-3 grid-rows-[11fr_10fr]",
-        isDesktop ? "min-h-[900px]" : MOBILE_COLLAGE_H,
+        isDesktop ? DESKTOP_COLLAGE_MIN_H : MOBILE_COLLAGE_H,
         className,
       )}
     >
@@ -549,7 +554,7 @@ function CateringServiceSlot({
       ref={containerRef}
       className={cn(
         "relative w-full overflow-hidden",
-        isDesktop ? "min-h-[900px]" : MOBILE_COLLAGE_H,
+        isDesktop ? DESKTOP_COLLAGE_MIN_H : MOBILE_COLLAGE_H,
         className,
       )}
     >
@@ -638,19 +643,44 @@ function CateringInquirySection() {
       return;
     }
 
+    const formEl = e.currentTarget as HTMLFormElement;
+    const honeypot = String(new FormData(formEl).get(RESERVATION_HONEYPOT_FIELD) ?? "").trim();
+    if (honeypot) return;
+
     setLoading(true);
     try {
       const tipeLabel = CATERING_TYPES.find((t) => t.value === form.tipe)?.label ?? form.tipe;
+      const res = await apiRequest("POST", "/api/catering-inquiries", {
+        nama: form.nama.trim(),
+        telepon: form.telepon,
+        email: emailTrimmed || undefined,
+        tipe: form.tipe,
+        pax: parseInt(form.pax, 10) || 10,
+        [RESERVATION_HONEYPOT_FIELD]: "",
+      });
+      const result = await res.json();
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+
       const message = encodeURIComponent(
         lang === "ID"
-          ? `Halo Gadang Barubah, saya ingin konsultasi catering:\n\nNama: ${form.nama}\nTelepon: ${form.telepon}\nEmail: ${emailTrimmed || "-"}\nTipe: ${tipeLabel}\nPax: ${form.pax}`
-          : `Hello Gadang Barubah, I want to discuss catering:\n\nName: ${form.nama}\nPhone: ${form.telepon}\nEmail: ${emailTrimmed || "-"}\nType: ${tipeLabel}\nPax: ${form.pax}`,
+          ? `Halo Gadang Barubah, saya ingin konsultasi catering:\n\nNama: ${form.nama}\nTelepon: ${form.telepon}\nEmail: ${emailTrimmed || "-"}\nTipe: ${tipeLabel}\nPax: ${form.pax}\nRef: ${result.data?.shortId ?? ""}`
+          : `Hello Gadang Barubah, I want to discuss catering:\n\nName: ${form.nama}\nPhone: ${form.telepon}\nEmail: ${emailTrimmed || "-"}\nType: ${tipeLabel}\nPax: ${form.pax}\nRef: ${result.data?.shortId ?? ""}`,
       );
-      window.open(`https://wa.me/${COMPANY.whatsapp}?text=${message}`, "_blank");
+      window.open(`https://wa.me/${COMPANY.cateringWhatsapp}?text=${message}`, "_blank");
       toast({
-        title: lang === "ID" ? "Membuka WhatsApp" : "Opening WhatsApp",
+        title: lang === "ID" ? "Inquiry catering terkirim" : "Catering inquiry sent",
         description:
-          lang === "ID" ? "Lanjutkan pesan catering di WhatsApp." : "Continue your catering message on WhatsApp.",
+          lang === "ID"
+            ? "Data tersimpan. Lanjutkan pesan di WhatsApp bila perlu."
+            : "Your request was saved. Continue on WhatsApp if needed.",
+      });
+    } catch (err) {
+      toast({
+        title: lang === "ID" ? "Gagal mengirim inquiry" : "Inquiry failed",
+        description: parseApiError(err),
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -697,7 +727,7 @@ function CateringInquirySection() {
       </div>
 
       {/* Desktop — grid 4 kolom selaras dengan outlet section (col 1–2 form, col 3–4 kolase) */}
-      <div className="mx-auto hidden w-full max-w-[1920px] xl:grid xl:min-h-[900px] xl:grid-cols-4 xl:items-stretch">
+      <div className={cn("mx-auto hidden w-full max-w-[1920px] xl:grid xl:grid-cols-4 xl:items-stretch", DESKTOP_COLLAGE_MIN_H)}>
         <div className="col-span-2 flex items-center justify-center bg-[#D9D9D9] px-[clamp(2rem,5vw,5rem)] py-12">
           <CateringForm {...formProps} />
         </div>

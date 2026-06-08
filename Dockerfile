@@ -20,7 +20,7 @@ COPY --from=build /app/dist ./dist
 # Vite hanya untuk dev lokal — jangan ikut image production
 RUN rm -f dist/vite-dev.js
 
-RUN mkdir -p uploads/campaigns
+RUN mkdir -p uploads/campaigns uploads/menu
 
 EXPOSE 3000
 CMD ["node", "dist/index.js"]

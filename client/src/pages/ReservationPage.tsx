@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { CalendarDays, CheckCircle2, Loader2, Users } from "lucide-react";
+import { ReservationHoneypot, RESERVATION_HONEYPOT_FIELD } from "@/components/ReservationHoneypot";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,52 @@ import {
 } from "@shared/reservation-utils";
 import { useSiteLanguage } from "@/lib/language";
 import PrivacyConsentField from "@/components/PrivacyConsentField";
+import type { PublicReservationStatusPayload } from "@shared/public-reservation";
+
+function ReservationStatusPanel({
+  reservationId,
+  lang,
+}: {
+  reservationId: string;
+  lang: "ID" | "EN";
+}) {
+  const [data, setData] = useState<PublicReservationStatusPayload | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const checkStatus = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/reservations/${reservationId}/status`);
+      const json = await res.json();
+      if (!json.success) {
+        throw new Error(json.message || (lang === "ID" ? "Gagal memuat status" : "Failed to load status"));
+      }
+      setData(json.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : lang === "ID" ? "Gagal memuat status" : "Failed to load status");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2 text-left max-w-md mx-auto">
+      <Button variant="outline" size="sm" onClick={checkStatus} disabled={loading}>
+        {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+        {lang === "ID" ? "Cek status reservasi" : "Check reservation status"}
+      </Button>
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+      {data ? (
+        <p className="text-sm text-muted-foreground">
+          {lang === "ID" ? "Status" : "Status"}: <strong>{data.statusLabel}</strong> ·{" "}
+          {data.tanggalReservasi} {data.waktuReservasi} WIB · {data.outletLabel}
+        </p>
+      ) : null}
+    </div>
+  );
+}
 
 const outletIds = OUTLETS.map((o) => o.id) as [string, ...string[]];
 
@@ -99,9 +146,15 @@ export default function ReservationPage() {
   });
 
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const honeypotRef = useRef<HTMLInputElement>(null);
 
   const mutation = useMutation({
     mutationFn: async (data: ReservationFormData) => {
+      const honeypot = honeypotRef.current?.value?.trim() ?? "";
+      if (honeypot) {
+        return { success: true, data: null };
+      }
+
       const emailTrimmed = data.email?.trim() ?? "";
       const payload = {
         namaLengkap: data.namaLengkap.trim(),
@@ -113,6 +166,7 @@ export default function ReservationPage() {
         tipeMeja: data.tipeMeja,
         ...(emailTrimmed ? { email: emailTrimmed } : {}),
         ...(data.catatan?.trim() ? { catatan: data.catatan.trim() } : {}),
+        [RESERVATION_HONEYPOT_FIELD]: "",
       };
       const res = await apiRequest("POST", "/api/reservations", payload);
       return res.json();
@@ -213,6 +267,7 @@ export default function ReservationPage() {
                       {lang === "ID" ? "Konfirmasi via WhatsApp" : "Confirm via WhatsApp"}
                     </a>
                   </Button>
+                  <ReservationStatusPanel reservationId={submittedId} lang={lang} />
                   <Button variant="outline" onClick={() => setSubmittedId(null)}>
                     {lang === "ID" ? "Buat Reservasi Lain" : "Create Another Reservation"}
                   </Button>
@@ -238,8 +293,9 @@ export default function ReservationPage() {
                       }
                       mutation.mutate(data);
                     })}
-                    className="space-y-5"
+                    className="relative space-y-5"
                   >
+                    <ReservationHoneypot ref={honeypotRef} />
                     <FormField
                       control={form.control}
                       name="namaLengkap"

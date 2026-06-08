@@ -8,8 +8,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { cn } from "@/lib/utils";
 
 const LazyOurOutletSection = lazy(() => import("@/components/home/OurOutletSection"));
+
+/** Tinggi grid outlet desktop (4 kolom) — selaras dengan catering & laptop/MacBook */
+export const DESKTOP_OUTLET_MIN_H = "xl:min-h-[640px]";
 
 type OutletRevealContextValue = {
   visible: boolean;
@@ -37,7 +41,7 @@ export function useOutletVisible() {
 }
 
 function OutletPlaceholder() {
-  return <div className="min-h-[800px] w-full bg-[#300505]" aria-hidden />;
+  return <div className={cn("min-h-[420px] w-full bg-[#300505]", DESKTOP_OUTLET_MIN_H)} aria-hidden />;
 }
 
 export function OutletSectionSlot() {

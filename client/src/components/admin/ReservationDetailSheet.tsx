@@ -12,6 +12,8 @@ import {
   STATUS_BADGE_CLASS,
   formatOutletLabel,
   formatReservationDate,
+  hasCustomerNotifyFailure,
+  hasStaffNotifyFailure,
   waConfirmTemplate,
   waLink,
   type ReservationRow,
@@ -42,6 +44,18 @@ export default function ReservationDetailSheet({
             {RESERVATION_STATUS_LABELS[status]}
           </Badge>
         </SheetHeader>
+
+        {(hasCustomerNotifyFailure(reservation) || hasStaffNotifyFailure(reservation)) && (
+          <div className="mt-4 rounded-md border border-amber-300/80 bg-amber-50 px-3 py-2 text-xs text-amber-950">
+            <p className="font-medium">Notifikasi WhatsApp otomatis gagal</p>
+            {hasCustomerNotifyFailure(reservation) && reservation.customerNotifyError ? (
+              <p className="mt-1">Pelanggan: {reservation.customerNotifyError}</p>
+            ) : null}
+            {hasStaffNotifyFailure(reservation) && reservation.staffNotifyError ? (
+              <p className="mt-1">Staff: {reservation.staffNotifyError}</p>
+            ) : null}
+          </div>
+        )}
 
         <div className="mt-6 space-y-6 text-sm">
           <div className="grid grid-cols-2 gap-3">
@@ -102,6 +116,9 @@ export default function ReservationDetailSheet({
             <ReservationTimeline reservation={reservation} />
             <ul className="mt-4 space-y-1 text-xs text-muted-foreground">
               <li>Dibuat: {formatTimeShort(reservation.createdAt) ?? "—"}</li>
+              {reservation.confirmedAt && (
+                <li>Dikonfirmasi: {formatTimeShort(reservation.confirmedAt)}</li>
+              )}
               {reservation.arrivedAt && (
                 <li>Datang: {formatTimeShort(reservation.arrivedAt)}</li>
               )}
@@ -110,6 +127,9 @@ export default function ReservationDetailSheet({
               )}
               {reservation.completedAt && (
                 <li>Pulang: {formatTimeShort(reservation.completedAt)}</li>
+              )}
+              {reservation.cancelledAt && (
+                <li>Dibatalkan: {formatTimeShort(reservation.cancelledAt)}</li>
               )}
             </ul>
           </div>

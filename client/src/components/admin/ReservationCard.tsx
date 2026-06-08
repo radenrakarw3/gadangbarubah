@@ -1,4 +1,4 @@
-import { Loader2, MessageCircle, Users, Crown } from "lucide-react";
+import { AlertTriangle, Loader2, MessageCircle, Users, Crown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import {
   STATUS_BADGE_CLASS,
   formatOutletLabel,
   formatReservationDate,
+  hasCustomerNotifyFailure,
+  hasStaffNotifyFailure,
   isSoonReservation,
   waLink,
   type ReservationRow,
@@ -55,6 +57,20 @@ export default function ReservationCard({
               {soon && (
                 <Badge className="bg-amber-500 hover:bg-amber-500 text-white text-[10px]">
                   Segera
+                </Badge>
+              )}
+              {(hasCustomerNotifyFailure(reservation) || hasStaffNotifyFailure(reservation)) && (
+                <Badge
+                  variant="outline"
+                  className="gap-1 border-amber-500/60 text-amber-800 text-[10px]"
+                  title={
+                    hasCustomerNotifyFailure(reservation)
+                      ? reservation.customerNotifyError ?? "Notifikasi WA pelanggan gagal"
+                      : reservation.staffNotifyError ?? "Notifikasi WA staff gagal"
+                  }
+                >
+                  <AlertTriangle className="h-3 w-3" />
+                  WA gagal
                 </Badge>
               )}
             </div>

@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ReservationHoneypot, RESERVATION_HONEYPOT_FIELD } from "@/components/ReservationHoneypot";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, parseApiError } from "@/lib/queryClient";
 import { OUTLETS, todayISO } from "@/lib/siteContent";
@@ -200,7 +201,7 @@ function QuickReservationBarInner() {
 
   const paxOptions = useMemo(
     () =>
-      Array.from({ length: 20 }, (_, i) => {
+      Array.from({ length: 50 }, (_, i) => {
         const n = String(i + 1);
         const unit = lang === "ID" ? "Tamu" : "Pax";
         return { value: n, label: `${n} ${unit}` };
@@ -233,6 +234,8 @@ function QuickReservationBarInner() {
     const nama = String(fd.get("nama") ?? "").trim();
     const telepon = normalizeWhatsAppInput(String(fd.get("telepon") ?? ""));
     const email = String(fd.get("email") ?? "").trim();
+    const honeypot = String(fd.get(RESERVATION_HONEYPOT_FIELD) ?? "").trim();
+    if (honeypot) return;
 
     if (!nama) {
       toast({
@@ -313,6 +316,7 @@ function QuickReservationBarInner() {
         jumlahTamu: parseInt(pax, 10) || 2,
         tipeMeja: "reguler",
         catatan: "Quick reserve dari homepage",
+        [RESERVATION_HONEYPOT_FIELD]: "",
       };
       const res = await apiRequest("POST", "/api/reservations", payload);
       const result = await res.json();
@@ -389,7 +393,8 @@ function QuickReservationBarInner() {
           </button>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:gap-5 sm:p-3.5 lg:overflow-visible lg:gap-0 lg:p-0 lg:pb-0">
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:gap-5 sm:p-3.5 lg:overflow-visible lg:gap-0 lg:p-0 lg:pb-0">
+          <ReservationHoneypot />
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2 lg:grid-cols-4 lg:items-center lg:gap-2 xl:grid-cols-7 xl:gap-2.5">
             <Input
               name="nama"

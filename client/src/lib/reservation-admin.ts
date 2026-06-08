@@ -18,6 +18,14 @@ export const STATUS_BADGE_CLASS: Record<ReservationStatus, string> = {
   cancelled: "bg-red-100 text-red-900 border-red-200",
 };
 
+export function hasCustomerNotifyFailure(reservation: ReservationRow): boolean {
+  return reservation.customerNotifyOk === false;
+}
+
+export function hasStaffNotifyFailure(reservation: ReservationRow): boolean {
+  return reservation.staffNotifyOk === false;
+}
+
 export function formatOutletLabel(outletId: string | null | undefined): string {
   if (!outletId) return "—";
   return OUTLETS.find((o) => o.id === outletId)?.label ?? outletId;

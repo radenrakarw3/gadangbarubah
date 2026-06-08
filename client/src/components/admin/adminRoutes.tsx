@@ -25,7 +25,6 @@ export const MainAdminDashboard = withPortalPage(AdminDashboard, "main");
 export const CikarangAdminDashboard = withPortalPage(AdminDashboard, "cikarang");
 export const BintaroAdminDashboard = withPortalPage(AdminDashboard, "bintaro");
 
-export const MainAdminReservations = withPortalPage(AdminReservations, "main");
 export const CikarangAdminReservations = withPortalPage(AdminReservations, "cikarang");
 export const BintaroAdminReservations = withPortalPage(AdminReservations, "bintaro");
 

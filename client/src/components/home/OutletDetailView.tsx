@@ -9,6 +9,7 @@ import {
 } from "react";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { HOME_OUTLET_PANELS } from "@/lib/siteContent";
+import { DESKTOP_OUTLET_MIN_H } from "@/lib/outletReveal";
 import { useSiteLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
 import cikarangImg from "@assets/DSC07220_1758567803910.jpg";
@@ -378,7 +379,10 @@ export default function OutletDetailView({
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-10 h-full w-full overflow-hidden xl:min-h-[800px]"
+      className={cn(
+        "pointer-events-none absolute inset-0 z-10 h-full w-full overflow-hidden",
+        DESKTOP_OUTLET_MIN_H,
+      )}
       role="region"
       aria-label={navLabel}
     >
@@ -389,7 +393,12 @@ export default function OutletDetailView({
           originRect ? undefined : { transform: "translate3d(0, 0, 0) scale(1, 1)" }
         }
       >
-        <div className="relative min-h-[min(100svh,720px)] w-full sm:min-h-[min(100svh,780px)] xl:min-h-[800px]">
+        <div
+          className={cn(
+            "relative min-h-[min(100svh,720px)] w-full sm:min-h-[min(100svh,780px)]",
+            DESKTOP_OUTLET_MIN_H,
+          )}
+        >
           <OutletPhotoCarousel
             images={gallery}
             expanded={expanded}

@@ -1,12 +1,14 @@
 import { sql } from "drizzle-orm";
 
-import { pgTable, text, varchar, date, integer, timestamp, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, date, integer, timestamp, json, boolean } from "drizzle-orm/pg-core";
 
 import { createInsertSchema } from "drizzle-zod";
 
 import { z } from "zod";
 
 import { RESERVATION_STATUSES } from "./reservation-status";
+import { CATERING_INQUIRY_TYPES } from "./catering";
+import { RESERVATION_OUTLET_IDS } from "./reservation-utils";
 
 export const ADMIN_ROLES = ["admin_main", "admin_cikarang", "admin_bintaro"] as const;
 export type AdminRole = (typeof ADMIN_ROLES)[number];
@@ -64,16 +66,45 @@ export const reservations = pgTable("reservations", {
 
   status: varchar("status", { length: 20 }).notNull().default("pending"),
 
+  confirmedAt: timestamp("confirmed_at"),
+
   arrivedAt: timestamp("arrived_at"),
 
   diningAt: timestamp("dining_at"),
 
   completedAt: timestamp("completed_at"),
 
+  cancelledAt: timestamp("cancelled_at"),
+
+  customerNotifyOk: boolean("customer_notify_ok"),
+
+  customerNotifyError: text("customer_notify_error"),
+
+  customerNotifyAt: timestamp("customer_notify_at"),
+
+  staffNotifyOk: boolean("staff_notify_ok"),
+
+  staffNotifyError: text("staff_notify_error"),
+
+  staffNotifyAt: timestamp("staff_notify_at"),
+
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
 
+});
+
+
+
+export const cateringInquiries = pgTable("catering_inquiries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  nama: text("nama").notNull(),
+  noWhatsApp: text("no_whatsapp").notNull(),
+  email: text("email"),
+  tipeLayanan: varchar("tipe_layanan", { length: 40 }).notNull(),
+  pax: integer("pax").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 
@@ -98,6 +129,34 @@ export const campaigns = pgTable("campaigns", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
 
+});
+
+
+
+export const menuCategories = pgTable("menu_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  nameId: text("name_id").notNull(),
+  nameEn: text("name_en").notNull(),
+  slug: varchar("slug", { length: 80 }).notNull().unique(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const menuItems = pgTable("menu_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  categoryId: varchar("category_id").notNull().references(() => menuCategories.id),
+  nameId: text("name_id").notNull(),
+  nameEn: text("name_en").notNull(),
+  descriptionId: text("description_id").notNull(),
+  descriptionEn: text("description_en").notNull(),
+  imagePath: text("image_path").notNull(),
+  tag: varchar("tag", { length: 40 }),
+  isFeatured: boolean("is_featured").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 
@@ -145,7 +204,9 @@ export const insertReservationSchema = z.object({
 
   ),
 
-  outlet: z.string().max(80).optional(),
+  outlet: z.enum(RESERVATION_OUTLET_IDS, {
+    errorMap: () => ({ message: "Pilih outlet yang valid" }),
+  }),
 
   tanggalReservasi: z.string().min(1, "Tanggal reservasi wajib diisi"),
 
@@ -161,6 +222,21 @@ export const insertReservationSchema = z.object({
 
   catatan: z.string().max(500, "Catatan maksimal 500 karakter").optional(),
 
+});
+
+
+
+export const insertCateringInquirySchema = z.object({
+  nama: z.string().min(2, "Nama wajib diisi"),
+  telepon: z.string().min(10, "Nomor telepon minimal 10 digit"),
+  email: z.preprocess(
+    (val) => (typeof val === "string" && val.trim() === "" ? undefined : val),
+    z.string().email("Email tidak valid").optional(),
+  ),
+  tipe: z.enum(CATERING_INQUIRY_TYPES, {
+    errorMap: () => ({ message: "Pilih layanan catering yang valid" }),
+  }),
+  pax: z.coerce.number().int().min(1, "Minimal 1 pax").max(5000, "Maksimal 5000 pax"),
 });
 
 
@@ -189,6 +265,41 @@ export const insertCampaignSchema = z.object({
 
 
 
+export const insertMenuCategorySchema = z.object({
+  nameId: z.string().min(1, "Nama kategori (ID) wajib diisi"),
+  nameEn: z.string().min(1, "Nama kategori (EN) wajib diisi"),
+  slug: z
+    .string()
+    .min(1, "Slug wajib diisi")
+    .max(80)
+    .regex(/^[a-z0-9-]+$/, "Slug hanya huruf kecil, angka, dan strip"),
+  sortOrder: z.coerce.number().int().min(0).optional().default(0),
+  isActive: z.coerce.boolean().optional().default(true),
+});
+
+export const updateMenuCategorySchema = insertMenuCategorySchema.partial();
+
+export const insertMenuItemSchema = z.object({
+  categoryId: z.string().min(1, "Kategori wajib dipilih"),
+  nameId: z.string().min(1, "Nama (ID) wajib diisi"),
+  nameEn: z.string().min(1, "Nama (EN) wajib diisi"),
+  descriptionId: z.string().min(1, "Deskripsi (ID) wajib diisi"),
+  descriptionEn: z.string().min(1, "Deskripsi (EN) wajib diisi"),
+  tag: z.string().max(40).optional(),
+  isFeatured: z.coerce.boolean().optional().default(false),
+  isActive: z.coerce.boolean().optional().default(true),
+  sortOrder: z.coerce.number().int().min(0).optional().default(0),
+});
+
+export const updateMenuItemSchema = insertMenuItemSchema.partial();
+
+export const updateMenuItemStatusSchema = z.object({
+  isActive: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
+});
+
+
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
 export type LoginUser = z.infer<typeof loginUserSchema>;
@@ -199,8 +310,20 @@ export type InsertReservation = z.infer<typeof insertReservationSchema>;
 
 export type Reservation = typeof reservations.$inferSelect;
 
+export type InsertCateringInquiry = z.infer<typeof insertCateringInquirySchema>;
+
+export type CateringInquiry = typeof cateringInquiries.$inferSelect;
+
 export type InsertCampaign = z.infer<typeof insertCampaignSchema>;
 
 export type Campaign = typeof campaigns.$inferSelect;
+
+export type InsertMenuCategory = z.infer<typeof insertMenuCategorySchema>;
+export type UpdateMenuCategory = z.infer<typeof updateMenuCategorySchema>;
+export type MenuCategory = typeof menuCategories.$inferSelect;
+
+export type InsertMenuItem = z.infer<typeof insertMenuItemSchema>;
+export type UpdateMenuItem = z.infer<typeof updateMenuItemSchema>;
+export type MenuItem = typeof menuItems.$inferSelect;
 
 

@@ -1,3 +1,12 @@
+/** ID outlet yang menerima reservasi meja — selaras dengan admin portal & form */
+export const RESERVATION_OUTLET_IDS = ["pollux-cikarang", "bintaro"] as const;
+
+export type ReservationOutletId = (typeof RESERVATION_OUTLET_IDS)[number];
+
+export function isReservationOutletId(value: string): value is ReservationOutletId {
+  return (RESERVATION_OUTLET_IDS as readonly string[]).includes(value);
+}
+
 /** Slot jam reservasi meja — dipakai client & server */
 export const RESERVATION_TIME_SLOTS = [
   "11:00",

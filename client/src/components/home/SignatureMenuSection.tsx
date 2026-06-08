@@ -1,38 +1,24 @@
 import { useLocation } from "wouter";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { memo, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSiteLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
-import rendangImg from "@assets/DSC02799_1758628102653.jpg";
-import dendengImg from "@assets/DSC07168_1758564588951.jpg";
-import gulaiImg from "@assets/DSC02371_1758564588950.jpg";
-import ayamPopImg from "@assets/DSC02436_1758564588903.jpg";
+import type { MenuItem } from "@shared/schema";
 
 /** Ganti ke import asset saat file `attached_assets/signature-menu-bg.webp` sudah siap */
 const SIGNATURE_MENU_BG_URL: string | undefined = undefined;
 
-const FIGMA_SIGNATURE_ITEMS = [
-  {
-    nameID: "Tunjang Hotplate",
-    nameEN: "Tunjang Hotplate",
-    image: gulaiImg,
-    objectPosition: "48% center",
-  },
-  { nameID: "Dendeng Bakar", nameEN: "Grilled Dendeng", image: dendengImg },
-  { nameID: "Rendang", nameEN: "Rendang", image: rendangImg },
-  { nameID: "Es Tebak", nameEN: "Es Tebak", image: ayamPopImg },
-] as const;
-
 /** Ukuran foto kartu menu — dipakai item menu */
 const MENU_CARD_IMAGE_CLASS =
-  "aspect-[8/5] h-auto w-full max-h-[250px] sm:max-h-[220px] xl:max-h-[250px]";
+  "aspect-[8/5] h-auto w-full max-h-[250px] sm:max-h-[220px] xl:max-h-[200px] 2xl:max-h-[250px]";
 
 /** Tinggi tombol "Lihat Menu" — sama dengan foto (lebar tetap sempit) */
-const VIEW_MENU_CARD_HEIGHT_CLASS = "h-[250px] sm:h-[220px] xl:h-[250px]";
+const VIEW_MENU_CARD_HEIGHT_CLASS = "h-[250px] sm:h-[220px] xl:h-[200px] 2xl:h-[250px]";
 
-/** Inset horizontal seragam — judul & kartu carousel sejajar */
+/** Inset horizontal seragam — judul & kartu carousel sejajar; xl = laptop/MacBook lebih mepet */
 const SECTION_SCROLL_INSET =
-  "pl-4 pr-4 scroll-ps-4 scroll-pe-4 sm:pl-8 sm:pr-8 sm:scroll-ps-8 sm:scroll-pe-8 lg:pl-10 lg:pr-10 lg:scroll-ps-10 lg:scroll-pe-10 xl:pl-[max(3rem,calc((100vw-82.5rem)/2+3rem))] xl:pr-6 xl:scroll-ps-[max(3rem,calc((100vw-82.5rem)/2+3rem))] xl:scroll-pe-6";
+  "pl-5 pr-4 scroll-ps-5 scroll-pe-4 sm:pl-6 sm:pr-6 sm:scroll-ps-6 sm:scroll-pe-6 lg:pl-8 lg:pr-8 lg:scroll-ps-8 lg:scroll-pe-8 xl:pl-8 xl:pr-6 xl:scroll-ps-8 xl:scroll-pe-6 2xl:pl-12 2xl:pr-8 2xl:scroll-ps-12 2xl:scroll-pe-8";
 
 function CarouselNavButton({
   dir,
@@ -60,7 +46,7 @@ function ViewFullMenuCard({ lang, onClick }: { lang: "ID" | "EN"; onClick: () =>
   const label = lang === "ID" ? "Lihat Menu Selengkapnya" : "View Full Menu";
 
   return (
-    <article className="flex w-[min(40vw,140px)] shrink-0 snap-start flex-col items-center sm:w-[150px] xl:w-[160px]">
+    <article className="flex w-[min(40vw,140px)] shrink-0 snap-start flex-col items-center sm:w-[150px] xl:w-[140px] 2xl:w-[160px]">
       <button
         type="button"
         onClick={onClick}
@@ -88,6 +74,12 @@ function SignatureMenuSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { lang } = useSiteLanguage();
 
+  const { data } = useQuery<{ success: boolean; items: MenuItem[] }>({
+    queryKey: ["/api/menu/featured"],
+  });
+
+  const featuredItems = data?.items ?? [];
+
   const title =
     lang === "ID" ? "Signature Menu Gadang Barubah" : "Signature Menu Gadang Barubah";
 
@@ -102,6 +94,10 @@ function SignatureMenuSection() {
       behavior: "smooth",
     });
   };
+
+  if (featuredItems.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -126,7 +122,7 @@ function SignatureMenuSection() {
           SECTION_SCROLL_INSET,
         )}
       >
-        <div className="mb-6 flex flex-col items-start gap-4 sm:mb-8 sm:flex-row sm:items-start sm:justify-between xl:mb-[clamp(2rem,4vh,64px)]">
+        <div className="mb-6 flex flex-col items-start gap-4 sm:mb-6 sm:flex-row sm:items-start sm:justify-between xl:mb-8 2xl:mb-[clamp(2rem,4vh,64px)]">
           <h2 className="text-figma-section-title w-full max-w-[20rem] text-left text-white sm:max-w-[439px]">
             {title}
           </h2>
@@ -163,16 +159,16 @@ function SignatureMenuSection() {
         <div
           ref={scrollRef}
           className={cn(
-            "flex snap-x snap-mandatory items-start gap-4 overflow-x-auto scrollbar-hide pb-2 sm:gap-[clamp(1.5rem,4vw,75px)]",
+            "flex snap-x snap-mandatory items-start gap-4 overflow-x-auto scrollbar-hide pb-2 sm:gap-4 lg:gap-5 xl:gap-4 2xl:gap-8",
             SECTION_SCROLL_INSET,
           )}
         >
-          {FIGMA_SIGNATURE_ITEMS.map((item) => {
-            const label = lang === "ID" ? item.nameID : item.nameEN;
+          {featuredItems.map((item) => {
+            const label = lang === "ID" ? item.nameId : item.nameEn;
             return (
               <article
-                key={item.nameID}
-                className="flex w-[min(72vw,280px)] shrink-0 snap-start flex-col items-center sm:w-[min(70vw,360px)] xl:w-[min(32vw,400px)]"
+                key={item.id}
+                className="flex w-[min(72vw,280px)] shrink-0 snap-start flex-col items-center sm:w-[min(70vw,360px)] xl:w-[min(26vw,300px)] 2xl:w-[min(32vw,400px)]"
               >
                 <button
                   type="button"
@@ -183,20 +179,15 @@ function SignatureMenuSection() {
                   )}
                 >
                   <img
-                    src={item.image}
+                    src={item.imagePath}
                     alt={label}
                     className="h-full w-full object-cover"
-                    style={
-                      "objectPosition" in item
-                        ? { objectPosition: item.objectPosition }
-                        : undefined
-                    }
                     loading="lazy"
                     decoding="async"
                     draggable={false}
                   />
                 </button>
-                <p className="mt-4 text-center font-heroCta text-base leading-tight text-white sm:mt-5 sm:text-lg xl:mt-6 xl:text-[clamp(1rem,1.1vw,1.25rem)] xl:leading-snug">
+                <p className="mt-4 text-center font-heroCta text-base leading-tight text-white sm:mt-4 sm:text-lg xl:mt-3 xl:text-[clamp(0.9375rem,1vw,1.125rem)] xl:leading-snug 2xl:mt-6 2xl:text-[clamp(1rem,1.1vw,1.25rem)]">
                   {label}
                 </p>
               </article>
