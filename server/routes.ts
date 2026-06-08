@@ -22,6 +22,11 @@ import {
   type AdminPortal,
 } from "@shared/admin-portals";
 import { notifyReservationCustomerAsync } from "./reservation-notify";
+import {
+  isValidWhatsApp,
+  normalizeWhatsAppInput,
+  validateReservationDateTime,
+} from "@shared/reservation-utils";
 import { upload, validateImageDimensions } from "./upload-middleware";
 import fs from "fs";
 import path from "path";
@@ -146,16 +151,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validated = insertReservationSchema.parse({
         ...req.body,
+        noWhatsApp: normalizeWhatsAppInput(String(req.body.noWhatsApp ?? "")),
         jumlahTamu: Number(req.body.jumlahTamu),
       });
 
-      const reservationDate = validated.tanggalReservasi;
-      const today = new Date();
-      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-      if (reservationDate < todayStr) {
+      const dateTimeError = validateReservationDateTime(
+        validated.tanggalReservasi,
+        validated.waktuReservasi,
+      );
+      if (dateTimeError) {
+        return res.status(400).json({ success: false, message: dateTimeError });
+      }
+
+      if (!isValidWhatsApp(validated.noWhatsApp)) {
         return res.status(400).json({
           success: false,
-          message: "Tanggal reservasi tidak boleh di masa lalu",
+          message: "Nomor WhatsApp tidak valid. Gunakan format 08xxxxxxxxxx",
         });
       }
 

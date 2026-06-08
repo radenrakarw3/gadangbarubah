@@ -12,7 +12,12 @@ import ayamPopImg from "@assets/DSC02436_1758564588903.jpg";
 const SIGNATURE_MENU_BG_URL: string | undefined = undefined;
 
 const FIGMA_SIGNATURE_ITEMS = [
-  { nameID: "Tunjang Hotplate", nameEN: "Tunjang Hotplate", image: gulaiImg },
+  {
+    nameID: "Tunjang Hotplate",
+    nameEN: "Tunjang Hotplate",
+    image: gulaiImg,
+    objectPosition: "left center",
+  },
   { nameID: "Dendeng Bakar", nameEN: "Grilled Dendeng", image: dendengImg },
   { nameID: "Rendang", nameEN: "Rendang", image: rendangImg },
   { nameID: "Es Tebak", nameEN: "Es Tebak", image: ayamPopImg },
@@ -24,6 +29,10 @@ const MENU_CARD_IMAGE_CLASS =
 
 /** Tinggi tombol "Lihat Menu" — sama dengan foto (lebar tetap sempit) */
 const VIEW_MENU_CARD_HEIGHT_CLASS = "h-[250px] sm:h-[220px] xl:h-[250px]";
+
+/** Inset horizontal seragam — judul & kartu carousel sejajar */
+const SECTION_SCROLL_INSET =
+  "pl-4 pr-4 scroll-ps-4 scroll-pe-4 sm:pl-8 sm:pr-8 sm:scroll-ps-8 sm:scroll-pe-8 lg:pl-10 lg:pr-10 lg:scroll-ps-10 lg:scroll-pe-10 xl:pl-[max(3rem,calc((100vw-82.5rem)/2+3rem))] xl:pr-6 xl:scroll-ps-[max(3rem,calc((100vw-82.5rem)/2+3rem))] xl:scroll-pe-6";
 
 function CarouselNavButton({
   dir,
@@ -111,9 +120,14 @@ function SignatureMenuSection() {
         aria-hidden
       />
 
-      <div className="relative mx-auto w-full max-w-[1320px] px-4 sm:px-8 lg:px-10 xl:px-12 xl:pt-[clamp(5rem,12vh,160px)]">
-        <div className="mb-6 flex flex-col items-center gap-4 sm:mb-8 sm:flex-row sm:items-start sm:justify-between xl:mb-[clamp(2rem,4vh,64px)]">
-          <h2 className="text-figma-section-title max-w-[20rem] text-center text-white sm:max-w-[439px] sm:text-left">
+      <div
+        className={cn(
+          "relative w-full xl:pt-[clamp(5rem,12vh,160px)]",
+          SECTION_SCROLL_INSET,
+        )}
+      >
+        <div className="mb-6 flex flex-col items-start gap-4 sm:mb-8 sm:flex-row sm:items-start sm:justify-between xl:mb-[clamp(2rem,4vh,64px)]">
+          <h2 className="text-figma-section-title w-full max-w-[20rem] text-left text-white sm:max-w-[439px]">
             {title}
           </h2>
 
@@ -131,7 +145,7 @@ function SignatureMenuSection() {
           </div>
         </div>
 
-        <div className="mb-4 flex justify-center gap-2 sm:hidden">
+        <div className="mb-4 flex justify-start gap-2 sm:hidden">
           <CarouselNavButton
             dir="left"
             onClick={() => scroll("left")}
@@ -145,11 +159,13 @@ function SignatureMenuSection() {
         </div>
       </div>
 
-      {/* Carousel full-bleed — scroll sampai tepi kanan layar */}
       <div className="relative w-full">
         <div
           ref={scrollRef}
-          className="flex snap-x snap-mandatory items-start gap-4 overflow-x-auto scrollbar-hide pb-2 pl-4 pr-4 scroll-ps-4 scroll-pe-4 sm:gap-[clamp(1.5rem,4vw,75px)] sm:pl-8 sm:pr-8 sm:scroll-ps-8 sm:scroll-pe-8 lg:pl-10 lg:pr-10 lg:scroll-ps-10 lg:scroll-pe-10 xl:pl-[max(3rem,calc((100vw-82.5rem)/2+3rem))] xl:pr-6 xl:scroll-ps-[max(3rem,calc((100vw-82.5rem)/2+3rem))] xl:scroll-pe-6"
+          className={cn(
+            "flex snap-x snap-mandatory items-start gap-4 overflow-x-auto scrollbar-hide pb-2 sm:gap-[clamp(1.5rem,4vw,75px)]",
+            SECTION_SCROLL_INSET,
+          )}
         >
           {FIGMA_SIGNATURE_ITEMS.map((item) => {
             const label = lang === "ID" ? item.nameID : item.nameEN;
@@ -170,6 +186,11 @@ function SignatureMenuSection() {
                     src={item.image}
                     alt={label}
                     className="h-full w-full object-cover"
+                    style={
+                      "objectPosition" in item
+                        ? { objectPosition: item.objectPosition }
+                        : undefined
+                    }
                     loading="lazy"
                     decoding="async"
                     draggable={false}

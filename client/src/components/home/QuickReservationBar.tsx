@@ -11,7 +11,13 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, parseApiError } from "@/lib/queryClient";
-import { OUTLETS, RESERVATION_TIME_SLOTS, todayISO } from "@/lib/siteContent";
+import { OUTLETS, todayISO } from "@/lib/siteContent";
+import {
+  availableTimeSlotsForDate,
+  isValidWhatsApp,
+  normalizeWhatsAppInput,
+  validateReservationDateTime,
+} from "@shared/reservation-utils";
 import { cn } from "@/lib/utils";
 import { useSiteLanguage } from "@/lib/language";
 import PrivacyConsentField from "@/components/PrivacyConsentField";
@@ -62,10 +68,6 @@ const SELECT_ITEM_CLASS =
   "text-[#D2D2D2] rounded-md focus:bg-white/15 focus:text-white data-[highlighted]:bg-white/15";
 
 const OUTLET_OPTIONS = OUTLETS.map((o) => ({ value: o.id, label: o.label }));
-const TIME_OPTIONS = RESERVATION_TIME_SLOTS.map((s) => ({
-  value: s,
-  label: `${s} WIB`,
-}));
 const ReservationSelect = memo(function ReservationSelect({
   value,
   onValueChange,
@@ -179,6 +181,23 @@ function QuickReservationBarInner() {
   const isTodaySelected = tanggal === todayISO();
   const minDate = todayISO();
 
+  const timeOptions = useMemo(
+    () =>
+      availableTimeSlotsForDate(tanggal).map((s) => ({
+        value: s,
+        label: `${s} WIB`,
+      })),
+    [tanggal],
+  );
+
+  useEffect(() => {
+    const available = availableTimeSlotsForDate(tanggal);
+    if (available.length === 0) return;
+    if (!available.includes(waktu as (typeof available)[number])) {
+      setWaktu(available[0]);
+    }
+  }, [tanggal, waktu]);
+
   const paxOptions = useMemo(
     () =>
       Array.from({ length: 20 }, (_, i) => {
@@ -212,16 +231,25 @@ function QuickReservationBarInner() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const nama = String(fd.get("nama") ?? "").trim();
-    const telepon = String(fd.get("telepon") ?? "").trim();
+    const telepon = normalizeWhatsAppInput(String(fd.get("telepon") ?? ""));
     const email = String(fd.get("email") ?? "").trim();
 
-    if (!nama || telepon.length < 10) {
+    if (!nama) {
       toast({
         title: lang === "ID" ? "Data belum lengkap" : "Incomplete data",
+        description: lang === "ID" ? "Isi nama lengkap Anda." : "Please enter your full name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isValidWhatsApp(telepon)) {
+      toast({
+        title: lang === "ID" ? "Nomor tidak valid" : "Invalid phone number",
         description:
           lang === "ID"
-            ? "Isi nama dan nomor telepon minimal 10 digit."
-            : "Please provide name and at least 10-digit phone number.",
+            ? "Gunakan nomor WhatsApp aktif format 08xxxxxxxxxx."
+            : "Use an active WhatsApp number in 08xxxxxxxxxx format.",
         variant: "destructive",
       });
       return;
@@ -251,23 +279,11 @@ function QuickReservationBarInner() {
       return;
     }
 
-    if (tanggal < todayISO()) {
+    const dateTimeError = validateReservationDateTime(tanggal, waktu);
+    if (dateTimeError) {
       toast({
-        title: lang === "ID" ? "Tanggal tidak valid" : "Invalid date",
-        description:
-          lang === "ID"
-            ? "Tanggal reservasi tidak boleh di masa lalu."
-            : "Reservation date cannot be in the past.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!RESERVATION_TIME_SLOTS.includes(waktu as (typeof RESERVATION_TIME_SLOTS)[number])) {
-      toast({
-        title: lang === "ID" ? "Jam tidak valid" : "Invalid time",
-        description:
-          lang === "ID" ? "Pilih jam reservasi yang tersedia." : "Please select an available time slot.",
+        title: lang === "ID" ? "Tanggal atau jam tidak valid" : "Invalid date or time",
+        description: dateTimeError,
         variant: "destructive",
       });
       return;
@@ -426,7 +442,7 @@ function QuickReservationBarInner() {
             <ReservationSelect
               value={waktu}
               onValueChange={setWaktu}
-              options={TIME_OPTIONS}
+              options={timeOptions}
               placeholder={placeholders.waktu}
               aria-label={lang === "ID" ? "Jam reservasi" : "Reservation time"}
               className="min-w-0"
@@ -445,7 +461,7 @@ function QuickReservationBarInner() {
             />
             <Button
               type="submit"
-              disabled={loading}
+              disabled={loading || timeOptions.length === 0}
               className="h-8 w-full max-w-[280px] rounded-lg border-0 bg-[rgba(89,0,0,0.9)] px-6 font-heroCta text-xs font-bold italic tracking-[0.03em] text-[rgba(210,210,210,0.95)] shadow-none hover:bg-[rgba(89,0,0,1)] sm:h-9 sm:text-[13px] xl:h-9 xl:w-auto xl:min-w-[200px] xl:max-w-[280px]"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : placeholders.reserve}

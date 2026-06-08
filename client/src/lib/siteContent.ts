@@ -73,26 +73,10 @@ export const HOME_OUTLET_PANELS = [
   },
 ] as const;
 
-export const RESERVATION_TIME_SLOTS = [
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "17:00",
-  "18:00",
-  "19:00",
-  "20:00",
-  "21:00",
-] as const;
-
-/** Tanggal lokal (WIB) format YYYY-MM-DD untuk input type="date" */
-export function todayISO() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
+export {
+  RESERVATION_TIME_SLOTS,
+  todayISOInWIB as todayISO,
+} from "@shared/reservation-utils";
 
 export const CATERING_CATEGORIES = [
   {

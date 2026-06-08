@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -27,17 +27,26 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, parseApiError } from "@/lib/queryClient";
-import { COMPANY, OUTLETS, RESERVATION_TIME_SLOTS, todayISO } from "@/lib/siteContent";
+import { COMPANY, OUTLETS, todayISO } from "@/lib/siteContent";
+import {
+  availableTimeSlotsForDate,
+  isValidWhatsApp,
+  normalizeWhatsAppInput,
+  validateReservationDateTime,
+} from "@shared/reservation-utils";
 import { useSiteLanguage } from "@/lib/language";
 import PrivacyConsentField from "@/components/PrivacyConsentField";
-
-const TIME_SLOTS = RESERVATION_TIME_SLOTS;
 
 const outletIds = OUTLETS.map((o) => o.id) as [string, ...string[]];
 
 const reservationFormSchema = z.object({
   namaLengkap: z.string().min(2, "Nama lengkap wajib diisi"),
-  noWhatsApp: z.string().min(10, "Nomor WhatsApp minimal 10 digit"),
+  noWhatsApp: z
+    .string()
+    .min(1, "Nomor WhatsApp wajib diisi")
+    .refine((val) => isValidWhatsApp(val), {
+      message: "Nomor WhatsApp tidak valid. Gunakan format 08xxxxxxxxxx",
+    }),
   email: z
     .string()
     .optional()
@@ -56,6 +65,15 @@ const reservationFormSchema = z.object({
   jumlahTamu: z.coerce.number().int().min(1, "Minimal 1 tamu").max(50, "Maksimal 50 tamu"),
   tipeMeja: z.enum(["reguler", "vip"], { errorMap: () => ({ message: "Pilih tipe meja" }) }),
   catatan: z.string().max(500).optional(),
+}).superRefine((data, ctx) => {
+  const err = validateReservationDateTime(data.tanggalReservasi, data.waktuReservasi);
+  if (err) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: err,
+      path: ["waktuReservasi"],
+    });
+  }
 });
 
 type ReservationFormData = z.infer<typeof reservationFormSchema>;
@@ -73,7 +91,7 @@ export default function ReservationPage() {
       email: "",
       outlet: OUTLETS[0].id,
       tanggalReservasi: todayISO(),
-      waktuReservasi: "",
+      waktuReservasi: "18:00",
       jumlahTamu: 2,
       tipeMeja: "reguler",
       catatan: "",
@@ -87,7 +105,7 @@ export default function ReservationPage() {
       const emailTrimmed = data.email?.trim() ?? "";
       const payload = {
         namaLengkap: data.namaLengkap.trim(),
-        noWhatsApp: data.noWhatsApp.trim(),
+        noWhatsApp: normalizeWhatsAppInput(data.noWhatsApp),
         outlet: data.outlet,
         tanggalReservasi: data.tanggalReservasi,
         waktuReservasi: data.waktuReservasi,
@@ -112,7 +130,7 @@ export default function ReservationPage() {
           email: "",
           outlet: OUTLETS[0].id,
           tanggalReservasi: todayISO(),
-          waktuReservasi: "",
+          waktuReservasi: "18:00",
           jumlahTamu: 2,
           tipeMeja: "reguler",
           catatan: "",
@@ -137,6 +155,20 @@ export default function ReservationPage() {
   });
 
   const minDate = todayISO();
+  const selectedDate = form.watch("tanggalReservasi");
+  const selectedTime = form.watch("waktuReservasi");
+
+  const timeSlots = useMemo(
+    () => availableTimeSlotsForDate(selectedDate || minDate),
+    [selectedDate, minDate],
+  );
+
+  useEffect(() => {
+    if (timeSlots.length === 0) return;
+    if (!timeSlots.includes(selectedTime as (typeof timeSlots)[number])) {
+      form.setValue("waktuReservasi", timeSlots[0], { shouldValidate: true });
+    }
+  }, [form, selectedTime, timeSlots]);
 
   return (
     <PublicPageLayout>
@@ -313,7 +345,7 @@ export default function ReservationPage() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {TIME_SLOTS.map((slot) => (
+                                {timeSlots.map((slot) => (
                                   <SelectItem key={slot} value={slot}>
                                     {slot} {lang === "ID" ? "WIB" : ""}
                                   </SelectItem>
@@ -396,7 +428,12 @@ export default function ReservationPage() {
                       className="pt-2"
                     />
 
-                    <Button type="submit" size="lg" className="w-full" disabled={mutation.isPending}>
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full"
+                      disabled={mutation.isPending || timeSlots.length === 0}
+                    >
                       {mutation.isPending ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
