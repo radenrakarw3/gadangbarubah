@@ -29,6 +29,10 @@ export const MainAdminReservations = withPortalPage(AdminReservations, "main");
 export const CikarangAdminReservations = withPortalPage(AdminReservations, "cikarang");
 export const BintaroAdminReservations = withPortalPage(AdminReservations, "bintaro");
 
+/** Staff cabang — langsung ke operasional reservasi */
+export const CikarangReservationStaff = CikarangAdminReservations;
+export const BintaroReservationStaff = BintaroAdminReservations;
+
 export function MainAdminOnlyPage({ component: Component }: { component: ComponentType }) {
   return (
     <ProtectedAdminRoute portal="main">

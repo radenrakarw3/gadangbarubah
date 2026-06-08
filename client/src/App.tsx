@@ -11,10 +11,8 @@ import RouteFallback from "@/components/RouteFallback";
 import ScrollToTop from "@/components/ScrollToTop";
 import { LanguageProvider } from "@/lib/language";
 import {
-  BintaroAdminDashboard,
-  BintaroAdminReservations,
-  CikarangAdminDashboard,
-  CikarangAdminReservations,
+  BintaroReservationStaff,
+  CikarangReservationStaff,
   MainAdminDashboard,
   MainAdminOnlyPage,
   MainAdminReservations,
@@ -46,6 +44,14 @@ function withSuspense(Component: ComponentType) {
       </Suspense>
     );
   };
+}
+
+function AdminRedirect({ to }: { to: string }) {
+  const [, navigate] = useLocation();
+  useEffect(() => {
+    navigate(to, { replace: true });
+  }, [navigate, to]);
+  return <RouteFallback />;
 }
 
 function ArticleRoute() {
@@ -81,10 +87,20 @@ function Router() {
       <Route path="/services/delivery" component={withSuspense(DeliveryPage)} />
       <Route path="/services/partnership" component={withSuspense(PartnershipPage)} />
       <Route path="/services/catering" component={withSuspense(CateringPage)} />
-      <Route path="/admin/cikarang/reservations" component={CikarangAdminReservations} />
-      <Route path="/admin/cikarang" component={CikarangAdminDashboard} />
-      <Route path="/admin/bintaro/reservations" component={BintaroAdminReservations} />
-      <Route path="/admin/bintaro" component={BintaroAdminDashboard} />
+      <Route path="/kelola-reservasi/cikarang" component={CikarangReservationStaff} />
+      <Route path="/kelola-reservasi/bintaro" component={BintaroReservationStaff} />
+      <Route path="/admin/cikarang/reservations">
+        <AdminRedirect to="/kelola-reservasi/cikarang" />
+      </Route>
+      <Route path="/admin/cikarang">
+        <AdminRedirect to="/kelola-reservasi/cikarang" />
+      </Route>
+      <Route path="/admin/bintaro/reservations">
+        <AdminRedirect to="/kelola-reservasi/bintaro" />
+      </Route>
+      <Route path="/admin/bintaro">
+        <AdminRedirect to="/kelola-reservasi/bintaro" />
+      </Route>
       <Route path="/admin/reservations" component={MainAdminReservations} />
       <Route
         path="/admin/campaigns"

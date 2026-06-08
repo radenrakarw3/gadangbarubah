@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 
-import { pgTable, text, varchar, date, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, date, integer, timestamp, json } from "drizzle-orm/pg-core";
 
 import { createInsertSchema } from "drizzle-zod";
 
@@ -12,6 +12,13 @@ export const ADMIN_ROLES = ["admin_main", "admin_cikarang", "admin_bintaro"] as 
 export type AdminRole = (typeof ADMIN_ROLES)[number];
 
 
+
+/** Tabel session express-session (connect-pg-simple) — jangan dihapus saat db:push */
+export const sessions = pgTable("session", {
+  sid: varchar("sid").primaryKey(),
+  sess: json("sess").notNull(),
+  expire: timestamp("expire", { precision: 6, mode: "date" }).notNull(),
+});
 
 export const users = pgTable("users", {
 

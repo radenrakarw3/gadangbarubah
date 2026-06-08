@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useSiteLanguage } from '@/lib/language';
 import {
   ADMIN_PORTAL_CONFIG,
+  isOutletReservationPortal,
   roleAllowedForPortal,
   type AdminPortal,
 } from '@shared/admin-portals';
@@ -87,7 +88,15 @@ export default function LoginAdmin({ portal, onLogin }: LoginAdminProps) {
     }
   };
 
-  const portalTitle = lang === 'ID' ? portalConfig.labelID : portalConfig.labelEN;
+  const staffPortal = isOutletReservationPortal(portal);
+  const portalTitle =
+    lang === 'ID'
+      ? staffPortal
+        ? portalConfig.staffLabelID
+        : portalConfig.labelID
+      : staffPortal
+        ? portalConfig.staffLabelEN
+        : portalConfig.labelEN;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-900 to-red-800 p-4">
@@ -99,8 +108,12 @@ export default function LoginAdmin({ portal, onLogin }: LoginAdminProps) {
           <CardTitle className="text-2xl">{portalTitle}</CardTitle>
           <CardDescription>
             {lang === 'ID'
-              ? `Masuk ke panel ${portalConfig.labelID} dengan username dan password cabang`
-              : `Sign in to the ${portalConfig.labelEN} panel with your branch credentials`}
+              ? staffPortal
+                ? 'Masuk untuk mengelola permintaan reservasi meja cabang Anda'
+                : `Masuk ke panel ${portalConfig.labelID} dengan username dan password`
+              : staffPortal
+                ? 'Sign in to manage table reservations for your branch'
+                : `Sign in to the ${portalConfig.labelEN} panel with your credentials`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -148,7 +161,9 @@ export default function LoginAdmin({ portal, onLogin }: LoginAdminProps) {
             >
               {isLoading
                 ? (lang === 'ID' ? 'Memverifikasi...' : 'Verifying...')
-                : (lang === 'ID' ? 'Masuk ke Admin' : 'Sign in as Admin')}
+                : staffPortal
+                  ? (lang === 'ID' ? 'Masuk' : 'Sign in')
+                  : (lang === 'ID' ? 'Masuk ke Admin' : 'Sign in as Admin')}
             </Button>
           </form>
         </CardContent>

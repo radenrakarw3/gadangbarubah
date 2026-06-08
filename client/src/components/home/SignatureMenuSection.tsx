@@ -16,7 +16,7 @@ const FIGMA_SIGNATURE_ITEMS = [
     nameID: "Tunjang Hotplate",
     nameEN: "Tunjang Hotplate",
     image: gulaiImg,
-    objectPosition: "left center",
+    objectPosition: "48% center",
   },
   { nameID: "Dendeng Bakar", nameEN: "Grilled Dendeng", image: dendengImg },
   { nameID: "Rendang", nameEN: "Rendang", image: rendangImg },

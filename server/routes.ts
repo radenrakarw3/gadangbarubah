@@ -180,6 +180,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Create reservation error:", error);
+      if (error?.code === "42P01") {
+        return res.status(503).json({
+          success: false,
+          message:
+            "Tabel reservasi belum tersedia di database. Jalankan migrasi database terlebih dahulu.",
+        });
+      }
       res.status(400).json({
         success: false,
         message: error.errors?.[0]?.message || error.message || "Gagal membuat reservasi",

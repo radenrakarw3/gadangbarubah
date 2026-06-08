@@ -11,10 +11,14 @@ import ReservationDetailSheet from "@/components/admin/ReservationDetailSheet";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { apiFetch } from "@/lib/api";
-import { todayISO } from "@/lib/siteContent";
+import { OUTLETS, todayISO } from "@/lib/siteContent";
 import type { ReservationRow } from "@/lib/reservation-admin";
 import type { ReservationStatus } from "@shared/reservation-status";
-import { ADMIN_PORTAL_CONFIG, type AdminPortal } from "@shared/admin-portals";
+import {
+  ADMIN_PORTAL_CONFIG,
+  isOutletReservationPortal,
+  type AdminPortal,
+} from "@shared/admin-portals";
 
 type FilterTab = "today" | "tomorrow" | "all" | "cancelled";
 
@@ -48,6 +52,9 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
   const searchString = useSearch();
   const { toast } = useToast();
   const portalConfig = ADMIN_PORTAL_CONFIG[portal];
+  const staffOnly = isOutletReservationPortal(portal);
+  const outletLabel =
+    OUTLETS.find((o) => o.id === portalConfig.outletId)?.label ?? portalConfig.staffLabelID;
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [detailRes, setDetailRes] = useState<ReservationRow | null>(null);
 
@@ -131,9 +138,10 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
       </Helmet>
 
       <AdminShell
-        title="Operasional Reservasi"
-        subtitle={portalConfig.labelID}
-        backHref={portalConfig.basePath}
+        title={staffOnly ? portalConfig.staffLabelID : "Operasional Reservasi"}
+        subtitle={staffOnly ? outletLabel : portalConfig.labelID}
+        backHref={staffOnly ? "/" : portalConfig.basePath}
+        showLogout={staffOnly}
       >
         <div className="p-4 lg:p-6">
           <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-6">
@@ -167,9 +175,11 @@ export default function AdminReservations({ portal }: { portal: AdminPortal }) {
                   </p>
                 </CardContent>
               </Card>
-              <Button variant="outline" className="w-full" onClick={() => navigate(portalConfig.basePath)}>
-                Kembali ke Dashboard
-              </Button>
+              {!staffOnly ? (
+                <Button variant="outline" className="w-full" onClick={() => navigate(portalConfig.basePath)}>
+                  Kembali ke Dashboard
+                </Button>
+              ) : null}
             </aside>
 
             <div className="space-y-4">
