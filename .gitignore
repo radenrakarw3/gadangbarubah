@@ -22,3 +22,7 @@ vite.config.ts.*
 *.log
 npm-debug.log*
 .cache
+
+# Staging aset revisi konten (ZIP client — jangan di-commit)
+content-revision/incoming/
+content-revision/previews/

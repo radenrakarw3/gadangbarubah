@@ -5,16 +5,18 @@ import { DESKTOP_OUTLET_MIN_H } from "@/lib/outletReveal";
 import { useSiteLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
 import OutletDetailView, { type OpenPanel, type OutletOriginRect } from "./OutletDetailView";
-import cikarangImg from "@assets/DSC07220_1758567803910.jpg";
-import bintaroImg from "@assets/DSC03165_1758567860370.jpg";
-import puriIndahImg from "@assets/DSC03078_1758567885565.jpg";
+import cikarangImg from "@assets/outlet-cikarang-1_1781246285353.jpg";
+import bintaroImg from "@assets/outlet-bintaro-1_1781246285353.jpg";
+import puriIndahImg from "@assets/outlet-puri-indah_1781246285353.jpg";
 import fourthOutletImg from "@assets/DSC03147_1758567860387.jpg";
 
-const PANEL_IMAGES: Record<(typeof HOME_OUTLET_PANELS)[number]["id"], string> = {
-  cikarang: cikarangImg,
-  bintaro: bintaroImg,
-  "puri-indah": puriIndahImg,
-  "fourth-outlet": fourthOutletImg,
+type PanelImage = { src: string; objectPosition?: string };
+
+const PANEL_IMAGES: Record<(typeof HOME_OUTLET_PANELS)[number]["id"], PanelImage> = {
+  cikarang: { src: cikarangImg, objectPosition: "center center" },
+  bintaro: { src: bintaroImg, objectPosition: "center center" },
+  "puri-indah": { src: puriIndahImg, objectPosition: "center center" },
+  "fourth-outlet": { src: fourthOutletImg, objectPosition: "center center" },
 };
 
 type Panel = (typeof HOME_OUTLET_PANELS)[number];
@@ -33,7 +35,7 @@ function OutletCard({
   const name = lang === "ID" ? panel.nameID : panel.nameEN;
   const address = lang === "ID" ? panel.addressID : panel.addressEN;
   const isOpen = panel.status === "open";
-  const image = PANEL_IMAGES[panel.id];
+  const { src: image, objectPosition } = PANEL_IMAGES[panel.id];
   const detailHint = lang === "ID" ? "Lihat detail outlet" : "View outlet details";
   const soonLabel = lang === "ID" ? "Segera Hadir" : "Coming Soon";
 
@@ -55,6 +57,7 @@ function OutletCard({
           src={image}
           alt=""
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          style={objectPosition ? { objectPosition } : undefined}
           loading="lazy"
           decoding="async"
           draggable={false}

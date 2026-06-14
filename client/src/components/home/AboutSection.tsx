@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { ChevronDown } from "lucide-react";
-import aboutImage from "@assets/DSC07220_1758565473982.jpg";
+import aboutImage from "@assets/about-interior_1781246285353.jpg";
 import aboutTitle from "@assets/about-title-gadang-barubah.svg";
 import { useSiteLanguage } from "@/lib/language";
 import { useRevealOutlet, useOutletVisible } from "@/lib/outletReveal";
@@ -42,7 +42,7 @@ function AboutSection() {
           <img
             src={aboutImage}
             alt="Interior Gadang Barubah"
-            className="absolute inset-0 h-[115%] w-full object-cover object-center -top-[8%]"
+            className="absolute inset-0 h-[115%] w-full object-cover object-[center_30%] -top-[8%]"
             loading="lazy"
             decoding="async"
             draggable={false}
@@ -74,7 +74,7 @@ function AboutSection() {
           <img
             src={aboutImage}
             alt="Interior Gadang Barubah"
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            className="absolute inset-0 h-full w-full object-cover object-[center_35%]"
             loading="lazy"
             decoding="async"
             draggable={false}

@@ -16,7 +16,7 @@ import {
   HOME_CATERING_SERVICES,
 } from "@/lib/siteContent";
 import mealboxImg from "@assets/Nasi Box_1758628102653.jpg";
-import buffetImg from "@assets/DSC03388_1758567885565.jpg";
+import buffetImg from "@assets/catering-buffet_1781246285353.jpg";
 import snackboxImg from "@assets/DSC03165_1758567860370.jpg";
 import rentalRoomImg from "@assets/DSC03147_1758567860387.jpg";
 import stallImg from "@assets/DSC05600_1758565473997.jpg";
@@ -231,6 +231,7 @@ function ServiceTile({  service,
         src={image}
         alt=""
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        style={service.id === "buffet" ? { objectPosition: "center 40%" } : undefined}
         loading="lazy"
         decoding="async"
         draggable={false}
@@ -436,11 +437,13 @@ function ServiceExpandedPanel({
             ? undefined
             : { transform: "translate3d(0, 0, 0) scale(1, 1)" }
         }
-      >        <img
+      >
+        <img
           src={image}
           alt={name}
           className="absolute inset-0 h-full w-full object-cover"
           style={{
+            objectPosition: service.id === "buffet" ? "center 40%" : "center center",
             transform: expanded ? "scale(1)" : "scale(1.1)",
             transition: `transform ${EXPAND_MS}ms ${EASE}`,
           }}

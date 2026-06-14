@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "sumber": "Web Gadang Asset-20260612T062513Z-3-001.zip",
+    "tanggal": "2026-06-12",
+    "status": "implemented",
+    "batch": "1781246285353",
+    "catatan": "Bukan semua file masuk repo. Preview ada di content-revision/previews/"
+  },
+  "slots": [
+    {
+      "id": "hero",
+      "label": "Hero homepage",
+      "target": "client/src/components/home/HeroSection.tsx",
+      "butuh": "1 landscape, branding jelas, object-cover",
+      "rekomendasi": {
+        "utama": "Foto/Landing Page/Intro/facade(1)-4.jpg",
+        "alternatif": "Foto/Landing Page/Intro/facade(1)-3.jpg"
+      },
+      "cadangan": ["Foto/Landing Page/Intro/facade(1).jpg"],
+      "tolak": [
+        "DSC00006.jpg — portrait, signage terpotong",
+        "DSC00023.jpg — portrait, exposure flat"
+      ],
+      "catatan": "Keduanya fasad Bintaro siang hari. Ada kabel listrik & motion blur kendaraan — crop atas atau terima sebagai nuansa urban."
+    },
+    {
+      "id": "about",
+      "label": "About section (gambar)",
+      "target": "client/src/components/home/AboutSection.tsx",
+      "butuh": "1 interior/warm, cocok strip mobile + panel desktop",
+      "rekomendasi": {
+        "utama": "Foto/Landing Page/Outlet/Cikarang (4 Foto)/DSC03111.jpg",
+        "alternatif": "Foto/Landing Page/Outlet/Bintaro (4 Foto)/DSC00274.jpg"
+      },
+      "cadangan": ["Foto/Landing Page/Intro/facade(1)-4.jpg"],
+      "catatan": "Folder Intro hanya eksterior. About lebih kuat pakai interior outlet."
+    },
+    {
+      "id": "outlet-cikarang",
+      "label": "Outlet Cikarang — carousel 3 foto",
+      "target": "client/src/components/home/OutletDetailView.tsx",
+      "butuh": "3 landscape, variasi: suasana → detail → identitas",
+      "rekomendasi": {
+        "slide1": "Foto/Landing Page/Outlet/Cikarang (4 Foto)/DSC03111.jpg",
+        "slide2": "Foto/Landing Page/Outlet/Cikarang (4 Foto)/DSC03081.jpg",
+        "slide3": "Foto/Landing Page/Outlet/Cikarang (4 Foto)/DSC03147.jpg"
+      },
+      "alternatif": {
+        "slide2": "DSC03084.jpg",
+        "slide3": "DSC03108.jpg"
+      },
+      "tolak": [
+        "DSC03067.jpg — area wastafel",
+        "DSC03096.jpg — portrait, kurang cocok carousel"
+      ]
+    },
+    {
+      "id": "outlet-bintaro",
+      "label": "Outlet Bintaro — carousel 3 foto",
+      "target": "client/src/components/home/OutletDetailView.tsx",
+      "butuh": "3 landscape, variasi dining + branding",
+      "rekomendasi": {
+        "slide1": "Foto/Landing Page/Outlet/Bintaro (4 Foto)/DSC00274.jpg",
+        "slide2": "Foto/Landing Page/Outlet/Bintaro (4 Foto)/DSC09868.jpg",
+        "slide3": "Foto/Landing Page/Outlet/Bintaro (4 Foto)/DSC09840.jpg"
+      },
+      "alternatif": {
+        "slide2": "DSC09788.jpg",
+        "slide3": "DSC09890.jpg"
+      },
+      "tolak": [
+        "DSC09938.jpg — koridor toilet",
+        "DSC09914.jpg — close-up plate (bisa galeri, kurang hero carousel)"
+      ]
+    },
+    {
+      "id": "catering-buffet",
+      "label": "Kartu Catering — Buffet",
+      "target": "client/src/components/home/CateringInquirySection.tsx",
+      "butuh": "1 landscape, prasmanan jelas di thumbnail kecil",
+      "rekomendasi": {
+        "utama": "Foto/Landing Page/Katering/Buffet/DSC00735.jpg",
+        "alternatif": "Foto/Landing Page/Katering/Buffet/DSC00869.jpg"
+      },
+      "tolak": [
+        "DSC00885.jpg — fokus orang, bukan setup buffet",
+        "DSC00876.jpg — fokus orang",
+        "DSC00923.jpg — fokus orang",
+        "DSC00980.jpg — fokus orang"
+      ],
+      "catatan": "5 layanan catering lain belum ada aset di ZIP."
+    },
+    {
+      "id": "catering-lainnya",
+      "label": "Mealbox, Snack Box, Rental, Stall, Delivery",
+      "target": "client/src/components/home/CateringInquirySection.tsx",
+      "status": "menunggu-aset",
+      "butuh": "1 foto per layanan (folder ZIP masih kosong)"
+    },
+    {
+      "id": "signature-menu",
+      "label": "Signature Menu background",
+      "target": "client/src/components/home/SignatureMenuSection.tsx",
+      "status": "menunggu-aset",
+      "butuh": "1 background (folder Signature Menu kosong)"
+    },
+    {
+      "id": "favicon",
+      "label": "Favicon & apple-touch-icon",
+      "target": "public/favicon.png",
+      "rekomendasi": {
+        "utama": "Grafis/Favicon Tab Web/Favicon Logo Web-08.svg",
+        "alternatif": "Grafis/Favicon Tab Web/Favicon Logo Web-11.svg"
+      },
+      "catatan": "Perlu export ke PNG 32/180/512 dari SVG pilihan client."
+    },
+    {
+      "id": "hero-video",
+      "label": "Video hero",
+      "target": "client/src/components/home/HeroSection.tsx",
+      "status": "menunggu-aset",
+      "catatan": "Folder Video/Hero Page kosong."
+    }
+  ],
+  "ringkasan": {
+    "fileDipilih": 11,
+    "dariZip": 138,
+    "menungguClient": ["5 foto catering", "signature menu", "video hero", "4 foto Puri Indah"]
+  }
+}

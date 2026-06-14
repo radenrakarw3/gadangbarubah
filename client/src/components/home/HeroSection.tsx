@@ -1,8 +1,9 @@
 import { memo } from "react";
 
-import heroImage from "@assets/DSC07140_1758564407964.jpg";
-
-import heroWebp from "@assets/DSC07140_1758564407964.webp";
+import heroImage from "@assets/hero-interior_DSC09800.jpg";
+import heroImageMd from "@assets/hero-interior_DSC09800-1600.jpg";
+import heroWebp from "@assets/hero-interior_DSC09800.webp";
+import heroWebpMd from "@assets/hero-interior_DSC09800-1600.webp";
 
 import heroHeadline from "@assets/hero-headline-en.svg";
 
@@ -36,13 +37,25 @@ function HeroSectionInner() {
 
           <picture>
 
-            <source type="image/webp" srcSet={heroWebp} />
+            <source
+              type="image/webp"
+              srcSet={`${heroWebpMd} 1600w, ${heroWebp} 2560w`}
+              sizes="100vw"
+            />
 
             <img
 
               src={heroImage}
 
-              alt="Suasana bersantap Gadang Barubah — rumah makan Padang mewah"
+              srcSet={`${heroImageMd} 1600w, ${heroImage} 2560w`}
+
+              sizes="100vw"
+
+              width={2560}
+
+              height={1708}
+
+              alt="Interior Gadang Barubah — ruang makan Padang modern dan autentik"
 
               className="h-full w-full object-cover object-center"
 

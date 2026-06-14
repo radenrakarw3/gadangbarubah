@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Instagram, Linkedin } from "lucide-react";
+import { Instagram } from "lucide-react";
 import navLogoIcon from "@assets/gadang-barubah-logo-icon.png";
 import { COMPANY, FOOTER_NAV_LEFT, SOCIAL_LINKS } from "@/lib/siteContent";
 import { useSiteLanguage } from "@/lib/language";
@@ -74,9 +74,6 @@ export default function SiteFooter() {
             </SocialIcon>
             <SocialIcon href={SOCIAL_LINKS.instagram} label="Instagram">
               <Instagram className="h-[22px] w-[22px]" strokeWidth={1.75} />
-            </SocialIcon>
-            <SocialIcon href={SOCIAL_LINKS.linkedin} label="LinkedIn">
-              <Linkedin className="h-[22px] w-[22px]" strokeWidth={1.75} />
             </SocialIcon>
           </div>
           <img

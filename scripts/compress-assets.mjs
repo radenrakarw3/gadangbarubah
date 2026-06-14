@@ -10,7 +10,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ASSETS_DIR = path.resolve(__dirname, "..", "attached_assets");
 const SKIP_EXT = new Set([".pdf", ".svg"]);
 
-const HERO_NAMES = new Set(["DSC07140_1758564407964.jpg"]);
+const SKIP_NAMES = new Set([
+  "hero-interior_DSC09800.png",
+  "hero-interior_DSC09800-1600.jpg",
+  "hero-interior_DSC09800-1600.webp",
+]);
+
+const HERO_NAMES = new Set([
+  "DSC07140_1758564407964.jpg",
+  "hero-interior_DSC09800.jpg",
+]);
 
 const CARD_NAMES = new Set([
   "DSC02799_1758628102653.jpg",
@@ -23,14 +32,31 @@ const CARD_NAMES = new Set([
   "DSC03388_1758567885565.jpg",
   "DSC03165_1758567860370.jpg",
   "DSC05600_1758565473997.jpg",
+  "catering-buffet_1781246285353.jpg",
 ]);
 
 const SECTION_NAMES = new Set([
   "DSC07220_1758565473982.jpg",
   "DSC07153_1758564588952.jpg",
+  "about-interior_1781246285353.jpg",
+  "outlet-puri-indah_1781246285353.jpg",
+  "outlet-cikarang-1_1781246285353.jpg",
+  "outlet-cikarang-2_1781246285353.jpg",
+  "outlet-cikarang-3_1781246285353.jpg",
+  "outlet-cikarang-4_1781246285353.jpg",
+  "outlet-bintaro-1_1781246285353.jpg",
+  "outlet-bintaro-2_1781246285353.jpg",
+  "outlet-bintaro-3_1781246285353.jpg",
+  "outlet-bintaro-4_1781246285353.jpg",
+  "outlet-bintaro-5_1781246285353.jpg",
+  "outlet-bintaro-6_1781246285353.jpg",
 ]);
 
 function maxWidthFor(name) {
+  if (name.startsWith("outlet-puri-indah_")) return 1600;
+  if (name === "about-interior_1781246285353.jpg") return 1600;
+  if (name.startsWith("outlet-bintaro-")) return 1600;
+  if (name.startsWith("outlet-cikarang-")) return 1600;
   if (HERO_NAMES.has(name)) return 1600;
   if (CARD_NAMES.has(name)) return 720;
   if (SECTION_NAMES.has(name)) return 1200;
@@ -40,6 +66,7 @@ function maxWidthFor(name) {
 }
 
 function jpegQualityFor(name) {
+  if (name === "hero-interior_DSC09800.jpg") return 88;
   if (HERO_NAMES.has(name)) return 76;
   if (CARD_NAMES.has(name)) return 74;
   return 78;
@@ -133,6 +160,8 @@ async function main() {
   let totalAfter = 0;
 
   for (const name of files) {
+    if (SKIP_NAMES.has(name)) continue;
+
     const filePath = path.join(ASSETS_DIR, name);
     const ext = path.extname(name).toLowerCase();
 

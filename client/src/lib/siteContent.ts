@@ -10,10 +10,9 @@ export const COMPANY = {
 };
 
 export const SOCIAL_LINKS = {
-  instagram: "https://www.instagram.com/gadangbarubahindonesia",
-  tiktok: "https://www.tiktok.com/@gadangbarubahindonesia",
-  linkedin: "https://www.linkedin.com/company/gadang-barubah-indonesia",
-};
+  instagram: "https://www.instagram.com/gadangbarubah",
+  tiktok: "https://www.tiktok.com/@gadangbarubah",
+} as const;
 
 export const OUTLETS = [
   { id: "pollux-cikarang", label: "Pollux Mall Cikarang" },

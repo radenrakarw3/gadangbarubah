@@ -12,19 +12,37 @@ import { HOME_OUTLET_PANELS } from "@/lib/siteContent";
 import { DESKTOP_OUTLET_MIN_H } from "@/lib/outletReveal";
 import { useSiteLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
-import cikarangImg from "@assets/DSC07220_1758567803910.jpg";
-import bintaroImg from "@assets/DSC03165_1758567860370.jpg";
-import cikarangGallery2 from "@assets/DSC03388_1758567885565.jpg";
-import cikarangGallery3 from "@assets/DSC05600_1758565473997.jpg";
-import bintaroGallery2 from "@assets/DSC03147_1758567860387.jpg";
-import bintaroGallery3 from "@assets/DSC03214_1758567860387.jpg";
+import cikarangImg from "@assets/outlet-cikarang-1_1781246285353.jpg";
+import cikarangGallery2 from "@assets/outlet-cikarang-2_1781246285353.jpg";
+import cikarangGallery3 from "@assets/outlet-cikarang-3_1781246285353.jpg";
+import cikarangGallery4 from "@assets/outlet-cikarang-4_1781246285353.jpg";
+import bintaroImg from "@assets/outlet-bintaro-1_1781246285353.jpg";
+import bintaroGallery2 from "@assets/outlet-bintaro-2_1781246285353.jpg";
+import bintaroGallery3 from "@assets/outlet-bintaro-3_1781246285353.jpg";
+import bintaroGallery4 from "@assets/outlet-bintaro-4_1781246285353.jpg";
+import bintaroGallery5 from "@assets/outlet-bintaro-5_1781246285353.jpg";
+import bintaroGallery6 from "@assets/outlet-bintaro-6_1781246285353.jpg";
 
 const AUTO_SLIDE_MS = 4500;
 const AUTO_PAUSE_AFTER_MANUAL_MS = 9000;
 
-const OUTLET_GALLERIES: Record<"cikarang" | "bintaro", readonly string[]> = {
-  cikarang: [cikarangImg, cikarangGallery2, cikarangGallery3],
-  bintaro: [bintaroImg, bintaroGallery2, bintaroGallery3],
+type OutletSlide = { src: string; objectPosition?: string };
+
+const OUTLET_GALLERIES: Record<"cikarang" | "bintaro", readonly OutletSlide[]> = {
+  cikarang: [
+    { src: cikarangImg, objectPosition: "center center" },
+    { src: cikarangGallery2, objectPosition: "center center" },
+    { src: cikarangGallery3, objectPosition: "center 35%" },
+    { src: cikarangGallery4, objectPosition: "center 55%" },
+  ],
+  bintaro: [
+    { src: bintaroImg, objectPosition: "center center" },
+    { src: bintaroGallery2, objectPosition: "center center" },
+    { src: bintaroGallery3, objectPosition: "center 42%" },
+    { src: bintaroGallery4, objectPosition: "center center" },
+    { src: bintaroGallery5, objectPosition: "center center" },
+    { src: bintaroGallery6, objectPosition: "center 38%" },
+  ],
 };
 
 type OpenPanel = Extract<(typeof HOME_OUTLET_PANELS)[number], { status: "open" }>;
@@ -60,7 +78,7 @@ function OutletPhotoCarousel({
   contentVisible,
   lang,
 }: {
-  images: readonly string[];
+  images: readonly OutletSlide[];
   expanded: boolean;
   contentVisible: boolean;
   lang: "ID" | "EN";
@@ -137,14 +155,15 @@ function OutletPhotoCarousel({
         }}
         aria-live="polite"
       >
-        {images.map((src) => (
+        {images.map((slide) => (
           <img
-            key={src}
-            src={src}
+            key={slide.src}
+            src={slide.src}
             alt=""
             className="h-full flex-shrink-0 object-cover"
             style={{
               width: `${100 / images.length}%`,
+              objectPosition: slide.objectPosition ?? "center center",
               transform: expanded ? "scale(1)" : "scale(1.08)",
               transition: `transform ${EXPAND_MS}ms ${EASE}`,
             }}
@@ -171,9 +190,9 @@ function OutletPhotoCarousel({
           </button>
 
           <div className="flex items-center gap-2">
-            {images.map((src, dotIndex) => (
+            {images.map((slide, dotIndex) => (
               <button
-                key={src}
+                key={slide.src}
                 type="button"
                 onClick={() => {
                   pauseAuto();
