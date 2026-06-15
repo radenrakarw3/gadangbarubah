@@ -107,7 +107,15 @@ function CateringForm({
   lang,
   className,
 }: {
-  form: { nama: string; telepon: string; email: string; tipe: string; pax: string };
+  form: {
+    nama: string;
+    telepon: string;
+    tanggalEvent: string;
+    eventDetail: string;
+    lokasiEvent: string;
+    tipe: string;
+    pax: string;
+  };
   setForm: React.Dispatch<React.SetStateAction<typeof form>>;
   copy: Record<string, string>;
   loading: boolean;
@@ -144,15 +152,37 @@ function CateringForm({
           value={form.telepon}
           onChange={(e) => setForm({ ...form, telepon: e.target.value })}
           autoComplete="tel"
+          inputMode="tel"
           className={FIGMA_CATERING_FIELD}
         />
         <Input
-          id="catering-email"
-          type="email"
-          placeholder={copy.email}
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          autoComplete="email"
+          id="catering-tanggal"
+          placeholder={copy.tanggalEvent}
+          value={form.tanggalEvent}
+          onChange={(e) => setForm({ ...form, tanggalEvent: e.target.value })}
+          className={FIGMA_CATERING_FIELD}
+        />
+        <Input
+          id="catering-event-detail"
+          placeholder={copy.eventDetail}
+          value={form.eventDetail}
+          onChange={(e) => setForm({ ...form, eventDetail: e.target.value })}
+          className={FIGMA_CATERING_FIELD}
+        />
+        <Input
+          id="catering-lokasi"
+          placeholder={copy.lokasiEvent}
+          value={form.lokasiEvent}
+          onChange={(e) => setForm({ ...form, lokasiEvent: e.target.value })}
+          className={FIGMA_CATERING_FIELD}
+        />
+        <Input
+          id="catering-pax"
+          type="number"
+          min={1}
+          placeholder={copy.pax}
+          value={form.pax}
+          onChange={(e) => setForm({ ...form, pax: e.target.value })}
           className={FIGMA_CATERING_FIELD}
         />
         <Select value={form.tipe} onValueChange={(v) => setForm({ ...form, tipe: v })}>
@@ -167,15 +197,6 @@ function CateringForm({
             ))}
           </SelectContent>
         </Select>
-        <Input
-          id="catering-pax"
-          type="number"
-          min={10}
-          placeholder={copy.pax}
-          value={form.pax}
-          onChange={(e) => setForm({ ...form, pax: e.target.value })}
-          className={FIGMA_CATERING_FIELD}
-        />
         <button
           type="submit"
           disabled={loading}
@@ -588,9 +609,11 @@ function CateringInquirySection() {
   const [form, setForm] = useState({
     nama: "",
     telepon: "",
-    email: "",
+    tanggalEvent: "",
+    eventDetail: "",
+    lokasiEvent: "",
     tipe: CATERING_TYPES[0].value as string,
-    pax: "50",
+    pax: "",
   });
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
@@ -600,11 +623,13 @@ function CateringInquirySection() {
       lang === "ID"
         ? "Ceritakan kebutuhan acara Anda — tim kami siap menyesuaikan menu dan jumlah tamu."
         : "Tell us about your event — our team will tailor the menu and guest count for you.",
-    nama: lang === "ID" ? "(Nama Anda)" : "(Your Name)",
-    telepon: lang === "ID" ? "(No. Handphone)" : "(No. Handphone)",
-    email: "(Email)",
+    nama: lang === "ID" ? "(Nama PIC)" : "(PIC Name)",
+    telepon: lang === "ID" ? "(No.hp PIC)" : "(PIC Phone)",
+    tanggalEvent: lang === "ID" ? "(Tanggal Event)" : "(Event Date)",
+    eventDetail: lang === "ID" ? "(Event Detail)" : "(Event Detail)",
+    lokasiEvent: lang === "ID" ? "(Lokasi Event)" : "(Event Location)",
     service: lang === "ID" ? "(Pilih Layanan)" : "(Choose Service)",
-    pax: "(Pax)",
+    pax: lang === "ID" ? "(Jumlah Pax)" : "(Guest Pax)",
     submit: lang === "ID" ? "Reservasi Sekarang!" : "Reserve Now!",
     collageTitle: lang === "ID" ? "Layanan Kami" : "Our Services",
   };
@@ -623,24 +648,20 @@ function CateringInquirySection() {
       return;
     }
 
-    if (!form.nama.trim() || form.telepon.length < 10) {
+    if (
+      !form.nama.trim() ||
+      form.telepon.length < 10 ||
+      !form.tanggalEvent.trim() ||
+      !form.eventDetail.trim() ||
+      !form.lokasiEvent.trim() ||
+      !form.pax.trim()
+    ) {
       toast({
         title: lang === "ID" ? "Data belum lengkap" : "Incomplete data",
         description:
-          lang === "ID" ? "Isi nama dan nomor telepon." : "Please fill in your name and phone number.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const emailTrimmed = form.email.trim();
-    if (emailTrimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
-      toast({
-        title: lang === "ID" ? "Email tidak valid" : "Invalid email",
-        description:
           lang === "ID"
-            ? "Kosongkan field email atau gunakan format email yang benar."
-            : "Leave email empty or use a valid email format.",
+            ? "Lengkapi semua field form catering."
+            : "Please complete all catering form fields.",
         variant: "destructive",
       });
       return;
@@ -656,9 +677,11 @@ function CateringInquirySection() {
       const res = await apiRequest("POST", "/api/catering-inquiries", {
         nama: form.nama.trim(),
         telepon: form.telepon,
-        email: emailTrimmed || undefined,
+        tanggalEvent: form.tanggalEvent.trim(),
+        eventDetail: form.eventDetail.trim(),
+        lokasiEvent: form.lokasiEvent.trim(),
         tipe: form.tipe,
-        pax: parseInt(form.pax, 10) || 10,
+        pax: parseInt(form.pax, 10) || 1,
         [RESERVATION_HONEYPOT_FIELD]: "",
       });
       const result = await res.json();
@@ -668,8 +691,8 @@ function CateringInquirySection() {
 
       const message = encodeURIComponent(
         lang === "ID"
-          ? `Halo Gadang Barubah, saya ingin konsultasi catering:\n\nNama: ${form.nama}\nTelepon: ${form.telepon}\nEmail: ${emailTrimmed || "-"}\nTipe: ${tipeLabel}\nPax: ${form.pax}\nRef: ${result.data?.shortId ?? ""}`
-          : `Hello Gadang Barubah, I want to discuss catering:\n\nName: ${form.nama}\nPhone: ${form.telepon}\nEmail: ${emailTrimmed || "-"}\nType: ${tipeLabel}\nPax: ${form.pax}\nRef: ${result.data?.shortId ?? ""}`,
+          ? `Halo Gadang Barubah, saya ingin konsultasi catering:\n\nNama PIC: ${form.nama}\nNo.hp PIC: ${form.telepon}\nTanggal Event: ${form.tanggalEvent}\nEvent Detail: ${form.eventDetail}\nLokasi Event: ${form.lokasiEvent}\nLayanan: ${tipeLabel}\nJumlah Pax: ${form.pax}\nRef: ${result.data?.shortId ?? ""}`
+          : `Hello Gadang Barubah, I want to discuss catering:\n\nPIC Name: ${form.nama}\nPIC Phone: ${form.telepon}\nEvent Date: ${form.tanggalEvent}\nEvent Detail: ${form.eventDetail}\nEvent Location: ${form.lokasiEvent}\nService: ${tipeLabel}\nGuest Pax: ${form.pax}\nRef: ${result.data?.shortId ?? ""}`,
       );
       window.open(`https://wa.me/${COMPANY.cateringWhatsapp}?text=${message}`, "_blank");
       toast({

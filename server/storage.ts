@@ -72,7 +72,9 @@ export interface IStorage {
   createCateringInquiry(data: {
     nama: string;
     noWhatsApp: string;
-    email?: string;
+    tanggalEvent: string;
+    eventDetail: string;
+    lokasiEvent: string;
     tipeLayanan: CateringInquiryType;
     pax: number;
   }): Promise<CateringInquiry>;
@@ -281,7 +283,9 @@ export class DatabaseStorage implements IStorage {
   async createCateringInquiry(data: {
     nama: string;
     noWhatsApp: string;
-    email?: string;
+    tanggalEvent: string;
+    eventDetail: string;
+    lokasiEvent: string;
     tipeLayanan: CateringInquiryType;
     pax: number;
   }): Promise<CateringInquiry> {
@@ -290,7 +294,9 @@ export class DatabaseStorage implements IStorage {
       .values({
         nama: data.nama,
         noWhatsApp: data.noWhatsApp,
-        email: data.email || null,
+        tanggalEvent: data.tanggalEvent,
+        eventDetail: data.eventDetail,
+        lokasiEvent: data.lokasiEvent,
         tipeLayanan: data.tipeLayanan,
         pax: data.pax,
         status: "pending",

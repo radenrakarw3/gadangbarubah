@@ -278,7 +278,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const inquiry = await storage.createCateringInquiry({
         nama: validated.nama.trim(),
         noWhatsApp: telepon,
-        email: validated.email,
+        tanggalEvent: validated.tanggalEvent.trim(),
+        eventDetail: validated.eventDetail.trim(),
+        lokasiEvent: validated.lokasiEvent.trim(),
         tipeLayanan: validated.tipe,
         pax: validated.pax,
       });

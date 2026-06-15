@@ -27,7 +27,9 @@ export type CateringInquiryStatus = (typeof CATERING_INQUIRY_STATUSES)[number];
 export type CateringInquiryMessageInput = {
   nama: string;
   noWhatsApp: string;
-  email?: string | null;
+  tanggalEvent: string;
+  eventDetail: string;
+  lokasiEvent: string;
   tipeLayanan: CateringInquiryType;
   pax: number;
 };
@@ -38,15 +40,16 @@ export function cateringTypeLabel(tipe: CateringInquiryType | string): string {
 
 export function buildStaffNewCateringMessage(inquiry: CateringInquiryMessageInput): string {
   const tipe = cateringTypeLabel(inquiry.tipeLayanan);
-  const emailLine = inquiry.email?.trim() ? `📧 ${inquiry.email.trim()}\n` : "";
 
   return (
     `🔔 *Inquiry Catering Baru*\n\n` +
-    `👤 ${inquiry.nama}\n` +
-    `📱 ${inquiry.noWhatsApp}\n` +
-    emailLine +
-    `🍽️ ${tipe}\n` +
-    `👥 ${inquiry.pax} pax\n\n` +
+    `👤 Nama PIC: ${inquiry.nama}\n` +
+    `📱 No.hp PIC: ${inquiry.noWhatsApp}\n` +
+    `📅 Tanggal Event: ${inquiry.tanggalEvent}\n` +
+    `📋 Event Detail: ${inquiry.eventDetail}\n` +
+    `📍 Lokasi Event: ${inquiry.lokasiEvent}\n` +
+    `🍽️ Layanan: ${tipe}\n` +
+    `👥 Jumlah Pax: ${inquiry.pax}\n\n` +
     `Silakan follow-up via WhatsApp.`
   );
 }

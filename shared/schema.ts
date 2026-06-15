@@ -101,6 +101,9 @@ export const cateringInquiries = pgTable("catering_inquiries", {
   nama: text("nama").notNull(),
   noWhatsApp: text("no_whatsapp").notNull(),
   email: text("email"),
+  tanggalEvent: text("tanggal_event").notNull(),
+  eventDetail: text("event_detail").notNull(),
+  lokasiEvent: text("lokasi_event").notNull(),
   tipeLayanan: varchar("tipe_layanan", { length: 40 }).notNull(),
   pax: integer("pax").notNull(),
   status: varchar("status", { length: 20 }).notNull().default("pending"),
@@ -227,12 +230,11 @@ export const insertReservationSchema = z.object({
 
 
 export const insertCateringInquirySchema = z.object({
-  nama: z.string().min(2, "Nama wajib diisi"),
+  nama: z.string().min(2, "Nama PIC wajib diisi"),
   telepon: z.string().min(10, "Nomor telepon minimal 10 digit"),
-  email: z.preprocess(
-    (val) => (typeof val === "string" && val.trim() === "" ? undefined : val),
-    z.string().email("Email tidak valid").optional(),
-  ),
+  tanggalEvent: z.string().min(1, "Tanggal event wajib diisi"),
+  eventDetail: z.string().min(2, "Detail event wajib diisi"),
+  lokasiEvent: z.string().min(2, "Lokasi event wajib diisi"),
   tipe: z.enum(CATERING_INQUIRY_TYPES, {
     errorMap: () => ({ message: "Pilih layanan catering yang valid" }),
   }),

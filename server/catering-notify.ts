@@ -36,7 +36,9 @@ export async function notifyStaffNewCatering(inquiry: CateringInquiry): Promise<
   const message = buildStaffNewCateringMessage({
     nama: inquiry.nama,
     noWhatsApp: inquiry.noWhatsApp,
-    email: inquiry.email,
+    tanggalEvent: inquiry.tanggalEvent,
+    eventDetail: inquiry.eventDetail,
+    lokasiEvent: inquiry.lokasiEvent,
     tipeLayanan: inquiry.tipeLayanan as Parameters<typeof buildStaffNewCateringMessage>[0]["tipeLayanan"],
     pax: inquiry.pax,
   });
