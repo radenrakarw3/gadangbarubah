@@ -4,6 +4,7 @@ import { memo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSiteLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
+import { menuFeaturedQueryKey, menuPublicQueryOptions } from "@/lib/menu";
 import type { MenuItem } from "@shared/schema";
 
 /** Ganti ke import asset saat file `attached_assets/signature-menu-bg.webp` sudah siap */
@@ -75,7 +76,8 @@ function SignatureMenuSection() {
   const { lang } = useSiteLanguage();
 
   const { data } = useQuery<{ success: boolean; items: MenuItem[] }>({
-    queryKey: ["/api/menu/featured"],
+    queryKey: menuFeaturedQueryKey(),
+    ...menuPublicQueryOptions,
   });
 
   const featuredItems = data?.items ?? [];

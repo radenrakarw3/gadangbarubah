@@ -7,6 +7,7 @@ import { Eye, FileText } from "lucide-react";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
 import { useSiteLanguage } from "@/lib/language";
+import { menuListQueryKey, menuPublicQueryOptions } from "@/lib/menu";
 import type { MenuCategory, MenuItem } from "@shared/schema";
 import menuPdf from "@assets/Menu Gadang Digital 5 September 2025_1758627992252.pdf";
 
@@ -19,7 +20,8 @@ export default function MenuPage() {
     success: boolean;
     categories: PublicMenuCategory[];
   }>({
-    queryKey: ["/api/menu"],
+    queryKey: menuListQueryKey(),
+    ...menuPublicQueryOptions,
   });
 
   const categories = (data?.categories ?? []).filter((cat) => cat.items.length > 0);

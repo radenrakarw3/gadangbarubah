@@ -10,6 +10,7 @@ import {
   Utensils,
   ArrowRight,
   Mail,
+  Newspaper,
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import AdminShell from "@/components/admin/AdminShell";
@@ -68,6 +69,14 @@ export default function AdminDashboard({ portal }: { portal: AdminPortal }) {
       icon: Utensils,
       route: "/admin/menu",
       color: "bg-orange-600",
+    },
+    {
+      id: "whats-on",
+      title: "Kelola What's On",
+      description: "Tulis, edit, dan publikasikan artikel Kabar Terkini",
+      icon: Newspaper,
+      route: "/admin/whats-on",
+      color: "bg-red-800",
     },
     {
       id: "campaigns",

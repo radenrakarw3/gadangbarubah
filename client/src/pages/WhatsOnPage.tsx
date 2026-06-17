@@ -1,14 +1,30 @@
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, ChevronRight } from "lucide-react";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
-import { ARTICLES } from "@/lib/siteContent";
 import { useSiteLanguage } from "@/lib/language";
+import {
+  articleCategory,
+  articleExcerpt,
+  articleTitle,
+  formatArticleDate,
+  whatsOnListQueryKey,
+  whatsOnPublicQueryOptions,
+} from "@/lib/whats-on";
+import type { WhatsOnArticle } from "@shared/schema";
 
 export default function WhatsOnPage() {
   const { lang } = useSiteLanguage();
+
+  const { data, isLoading, isError } = useQuery<{ success: boolean; articles: WhatsOnArticle[] }>({
+    queryKey: whatsOnListQueryKey(),
+    ...whatsOnPublicQueryOptions,
+  });
+
+  const articles = data?.articles ?? [];
 
   return (
     <PublicPageLayout>
@@ -28,41 +44,71 @@ export default function WhatsOnPage() {
             </p>
           </section>
 
-          <div className="space-y-4">
-            {ARTICLES.map((article) => (
-              <Card
-                key={article.id}
-                className="border-border/30 hover-elevate transition-all group"
-              >
-                <CardContent className="p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <Badge variant="outline">{article.category}</Badge>
-                        <span className="flex items-center text-xs text-muted-foreground gap-1">
-                          <Calendar className="h-3.5 w-3.5" />
-                          {article.date}
-                        </span>
+          {isLoading ? (
+            <p className="text-center text-muted-foreground">
+              {lang === "ID" ? "Memuat artikel..." : "Loading articles..."}
+            </p>
+          ) : isError ? (
+            <p className="text-center text-destructive">
+              {lang === "ID" ? "Gagal memuat artikel." : "Failed to load articles."}
+            </p>
+          ) : articles.length === 0 ? (
+            <p className="text-center text-muted-foreground">
+              {lang === "ID"
+                ? "Belum ada artikel. Nantikan kabar terbaru dari kami."
+                : "No articles yet. Stay tuned for updates."}
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {articles.map((article) => (
+                <Card
+                  key={article.id}
+                  className="border-border/30 hover-elevate transition-all group overflow-hidden"
+                >
+                  <CardContent className="p-0">
+                    <div className="flex flex-col sm:flex-row">
+                      {article.imagePath ? (
+                        <div className="sm:w-48 md:w-56 shrink-0">
+                          <img
+                            src={article.imagePath}
+                            alt=""
+                            className="h-44 w-full object-cover sm:h-full"
+                            loading="lazy"
+                          />
+                        </div>
+                      ) : null}
+                      <div className="flex flex-1 flex-col justify-between gap-4 p-6">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <Badge variant="outline">
+                              {articleCategory(article, lang)}
+                            </Badge>
+                            <span className="flex items-center text-xs text-muted-foreground gap-1">
+                              <Calendar className="h-3.5 w-3.5" />
+                              {formatArticleDate(article.publishedAt, lang)}
+                            </span>
+                          </div>
+                          <h2 className="text-xl font-serif font-medium text-foreground mb-2 group-hover:text-primary transition-colors">
+                            {articleTitle(article, lang)}
+                          </h2>
+                          <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
+                            {articleExcerpt(article, lang)}
+                          </p>
+                        </div>
+                        <Link
+                          href={`/whats-on/${article.slug}`}
+                          className="inline-flex items-center text-sm text-primary font-medium shrink-0"
+                        >
+                          {lang === "ID" ? "Baca selengkapnya" : "Read more"}
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </Link>
                       </div>
-                      <h2 className="text-xl font-serif font-medium text-foreground mb-2 group-hover:text-primary transition-colors">
-                        {article.title}
-                      </h2>
-                      <p className="text-muted-foreground text-sm leading-relaxed">
-                        {article.excerpt}
-                      </p>
                     </div>
-                    <Link
-                      href={`/whats-on/${article.id}`}
-                      className="inline-flex items-center text-sm text-primary font-medium shrink-0"
-                    >
-                      {lang === "ID" ? "Baca" : "Read"}
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </PublicPageLayout>

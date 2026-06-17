@@ -5,6 +5,7 @@ import {
   cateringInquiries,
   menuCategories,
   menuItems,
+  whatsOnArticles,
   type User,
   type InsertUser,
   type InsertReservation,
@@ -18,6 +19,9 @@ import {
   type InsertMenuItem,
   type UpdateMenuItem,
   type MenuItem,
+  type InsertWhatsOnArticle,
+  type UpdateWhatsOnArticle,
+  type WhatsOnArticle,
 } from "@shared/schema";
 import type { CateringInquiryType } from "@shared/catering";
 import {
@@ -107,6 +111,15 @@ export interface IStorage {
   ): Promise<MenuItem>;
   deleteMenuItem(id: string): Promise<MenuItem | undefined>;
   getMenuItemById(id: string): Promise<MenuItem | undefined>;
+
+  getWhatsOnArticlesAdmin(): Promise<WhatsOnArticle[]>;
+  getPublishedWhatsOnArticles(): Promise<WhatsOnArticle[]>;
+  getWhatsOnArticleBySlug(slug: string, publishedOnly?: boolean): Promise<WhatsOnArticle | undefined>;
+  createWhatsOnArticle(data: InsertWhatsOnArticle, imagePath?: string | null): Promise<WhatsOnArticle>;
+  updateWhatsOnArticle(id: string, data: UpdateWhatsOnArticle): Promise<WhatsOnArticle>;
+  updateWhatsOnArticleImage(id: string, imagePath: string): Promise<WhatsOnArticle>;
+  updateWhatsOnArticlePublish(id: string, isPublished: boolean): Promise<WhatsOnArticle>;
+  deleteWhatsOnArticle(id: string): Promise<WhatsOnArticle | undefined>;
 
   getAdminStats(outlet?: string): Promise<{
     totalReservations: number;
@@ -442,7 +455,7 @@ export class DatabaseStorage implements IStorage {
       .values({
         nameId: data.nameId,
         nameEn: data.nameEn,
-        slug: data.slug,
+        slug: data.slug.trim().toLowerCase(),
         sortOrder: data.sortOrder ?? 0,
         isActive: data.isActive ?? true,
       })
@@ -456,7 +469,7 @@ export class DatabaseStorage implements IStorage {
       .set({
         ...(data.nameId !== undefined && { nameId: data.nameId }),
         ...(data.nameEn !== undefined && { nameEn: data.nameEn }),
-        ...(data.slug !== undefined && { slug: data.slug }),
+        ...(data.slug !== undefined && { slug: data.slug.trim().toLowerCase() }),
         ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
         ...(data.isActive !== undefined && { isActive: data.isActive }),
       })
@@ -612,6 +625,114 @@ export class DatabaseStorage implements IStorage {
     const [deleted] = await requireDb()
       .delete(menuItems)
       .where(eq(menuItems.id, id))
+      .returning();
+    return deleted;
+  }
+
+  async getWhatsOnArticlesAdmin(): Promise<WhatsOnArticle[]> {
+    return requireDb()
+      .select()
+      .from(whatsOnArticles)
+      .orderBy(desc(whatsOnArticles.publishedAt), asc(whatsOnArticles.sortOrder));
+  }
+
+  async getPublishedWhatsOnArticles(): Promise<WhatsOnArticle[]> {
+    return requireDb()
+      .select()
+      .from(whatsOnArticles)
+      .where(eq(whatsOnArticles.isPublished, true))
+      .orderBy(desc(whatsOnArticles.publishedAt), asc(whatsOnArticles.sortOrder));
+  }
+
+  async getWhatsOnArticleBySlug(
+    slug: string,
+    publishedOnly = false,
+  ): Promise<WhatsOnArticle | undefined> {
+    const normalizedSlug = slug.trim().toLowerCase();
+    const conditions = [eq(whatsOnArticles.slug, normalizedSlug)];
+    if (publishedOnly) conditions.push(eq(whatsOnArticles.isPublished, true));
+
+    const [row] = await requireDb()
+      .select()
+      .from(whatsOnArticles)
+      .where(and(...conditions))
+      .limit(1);
+    return row;
+  }
+
+  async createWhatsOnArticle(
+    data: InsertWhatsOnArticle,
+    imagePath?: string | null,
+  ): Promise<WhatsOnArticle> {
+    const [row] = await requireDb()
+      .insert(whatsOnArticles)
+      .values({
+        slug: data.slug.trim().toLowerCase(),
+        titleId: data.titleId,
+        titleEn: data.titleEn,
+        excerptId: data.excerptId,
+        excerptEn: data.excerptEn,
+        contentId: data.contentId,
+        contentEn: data.contentEn,
+        categoryId: data.categoryId,
+        categoryEn: data.categoryEn,
+        imagePath: imagePath ?? null,
+        publishedAt: data.publishedAt,
+        isPublished: data.isPublished ?? true,
+        sortOrder: data.sortOrder ?? 0,
+      })
+      .returning();
+    return row;
+  }
+
+  async updateWhatsOnArticle(id: string, data: UpdateWhatsOnArticle): Promise<WhatsOnArticle> {
+    const [updated] = await requireDb()
+      .update(whatsOnArticles)
+      .set({
+        ...(data.slug !== undefined && { slug: data.slug.trim().toLowerCase() }),
+        ...(data.titleId !== undefined && { titleId: data.titleId }),
+        ...(data.titleEn !== undefined && { titleEn: data.titleEn }),
+        ...(data.excerptId !== undefined && { excerptId: data.excerptId }),
+        ...(data.excerptEn !== undefined && { excerptEn: data.excerptEn }),
+        ...(data.contentId !== undefined && { contentId: data.contentId }),
+        ...(data.contentEn !== undefined && { contentEn: data.contentEn }),
+        ...(data.categoryId !== undefined && { categoryId: data.categoryId }),
+        ...(data.categoryEn !== undefined && { categoryEn: data.categoryEn }),
+        ...(data.publishedAt !== undefined && { publishedAt: data.publishedAt }),
+        ...(data.isPublished !== undefined && { isPublished: data.isPublished }),
+        ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
+        updatedAt: new Date(),
+      })
+      .where(eq(whatsOnArticles.id, id))
+      .returning();
+    if (!updated) throw new Error("Artikel tidak ditemukan");
+    return updated;
+  }
+
+  async updateWhatsOnArticleImage(id: string, imagePath: string): Promise<WhatsOnArticle> {
+    const [updated] = await requireDb()
+      .update(whatsOnArticles)
+      .set({ imagePath, updatedAt: new Date() })
+      .where(eq(whatsOnArticles.id, id))
+      .returning();
+    if (!updated) throw new Error("Artikel tidak ditemukan");
+    return updated;
+  }
+
+  async updateWhatsOnArticlePublish(id: string, isPublished: boolean): Promise<WhatsOnArticle> {
+    const [updated] = await requireDb()
+      .update(whatsOnArticles)
+      .set({ isPublished, updatedAt: new Date() })
+      .where(eq(whatsOnArticles.id, id))
+      .returning();
+    if (!updated) throw new Error("Artikel tidak ditemukan");
+    return updated;
+  }
+
+  async deleteWhatsOnArticle(id: string): Promise<WhatsOnArticle | undefined> {
+    const [deleted] = await requireDb()
+      .delete(whatsOnArticles)
+      .where(eq(whatsOnArticles.id, id))
       .returning();
     return deleted;
   }

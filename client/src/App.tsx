@@ -37,6 +37,7 @@ const AdminCampaigns = lazy(() => import("@/pages/AdminCampaigns"));
 const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
 const AdminEmails = lazy(() => import("@/pages/AdminEmails"));
 const AdminMenu = lazy(() => import("@/pages/AdminMenu"));
+const AdminWhatsOn = lazy(() => import("@/pages/AdminWhatsOn"));
 const AdminLoginPage = lazy(() => import("@/pages/AdminLoginPage"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
@@ -59,10 +60,11 @@ function AdminRedirect({ to }: { to: string }) {
 }
 
 function ArticleRoute() {
-  const [, params] = useRoute("/whats-on/:id");
+  const [, params] = useRoute("/whats-on/:slug");
+  const slug = params?.slug ? decodeURIComponent(params.slug) : "";
   return (
     <Suspense fallback={<RouteFallback />}>
-      <ArticleDetailPage articleId={params?.id ?? ""} />
+      <ArticleDetailPage articleSlug={slug} />
     </Suspense>
   );
 }
@@ -82,7 +84,7 @@ function Router() {
       <Route path="/catering" component={withSuspense(CateringPage)} />
       <Route path="/reservasi" component={withSuspense(ReservationPage)} />
       <Route path="/whats-on" component={withSuspense(WhatsOnPage)} />
-      <Route path="/whats-on/:id" component={ArticleRoute} />
+      <Route path="/whats-on/:slug" component={ArticleRoute} />
       <Route path="/faq" component={withSuspense(FaqPage)} />
       <Route path="/terms" component={withSuspense(TermsPage)} />
       <Route path="/privacy" component={withSuspense(PrivacyPage)} />
@@ -126,6 +128,10 @@ function Router() {
       <Route
         path="/admin/menu"
         component={() => <MainAdminOnlyPage component={AdminMenu} />}
+      />
+      <Route
+        path="/admin/whats-on"
+        component={() => <MainAdminOnlyPage component={AdminWhatsOn} />}
       />
       <Route path="/admin" component={MainAdminDashboard} />
       <Route component={withSuspense(NotFound)} />

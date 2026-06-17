@@ -45,8 +45,14 @@ import {
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, parseApiError } from "@/lib/queryClient";
 import { apiFetch } from "@/lib/api";
+import {
+  menuFeaturedQueryKey,
+  menuListQueryKey,
+  validateCategoryForm,
+  validateItemForm,
+} from "@/lib/menu";
 import type { MenuCategory, MenuItem } from "@shared/schema";
 
 type MenuItemRow = MenuItem & { categoryNameId: string; categoryNameEn: string };
@@ -115,6 +121,29 @@ export default function AdminMenu() {
   const invalidateMenu = () => {
     queryClient.invalidateQueries({ queryKey: ["/api/admin/menu/categories"] });
     queryClient.invalidateQueries({ queryKey: ["/api/admin/menu/items"] });
+    queryClient.invalidateQueries({ queryKey: menuListQueryKey() });
+    queryClient.invalidateQueries({ queryKey: menuFeaturedQueryKey() });
+  };
+
+  const handleSaveCategory = () => {
+    const error = validateCategoryForm(categoryForm);
+    if (error) {
+      toast({ title: "Form belum lengkap", description: error, variant: "destructive" });
+      return;
+    }
+    categoryMutation.mutate();
+  };
+
+  const handleSaveItem = () => {
+    const error = validateItemForm(itemForm, {
+      requireImage: !editingItemId,
+      hasImage: Boolean(selectedFile),
+    });
+    if (error) {
+      toast({ title: "Form belum lengkap", description: error, variant: "destructive" });
+      return;
+    }
+    itemMutation.mutate();
   };
 
   const categoryMutation = useMutation({
@@ -136,8 +165,33 @@ export default function AdminMenu() {
       invalidateMenu();
       closeCategoryDialog();
     },
-    onError: (error: Error) => {
-      toast({ title: "Gagal menyimpan kategori", description: error.message, variant: "destructive" });
+    onError: (error: unknown) => {
+      toast({
+        title: "Gagal menyimpan kategori",
+        description: parseApiError(error),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const categoryStatusMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) =>
+      apiRequest("PATCH", `/api/admin/menu/categories/${id}`, { isActive }),
+    onSuccess: (_data, { isActive }) => {
+      toast({
+        title: isActive ? "Kategori diaktifkan" : "Kategori disembunyikan",
+        description: isActive
+          ? "Kategori dan item aktifnya tampil di halaman menu."
+          : "Kategori tidak lagi tampil di halaman menu publik.",
+      });
+      invalidateMenu();
+    },
+    onError: (error: unknown) => {
+      toast({
+        title: "Gagal mengubah status kategori",
+        description: parseApiError(error),
+        variant: "destructive",
+      });
     },
   });
 
@@ -148,8 +202,12 @@ export default function AdminMenu() {
       invalidateMenu();
       setDeleteCategoryId(null);
     },
-    onError: (error: Error) => {
-      toast({ title: "Gagal menghapus kategori", description: error.message, variant: "destructive" });
+    onError: (error: unknown) => {
+      toast({
+        title: "Gagal menghapus kategori",
+        description: parseApiError(error),
+        variant: "destructive",
+      });
     },
   });
 
@@ -195,8 +253,12 @@ export default function AdminMenu() {
       invalidateMenu();
       closeItemDialog();
     },
-    onError: (error: Error) => {
-      toast({ title: "Gagal menyimpan item", description: error.message, variant: "destructive" });
+    onError: (error: unknown) => {
+      toast({
+        title: "Gagal menyimpan item",
+        description: parseApiError(error),
+        variant: "destructive",
+      });
     },
   });
 
@@ -214,12 +276,17 @@ export default function AdminMenu() {
       }
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: { item?: MenuItem }) => {
       toast({ title: "Foto menu berhasil diperbarui" });
+      if (data.item?.imagePath) setPreviewUrl(data.item.imagePath);
       invalidateMenu();
     },
-    onError: (error: Error) => {
-      toast({ title: "Gagal mengganti foto", description: error.message, variant: "destructive" });
+    onError: (error: unknown) => {
+      toast({
+        title: "Gagal mengganti foto",
+        description: parseApiError(error),
+        variant: "destructive",
+      });
     },
   });
 
@@ -231,24 +298,48 @@ export default function AdminMenu() {
       id: string;
       patch: { isActive?: boolean; isFeatured?: boolean };
     }) => apiRequest("PATCH", `/api/admin/menu/items/${id}/status`, patch),
-    onSuccess: () => {
-      toast({ title: "Status berhasil diperbarui" });
+    onSuccess: (_data, { patch }) => {
+      if (patch.isActive === false) {
+        toast({
+          title: "Item disembunyikan",
+          description: "Item tidak lagi tampil di halaman menu publik.",
+        });
+      } else if (patch.isActive === true) {
+        toast({
+          title: "Item diaktifkan",
+          description: "Item tampil kembali di halaman menu publik.",
+        });
+      } else if (patch.isFeatured === true) {
+        toast({ title: "Item ditandai unggulan", description: "Item tampil di homepage." });
+      } else if (patch.isFeatured === false) {
+        toast({ title: "Unggulan dicabut", description: "Item tidak lagi tampil di homepage." });
+      } else {
+        toast({ title: "Status berhasil diperbarui" });
+      }
       invalidateMenu();
     },
-    onError: (error: Error) => {
-      toast({ title: "Gagal memperbarui status", description: error.message, variant: "destructive" });
+    onError: (error: unknown) => {
+      toast({
+        title: "Gagal memperbarui status",
+        description: parseApiError(error),
+        variant: "destructive",
+      });
     },
   });
 
   const deleteItemMutation = useMutation({
     mutationFn: async (id: string) => apiRequest("DELETE", `/api/admin/menu/items/${id}`),
     onSuccess: () => {
-      toast({ title: "Item menu berhasil dihapus" });
+      toast({ title: "Item menu berhasil dihapus", description: "Item dihapus permanen dari sistem." });
       invalidateMenu();
       setDeleteItemId(null);
     },
-    onError: (error: Error) => {
-      toast({ title: "Gagal menghapus item", description: error.message, variant: "destructive" });
+    onError: (error: unknown) => {
+      toast({
+        title: "Gagal menghapus item",
+        description: parseApiError(error),
+        variant: "destructive",
+      });
     },
   });
 
@@ -364,6 +455,26 @@ export default function AdminMenu() {
                         </p>
                       </div>
                       <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={
+                            categoryStatusMutation.isPending &&
+                            categoryStatusMutation.variables?.id === cat.id
+                          }
+                          onClick={() =>
+                            categoryStatusMutation.mutate({
+                              id: cat.id,
+                              isActive: !cat.isActive,
+                            })
+                          }
+                        >
+                          {cat.isActive ? (
+                            <PowerOff className="h-4 w-4" />
+                          ) : (
+                            <Power className="h-4 w-4" />
+                          )}
+                        </Button>
                         <Button variant="outline" size="sm" onClick={() => openEditCategory(cat)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -459,6 +570,10 @@ export default function AdminMenu() {
                         <Button
                           variant="outline"
                           size="sm"
+                          disabled={
+                            itemStatusMutation.isPending &&
+                            itemStatusMutation.variables?.id === item.id
+                          }
                           onClick={() =>
                             itemStatusMutation.mutate({
                               id: item.id,
@@ -472,6 +587,10 @@ export default function AdminMenu() {
                         <Button
                           variant="outline"
                           size="sm"
+                          disabled={
+                            itemStatusMutation.isPending &&
+                            itemStatusMutation.variables?.id === item.id
+                          }
                           onClick={() =>
                             itemStatusMutation.mutate({
                               id: item.id,
@@ -489,6 +608,7 @@ export default function AdminMenu() {
                         <Button
                           variant="outline"
                           size="sm"
+                          disabled={deleteItemMutation.isPending}
                           onClick={() => setDeleteItemId(item.id)}
                         >
                           <Trash2 className="h-3 w-3 mr-1 text-destructive" />
@@ -545,7 +665,9 @@ export default function AdminMenu() {
               <Label>Slug (URL)</Label>
               <Input
                 value={categoryForm.slug}
-                onChange={(e) => setCategoryForm((prev) => ({ ...prev, slug: e.target.value }))}
+                onChange={(e) =>
+                  setCategoryForm((prev) => ({ ...prev, slug: slugify(e.target.value) }))
+                }
               />
             </div>
             <div className="space-y-2">
@@ -571,10 +693,10 @@ export default function AdminMenu() {
             </div>
             <Button
               className="w-full"
-              onClick={() => categoryMutation.mutate()}
+              onClick={handleSaveCategory}
               disabled={categoryMutation.isPending}
             >
-              Simpan Kategori
+              {categoryMutation.isPending ? "Menyimpan..." : "Simpan Kategori"}
             </Button>
           </div>
         </DialogContent>
@@ -733,10 +855,10 @@ export default function AdminMenu() {
             </div>
             <Button
               className="w-full"
-              onClick={() => itemMutation.mutate()}
-              disabled={itemMutation.isPending}
+              onClick={handleSaveItem}
+              disabled={itemMutation.isPending || itemImageMutation.isPending}
             >
-              Simpan Item
+              {itemMutation.isPending ? "Menyimpan..." : "Simpan Item"}
             </Button>
           </div>
         </DialogContent>
@@ -753,9 +875,10 @@ export default function AdminMenu() {
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
+              disabled={deleteCategoryMutation.isPending}
               onClick={() => deleteCategoryId && deleteCategoryMutation.mutate(deleteCategoryId)}
             >
-              Hapus
+              {deleteCategoryMutation.isPending ? "Menghapus..." : "Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -772,9 +895,10 @@ export default function AdminMenu() {
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
+              disabled={deleteItemMutation.isPending}
               onClick={() => deleteItemId && deleteItemMutation.mutate(deleteItemId)}
             >
-              Hapus
+              {deleteItemMutation.isPending ? "Menghapus..." : "Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

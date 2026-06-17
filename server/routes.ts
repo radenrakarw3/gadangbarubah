@@ -13,6 +13,9 @@ import {
   insertMenuItemSchema,
   updateMenuItemSchema,
   updateMenuItemStatusSchema,
+  insertWhatsOnArticleSchema,
+  updateWhatsOnArticleSchema,
+  updateWhatsOnArticlePublishSchema,
 } from "@shared/schema";
 import {
   isReservationPublicId,
@@ -43,6 +46,7 @@ import {
 } from "@shared/reservation-utils";
 import { upload, validateImageDimensions } from "./upload-middleware";
 import { menuUpload } from "./menu-upload-middleware";
+import { articleUpload } from "./article-upload-middleware";
 import fs from "fs";
 import path from "path";
 
@@ -577,7 +581,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, categories });
     } catch (error) {
       console.error("Get public menu error:", error);
-      res.status(400).json({ success: false, message: "Gagal mengambil data menu" });
+      res.status(500).json({ success: false, message: "Gagal mengambil data menu" });
     }
   });
 
@@ -587,9 +591,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, items });
     } catch (error) {
       console.error("Get featured menu error:", error);
-      res.status(400).json({ success: false, message: "Gagal mengambil menu unggulan" });
+      res.status(500).json({ success: false, message: "Gagal mengambil menu unggulan" });
     }
   });
+
+  const menuErrorMessage = (error: any, fallback: string) => {
+    if (error?.code === "23505") {
+      return "Slug kategori sudah digunakan. Gunakan slug lain.";
+    }
+    return error.errors?.[0]?.message || error.message || fallback;
+  };
+
+  const parseMenuFormBoolean = (value: unknown) => value === "true" || value === true;
 
   app.get("/api/admin/menu/categories", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
     try {
@@ -597,7 +610,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, categories });
     } catch (error) {
       console.error("Get menu categories error:", error);
-      res.status(400).json({ success: false, message: "Gagal mengambil kategori menu" });
+      res.status(500).json({ success: false, message: "Gagal mengambil kategori menu" });
     }
   });
 
@@ -610,7 +623,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Create menu category error:", error);
       res.status(400).json({
         success: false,
-        message: error.errors ? "Data tidak valid" : error.message || "Gagal menambah kategori",
+        message: menuErrorMessage(error, "Gagal menambah kategori"),
       });
     }
   });
@@ -628,7 +641,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Update menu category error:", error);
         res.status(400).json({
           success: false,
-          message: error.errors ? "Data tidak valid" : error.message || "Gagal memperbarui kategori",
+          message: menuErrorMessage(error, "Gagal memperbarui kategori"),
         });
       }
     },
@@ -673,7 +686,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ success: false, message: "Foto menu harus diupload" });
         }
 
-        const data = insertMenuItemSchema.parse(req.body);
+        const data = insertMenuItemSchema.parse({
+          ...req.body,
+          isFeatured: parseMenuFormBoolean(req.body.isFeatured),
+          isActive: parseMenuFormBoolean(req.body.isActive),
+        });
         const imagePath = `/uploads/menu/${req.file.filename}`;
         const item = await storage.createMenuItem(data, imagePath);
         res.json({ success: true, message: "Item menu berhasil ditambahkan", item });
@@ -779,20 +796,216 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
-  app.get("/sitemap.xml", (_req, res) => {
+  app.get("/api/whats-on/articles", async (_req, res) => {
+    try {
+      const articles = await storage.getPublishedWhatsOnArticles();
+      res.json({ success: true, articles });
+    } catch (error) {
+      console.error("Get whats-on articles error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil artikel" });
+    }
+  });
+
+  app.get("/api/whats-on/articles/:slug", async (req, res) => {
+    try {
+      const slug = decodeURIComponent(req.params.slug).trim().toLowerCase();
+      const article = await storage.getWhatsOnArticleBySlug(slug, true);
+      if (!article) {
+        return res.status(404).json({ success: false, message: "Artikel tidak ditemukan" });
+      }
+      res.json({ success: true, article });
+    } catch (error) {
+      console.error("Get whats-on article error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil artikel" });
+    }
+  });
+
+  app.get("/api/admin/whats-on/articles", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
+    try {
+      const articles = await storage.getWhatsOnArticlesAdmin();
+      res.json({ success: true, articles });
+    } catch (error) {
+      console.error("Get admin whats-on articles error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil artikel" });
+    }
+  });
+
+  app.get(
+    "/api/admin/whats-on/articles/by-slug/:slug",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    async (req, res) => {
+      try {
+        const slug = decodeURIComponent(req.params.slug).trim().toLowerCase();
+        const article = await storage.getWhatsOnArticleBySlug(slug, false);
+        if (!article) {
+          return res.status(404).json({ success: false, message: "Artikel tidak ditemukan" });
+        }
+        res.json({ success: true, article });
+      } catch (error) {
+        console.error("Get admin whats-on article by slug error:", error);
+        res.status(500).json({ success: false, message: "Gagal mengambil artikel" });
+      }
+    },
+  );
+
+  const whatsOnErrorMessage = (error: any, fallback: string) => {
+    if (error?.code === "23505") {
+      return "Slug URL sudah digunakan. Gunakan slug lain.";
+    }
+    return error.errors?.[0]?.message || error.message || fallback;
+  };
+
+  const parseWhatsOnPublished = (value: unknown) => value === "true" || value === true;
+
+  app.post(
+    "/api/admin/whats-on/articles",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    articleUpload.single("image"),
+    async (req, res) => {
+      try {
+        const body = insertWhatsOnArticleSchema.parse({
+          ...req.body,
+          isPublished: parseWhatsOnPublished(req.body.isPublished),
+        });
+        const imagePath = req.file ? `/uploads/articles/${req.file.filename}` : null;
+        const article = await storage.createWhatsOnArticle(body, imagePath);
+        res.json({ success: true, message: "Artikel berhasil ditambahkan", article });
+      } catch (error: any) {
+        console.error("Create whats-on article error:", error);
+        res.status(400).json({
+          success: false,
+          message: whatsOnErrorMessage(error, "Gagal menambah artikel"),
+        });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/admin/whats-on/articles/:id",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    async (req, res) => {
+      try {
+        const body = updateWhatsOnArticleSchema.parse(req.body);
+        const article = await storage.updateWhatsOnArticle(req.params.id, body);
+        res.json({ success: true, message: "Artikel berhasil diperbarui", article });
+      } catch (error: any) {
+        console.error("Update whats-on article error:", error);
+        res.status(400).json({
+          success: false,
+          message: whatsOnErrorMessage(error, "Gagal memperbarui artikel"),
+        });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/admin/whats-on/articles/:id/image",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    articleUpload.single("image"),
+    async (req, res) => {
+      try {
+        if (!req.file) {
+          return res.status(400).json({ success: false, message: "Foto artikel harus diupload" });
+        }
+        const existing = (await storage.getWhatsOnArticlesAdmin()).find((a) => a.id === req.params.id);
+        if (!existing) {
+          return res.status(404).json({ success: false, message: "Artikel tidak ditemukan" });
+        }
+        if (existing.imagePath) deleteUploadedFile(existing.imagePath);
+        const imagePath = `/uploads/articles/${req.file.filename}`;
+        const article = await storage.updateWhatsOnArticleImage(req.params.id, imagePath);
+        res.json({ success: true, message: "Foto artikel berhasil diperbarui", article });
+      } catch (error: any) {
+        console.error("Update whats-on article image error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.message || "Gagal memperbarui foto artikel",
+        });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/admin/whats-on/articles/:id/publish",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    async (req, res) => {
+      try {
+        const { isPublished } = updateWhatsOnArticlePublishSchema.parse(req.body);
+        const article = await storage.updateWhatsOnArticlePublish(req.params.id, isPublished);
+        res.json({
+          success: true,
+          message: isPublished ? "Artikel dipublikasikan" : "Artikel disembunyikan",
+          article,
+        });
+      } catch (error: any) {
+        console.error("Update whats-on publish error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.errors?.[0]?.message || error.message || "Gagal mengubah status artikel",
+        });
+      }
+    },
+  );
+
+  app.delete(
+    "/api/admin/whats-on/articles/:id",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    async (req, res) => {
+      try {
+        const deleted = await storage.deleteWhatsOnArticle(req.params.id);
+        if (deleted?.imagePath) deleteUploadedFile(deleted.imagePath);
+        res.json({ success: true, message: "Artikel berhasil dihapus" });
+      } catch (error: any) {
+        console.error("Delete whats-on article error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.message || "Gagal menghapus artikel",
+        });
+      }
+    },
+  );
+
+  app.get("/sitemap.xml", async (_req, res) => {
     const baseUrl = "https://gadangbarubahindonesia.id";
     const currentDate = new Date().toISOString();
 
-    const urls = [
-      { loc: `${baseUrl}/`, priority: "1.0", changefreq: "weekly" },
-      { loc: `${baseUrl}/about`, priority: "0.9", changefreq: "monthly" },
-      { loc: `${baseUrl}/menu`, priority: "0.9", changefreq: "weekly" },
-      { loc: `${baseUrl}/catering`, priority: "0.9", changefreq: "monthly" },
-      { loc: `${baseUrl}/reservasi`, priority: "0.9", changefreq: "weekly" },
-      { loc: `${baseUrl}/whats-on`, priority: "0.8", changefreq: "weekly" },
-      { loc: `${baseUrl}/faq`, priority: "0.7", changefreq: "monthly" },
-      { loc: `${baseUrl}/services/outlet`, priority: "0.8", changefreq: "monthly" },
+    const staticUrls = [
+      { loc: `${baseUrl}/`, priority: "1.0", changefreq: "weekly", lastmod: currentDate },
+      { loc: `${baseUrl}/about`, priority: "0.9", changefreq: "monthly", lastmod: currentDate },
+      { loc: `${baseUrl}/menu`, priority: "0.9", changefreq: "weekly", lastmod: currentDate },
+      { loc: `${baseUrl}/catering`, priority: "0.9", changefreq: "monthly", lastmod: currentDate },
+      { loc: `${baseUrl}/reservasi`, priority: "0.9", changefreq: "weekly", lastmod: currentDate },
+      { loc: `${baseUrl}/whats-on`, priority: "0.8", changefreq: "weekly", lastmod: currentDate },
+      { loc: `${baseUrl}/faq`, priority: "0.7", changefreq: "monthly", lastmod: currentDate },
+      { loc: `${baseUrl}/services/outlet`, priority: "0.8", changefreq: "monthly", lastmod: currentDate },
     ];
+
+    let articleUrls: Array<{
+      loc: string;
+      priority: string;
+      changefreq: string;
+      lastmod: string;
+    }> = [];
+
+    try {
+      const articles = await storage.getPublishedWhatsOnArticles();
+      articleUrls = articles.map((article) => ({
+        loc: `${baseUrl}/whats-on/${article.slug}`,
+        priority: "0.7",
+        changefreq: "monthly",
+        lastmod: article.updatedAt?.toISOString?.() ?? currentDate,
+      }));
+    } catch (error) {
+      console.error("Sitemap whats-on articles error:", error);
+    }
+
+    const urls = [...staticUrls, ...articleUrls];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -800,7 +1013,7 @@ ${urls
   .map(
     (url) => `  <url>
     <loc>${url.loc}</loc>
-    <lastmod>${currentDate}</lastmod>
+    <lastmod>${url.lastmod}</lastmod>
     <changefreq>${url.changefreq}</changefreq>
     <priority>${url.priority}</priority>
   </url>`,

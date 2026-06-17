@@ -80,9 +80,9 @@ export const pageSEOConfigs = {
   }),
 
   about: createSEOConfig({
-    title: "About Us - Gadang Barubah Indonesia",
-    description: "Kenali cerita Gadang Barubah, rumah makan Padang autentik dengan 2 cabang di Pollux Mall Cikarang dan Bintaro.",
-    keywords: "about gadang barubah, tentang gadang barubah, outlet padang cikarang, outlet padang bintaro, rumah makan padang",
+    title: "Tentang Kami - Gadang Barubah",
+    description: "Kenali cerita Gadang Barubah, rumah makan Padang berkelas yang mengangkat warisan kuliner Minang. Outlet di Pollux Mall Cikarang dan Bintaro.",
+    keywords: "about gadang barubah, tentang gadang barubah, rumah makan padang berkelas, outlet padang cikarang, outlet padang bintaro",
     path: "/about",
   }),
 

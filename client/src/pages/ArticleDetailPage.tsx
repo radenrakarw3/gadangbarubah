@@ -1,26 +1,57 @@
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
-import FaqSection from "@/components/FaqSection";
-import { ARTICLES } from "@/lib/siteContent";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useSiteLanguage } from "@/lib/language";
+import {
+  articleCategory,
+  articleContent,
+  articleExcerpt,
+  articleTitle,
+  formatArticleDate,
+  normalizeArticleSlug,
+  whatsOnDetailQueryKey,
+  whatsOnPublicQueryOptions,
+} from "@/lib/whats-on";
+import type { WhatsOnArticle } from "@shared/schema";
 
 interface ArticleDetailPageProps {
-  articleId: string;
+  articleSlug: string;
 }
 
-export default function ArticleDetailPage({ articleId }: ArticleDetailPageProps) {
+export default function ArticleDetailPage({ articleSlug }: ArticleDetailPageProps) {
   const { lang } = useSiteLanguage();
-  const article = ARTICLES.find((a) => a.id === articleId);
+  const slug = normalizeArticleSlug(articleSlug);
 
-  if (!article) {
+  const { data, isLoading, isError } = useQuery<{ success: boolean; article: WhatsOnArticle }>({
+    queryKey: whatsOnDetailQueryKey(slug),
+    enabled: Boolean(slug),
+    ...whatsOnPublicQueryOptions,
+  });
+
+  const article = data?.article;
+
+  if (isLoading) {
+    return (
+      <PublicPageLayout>
+        <SEOHead pageKey="whatsOn" />
+        <div className="px-4 py-20 text-center text-muted-foreground">
+          {lang === "ID" ? "Memuat artikel..." : "Loading article..."}
+        </div>
+      </PublicPageLayout>
+    );
+  }
+
+  if (isError || !article) {
     return (
       <PublicPageLayout>
         <SEOHead pageKey="notFound" />
         <div className="px-4 py-20 text-center">
-          <h1 className="text-2xl font-serif mb-4">Artikel tidak ditemukan</h1>
+          <h1 className="text-2xl font-serif mb-4">
+            {lang === "ID" ? "Artikel tidak ditemukan" : "Article not found"}
+          </h1>
           <Link href="/whats-on">
             <Button variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -31,6 +62,11 @@ export default function ArticleDetailPage({ articleId }: ArticleDetailPageProps)
       </PublicPageLayout>
     );
   }
+
+  const paragraphs = articleContent(article, lang)
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 
   return (
     <PublicPageLayout>
@@ -45,30 +81,30 @@ export default function ArticleDetailPage({ articleId }: ArticleDetailPageProps)
             </Button>
           </Link>
 
+          {article.imagePath ? (
+            <img
+              src={article.imagePath}
+              alt=""
+              className="mb-8 h-56 w-full rounded-xl object-cover sm:h-80"
+            />
+          ) : null}
+
           <p className="text-sm text-muted-foreground mb-2">
-            {article.category} • {article.date}
+            {articleCategory(article, lang)} • {formatArticleDate(article.publishedAt, lang)}
           </p>
           <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-6">
-            {article.title}
+            {articleTitle(article, lang)}
           </h1>
+
           <div className="prose prose-neutral dark:prose-invert max-w-none">
-            <p className="text-lg text-muted-foreground leading-relaxed mb-6">{article.excerpt}</p>
-            <p className="text-muted-foreground leading-relaxed">
-              {lang === "ID"
-                ? "Artikel lengkap akan segera tersedia. Untuk informasi lebih lanjut tentang "
-                : "The full article will be available soon. For more information about "}
-              {lang === "ID" ? article.category.toLowerCase() : article.category}
-              {lang === "ID" ? " Gadang Barubah, hubungi kami via WhatsApp di " : " at Gadang Barubah, contact us on WhatsApp at "}
-              <a
-                href="https://wa.me/6289509766739"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline"
-              >
-                089509766739
-              </a>
-              .
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+              {articleExcerpt(article, lang)}
             </p>
+            {paragraphs.map((paragraph) => (
+              <p key={paragraph} className="text-muted-foreground leading-relaxed mb-4">
+                {paragraph}
+              </p>
+            ))}
           </div>
         </div>
       </article>

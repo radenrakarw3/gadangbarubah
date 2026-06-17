@@ -162,6 +162,25 @@ export const menuItems = pgTable("menu_items", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const whatsOnArticles = pgTable("whats_on_articles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: varchar("slug", { length: 120 }).notNull().unique(),
+  titleId: text("title_id").notNull(),
+  titleEn: text("title_en").notNull(),
+  excerptId: text("excerpt_id").notNull(),
+  excerptEn: text("excerpt_en").notNull(),
+  contentId: text("content_id").notNull(),
+  contentEn: text("content_en").notNull(),
+  categoryId: text("category_id").notNull(),
+  categoryEn: text("category_en").notNull(),
+  imagePath: text("image_path"),
+  publishedAt: date("published_at").notNull(),
+  isPublished: boolean("is_published").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -300,6 +319,31 @@ export const updateMenuItemStatusSchema = z.object({
   isFeatured: z.boolean().optional(),
 });
 
+export const insertWhatsOnArticleSchema = z.object({
+  slug: z
+    .string()
+    .min(1, "Slug wajib diisi")
+    .max(120)
+    .regex(/^[a-z0-9-]+$/, "Slug hanya huruf kecil, angka, dan strip"),
+  titleId: z.string().min(1, "Judul (ID) wajib diisi"),
+  titleEn: z.string().min(1, "Judul (EN) wajib diisi"),
+  excerptId: z.string().min(1, "Ringkasan (ID) wajib diisi"),
+  excerptEn: z.string().min(1, "Ringkasan (EN) wajib diisi"),
+  contentId: z.string().min(1, "Konten (ID) wajib diisi"),
+  contentEn: z.string().min(1, "Konten (EN) wajib diisi"),
+  categoryId: z.string().min(1, "Kategori (ID) wajib diisi"),
+  categoryEn: z.string().min(1, "Kategori (EN) wajib diisi"),
+  publishedAt: z.string().min(1, "Tanggal publikasi wajib diisi"),
+  isPublished: z.coerce.boolean().optional().default(true),
+  sortOrder: z.coerce.number().int().min(0).optional().default(0),
+});
+
+export const updateWhatsOnArticleSchema = insertWhatsOnArticleSchema.partial();
+
+export const updateWhatsOnArticlePublishSchema = z.object({
+  isPublished: z.boolean(),
+});
+
 
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -327,5 +371,9 @@ export type MenuCategory = typeof menuCategories.$inferSelect;
 export type InsertMenuItem = z.infer<typeof insertMenuItemSchema>;
 export type UpdateMenuItem = z.infer<typeof updateMenuItemSchema>;
 export type MenuItem = typeof menuItems.$inferSelect;
+
+export type InsertWhatsOnArticle = z.infer<typeof insertWhatsOnArticleSchema>;
+export type UpdateWhatsOnArticle = z.infer<typeof updateWhatsOnArticleSchema>;
+export type WhatsOnArticle = typeof whatsOnArticles.$inferSelect;
 
 

@@ -259,41 +259,6 @@ export const FAQ_ITEMS = [
   },
 ] as const;
 
-export const ARTICLES = [
-  {
-    id: "1",
-    title: "Rendang Gadang Barubah: Warisan Rasa Minang",
-    excerpt:
-      "Mengenal proses dan cita rasa rendang autentik yang menjadi signature menu kami, dimasak dengan rempah pilihan dan resep turun-temurun.",
-    date: "15 Januari 2026",
-    category: "Kuliner",
-  },
-  {
-    id: "2",
-    title: "Tips Memilih Paket Katering untuk Acara Kantor",
-    excerpt:
-      "Panduan praktis memilih menu nasi box atau buffet Padang yang pas untuk meeting, gathering, dan event perusahaan.",
-    date: "8 Januari 2026",
-    category: "Katering",
-  },
-  {
-    id: "3",
-    title: "Cara Reservasi Meja & VIP Room di Gadang Barubah",
-    excerpt:
-      "Langkah mudah memesan meja reguler atau VIP room melalui form reservasi online kami.",
-    date: "2 Januari 2026",
-    category: "Reservasi",
-  },
-  {
-    id: "4",
-    title: "Suasana Outlet Gadang Barubah: Cikarang & Bintaro",
-    excerpt:
-      "Kenali pengalaman bersantap di dua cabang kami, dari VIP room di Cikarang hingga suasana hangat di Bintaro.",
-    date: "20 Desember 2025",
-    category: "Outlet",
-  },
-] as const;
-
 export const SIGNATURE_MENU = [
   {
     name: "Rendang Daging",

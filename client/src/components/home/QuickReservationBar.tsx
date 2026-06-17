@@ -69,6 +69,8 @@ const SELECT_ITEM_CLASS =
   "text-[#D2D2D2] rounded-md focus:bg-white/15 focus:text-white data-[highlighted]:bg-white/15";
 
 const OUTLET_OPTIONS = OUTLETS.map((o) => ({ value: o.id, label: o.label }));
+const DEFAULT_OUTLET_ID =
+  OUTLETS.find((o) => o.id === "bintaro")?.id ?? OUTLETS[0].id;
 const ReservationSelect = memo(function ReservationSelect({
   value,
   onValueChange,
@@ -161,7 +163,7 @@ function QuickReservationBarInner() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tanggal, setTanggal] = useState(() => todayISO());
   const [waktu, setWaktu] = useState("18:00");
-  const [outlet, setOutlet] = useState(OUTLETS[0].id as string);
+  const [outlet, setOutlet] = useState<string>(DEFAULT_OUTLET_ID);
   const [pax, setPax] = useState("2");
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const formKey = useRef(0);
@@ -222,7 +224,7 @@ function QuickReservationBarInner() {
     formKey.current += 1;
     setTanggal(todayISO());
     setWaktu("18:00");
-    setOutlet(OUTLETS[0].id as string);
+    setOutlet(DEFAULT_OUTLET_ID);
     setPax("2");
     setPrivacyAccepted(false);
     setMobileOpen(false);
