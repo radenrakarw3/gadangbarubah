@@ -7,6 +7,7 @@ import { useSiteLanguage } from "@/lib/language";
 const FOOTER_COL1_EN: Record<string, string> = {
   "/": "Home",
   "/about": "About Us",
+  "/kemitraan": "Partnership",
   "/whats-on": "What's On",
   "/menu": "Menu",
   "/catering": "Catering",

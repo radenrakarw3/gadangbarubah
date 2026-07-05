@@ -181,8 +181,8 @@ function getContentGroup(path: string): string {
   if (path.startsWith('/uni')) return 'services_hub';
   if (path.startsWith('/services/outlet')) return 'outlet_locator';
   if (path.startsWith('/services/delivery')) return 'delivery_service';
+  if (path.startsWith('/kemitraan')) return 'business_partnership';
   if (path.startsWith('/services/catering')) return 'catering_service';
-  if (path.startsWith('/services/partnership')) return 'business_partnership';
   if (path.startsWith('/reservasi')) return 'reservation';
   return 'other';
 }
@@ -229,8 +229,8 @@ export function denyAnalyticsConsent() {
 function getServiceTypeFromPath(path: string): RestaurantEventParams['service_type'] | undefined {
   if (path.startsWith('/services/outlet')) return 'outlet';
   if (path.startsWith('/services/delivery')) return 'delivery';
+  if (path.startsWith('/kemitraan')) return 'partnership';
   if (path.startsWith('/services/catering')) return 'catering';
-  if (path.startsWith('/services/partnership')) return 'partnership';
   if (path.startsWith('/reservasi')) return 'reservation';
   return undefined;
 }

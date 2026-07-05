@@ -8,7 +8,7 @@ import { useSiteLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
 
 const FIGMA_LEFT_NAV = [
-  { href: "/whats-on", labelEN: "WHAT'S ON", labelID: "WHAT'S ON" },
+  { href: "/kemitraan", labelEN: "PARTNERSHIP", labelID: "KEMITRAAN" },
   { href: "/about", labelEN: "ABOUT US", labelID: "TENTANG KAMI" },
 ] as const;
 
@@ -17,6 +17,7 @@ const EN_EXTRA_LABELS: Record<string, string> = {
   "/menu": "MENU",
   "/catering": "CATERING",
   "/reservasi": "RESERVE",
+  "/whats-on": "WHAT'S ON",
 };
 
 const EXTRA_NAV = MAIN_NAV.filter(

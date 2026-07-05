@@ -29,9 +29,9 @@ const TermsPage = lazy(() => import("@/pages/TermsPage"));
 const PrivacyPage = lazy(() => import("@/pages/PrivacyPage"));
 const ReservationPage = lazy(() => import("@/pages/ReservationPage"));
 const UniPage = lazy(() => import("@/components/UniPage"));
+const KemitraanPage = lazy(() => import("@/pages/KemitraanPage"));
 const OutletPage = lazy(() => import("@/components/services/OutletPage"));
 const DeliveryPage = lazy(() => import("@/components/services/DeliveryPage"));
-const PartnershipPage = lazy(() => import("@/components/services/PartnershipPage"));
 const CateringPage = lazy(() => import("@/components/services/CateringPage"));
 const AdminCampaigns = lazy(() => import("@/pages/AdminCampaigns"));
 const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
@@ -88,10 +88,13 @@ function Router() {
       <Route path="/faq" component={withSuspense(FaqPage)} />
       <Route path="/terms" component={withSuspense(TermsPage)} />
       <Route path="/privacy" component={withSuspense(PrivacyPage)} />
+      <Route path="/kemitraan" component={withSuspense(KemitraanPage)} />
       <Route path="/uni" component={withSuspense(UniPage)} />
       <Route path="/services/outlet" component={withSuspense(OutletPage)} />
       <Route path="/services/delivery" component={withSuspense(DeliveryPage)} />
-      <Route path="/services/partnership" component={withSuspense(PartnershipPage)} />
+      <Route path="/services/partnership">
+        <AdminRedirect to="/kemitraan" />
+      </Route>
       <Route path="/services/catering" component={withSuspense(CateringPage)} />
       <Route path="/admin/login" component={withSuspense(AdminLoginPage)} />
       <Route path="/kelola-reservasi/cikarang/dashboard" component={CikarangAdminDashboard} />

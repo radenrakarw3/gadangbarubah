@@ -30,8 +30,8 @@ const services = [
     id: 'partnership',
     name: 'Business Partnership',
     icon: Handshake,
-    description: 'Bergabunglah dalam ekosistem kuliner Padang kami dengan program kemitraan rumah makan yang memberikan keuntungan berkelanjutan.',
-    path: '/services/partnership'
+    description: 'Kemitraan operasional B2B — catering acara, tenant event, sewa venue, dan layanan corporate bersama Gadang Barubah.',
+    path: '/kemitraan'
   },
   {
     id: 'reservasi',
@@ -55,7 +55,7 @@ export default function UniPage() {
 
   const handleServiceClick = (service: typeof services[0]) => {
     // Services that redirect to WhatsApp
-    const whatsAppServices = ['delivery', 'partnership', 'catering'];
+    const whatsAppServices = ['delivery', 'catering'];
     const whatsAppNumber = '6289509766739'; // format untuk WhatsApp API (62 untuk Indonesia + nomor tanpa 0)
     
     if (whatsAppServices.includes(service.id)) {

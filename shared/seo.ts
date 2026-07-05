@@ -63,6 +63,13 @@ export const pageSEOConfigs = {
     keywords: "franchise gadang barubah, kemitraan restoran padang, bisnis rumah makan padang, franchise makanan, peluang usaha kuliner, kemitraan bisnis gadang barubah",
     path: "/services/partnership"
   }),
+
+  kemitraan: createSEOConfig({
+    title: "Kemitraan Gadang Barubah - Catering Event, Tenant & Corporate B2B",
+    description: "Hub kemitraan operasional Gadang Barubah: catering acara, tenant event, sewa venue, dan layanan corporate. Buffet, mealbox, stall, dan private dining untuk mitra B2B Anda.",
+    keywords: "kemitraan gadang barubah, catering event padang, tenant stall kuliner, kemitraan catering corporate, sewa venue padang, kemitraan b2b restoran",
+    path: "/kemitraan",
+  }),
   
   catering: createSEOConfig({
     title: "Catering Event Gadang Barubah - Layanan Katering Padang",
@@ -142,6 +149,7 @@ export function getSEOConfigByPath(path: string) {
   if (normalizedPath === '/terms') return pageSEOConfigs.terms;
   if (normalizedPath === '/privacy') return pageSEOConfigs.privacy;
   if (normalizedPath === '/catering') return pageSEOConfigs.catering;
+  if (normalizedPath === '/kemitraan') return pageSEOConfigs.kemitraan;
   if (normalizedPath === '/reservasi') return pageSEOConfigs.reservation;
   if (normalizedPath === '/uni') return pageSEOConfigs.services;
   if (normalizedPath === '/services/outlet') return pageSEOConfigs.outlet;

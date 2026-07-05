@@ -197,6 +197,7 @@ export const HOME_CATERING_SERVICES = [
 export const FOOTER_NAV_LEFT = [
   { href: "/", label: "Beranda" },
   { href: "/about", label: "Tentang Kami" },
+  { href: "/kemitraan", label: "Kemitraan" },
   { href: "/whats-on", label: "Kabar Terkini" },
   { href: "/menu", label: "Menu" },
   { href: "/catering", label: "Katering" },
@@ -210,6 +211,7 @@ export const FOOTER_NAV_RIGHT = [
 export const MAIN_NAV = [
   { href: "/", label: "Beranda" },
   { href: "/about", label: "Tentang Kami" },
+  { href: "/kemitraan", label: "Kemitraan" },
   { href: "/whats-on", label: "Kabar Terkini" },
   { href: "/menu", label: "Menu" },
   { href: "/catering", label: "Katering" },
