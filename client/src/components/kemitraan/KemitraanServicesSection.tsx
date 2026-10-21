@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import { KEMITRAAN_SERVICES } from "@/lib/kemitraanContent";
 import {
   scrollToKemitraanInquiry,
@@ -7,12 +7,9 @@ import {
 } from "@/lib/kemitraanSelection";
 
 function KemitraanServicesSection() {
-  const { lang } = useSiteLanguage();
-  const sectionTitle = lang === "ID" ? "Layanan Kemitraan" : "Partnership Services";
-  const sectionSubtitle =
-    lang === "ID"
-      ? "Lorem ipsum pilih bentuk kerja sama yang sesuai kebutuhan acara atau bisnis Anda."
-      : "Lorem ipsum choose the collaboration format that fits your event or business needs.";
+  const { t } = useSiteText();
+  const sectionTitle = t("kemitraan.services.title");
+  const sectionSubtitle = t("kemitraan.services.subtitle");
 
   const handleSelect = (cateringType: string) => {
     setPendingKemitraanService(cateringType);
@@ -24,13 +21,13 @@ function KemitraanServicesSection() {
       <div className="mx-auto max-w-[1200px] px-5 sm:px-8 lg:px-12">
         <header className="mb-10 text-center lg:mb-12">
           <h2 className="font-heroCta text-figma-section-title text-white">{sectionTitle}</h2>
-          <p className="mx-auto mt-3 max-w-xl font-heroCta text-figma-body text-white/70">{sectionSubtitle}</p>
+          <p className="mx-auto mt-3 max-w-xl whitespace-pre-line font-heroCta text-figma-body text-white/70">{sectionSubtitle}</p>
         </header>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {KEMITRAAN_SERVICES.map((service) => {
-            const name = lang === "ID" ? service.nameID : service.nameEN;
-            const desc = lang === "ID" ? service.descID : service.descEN;
+            const name = t(`kemitraan.services.${service.id}.name`);
+            const desc = t(`kemitraan.services.${service.id}.desc`);
             return (
               <button
                 key={service.id}
@@ -51,9 +48,9 @@ function KemitraanServicesSection() {
                 </div>
                 <div className="flex flex-1 flex-col p-5">
                   <h3 className="font-heroCta text-lg text-white">{name}</h3>
-                  <p className="mt-2 flex-1 font-heroCta text-sm leading-relaxed text-white/65">{desc}</p>
+                  <p className="mt-2 flex-1 whitespace-pre-line font-heroCta text-sm leading-relaxed text-white/65">{desc}</p>
                   <span className="mt-4 font-heroCta text-xs uppercase tracking-[0.15em] text-[#FFEEDD]/80 group-hover:text-[#FFEEDD]">
-                    {lang === "ID" ? "Ajukan kemitraan →" : "Inquire →"}
+                    {t("kemitraan.services.cta")}
                   </span>
                 </div>
               </button>

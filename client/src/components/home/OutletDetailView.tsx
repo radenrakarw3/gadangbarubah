@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { HOME_OUTLET_PANELS } from "@/lib/siteContent";
 import { DESKTOP_OUTLET_MIN_H } from "@/lib/outletReveal";
 import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import { cn } from "@/lib/utils";
 import cikarangImg from "@assets/outlet-cikarang-1_1781246285353.jpg";
 import cikarangGallery2 from "@assets/outlet-cikarang-2_1781246285353.jpg";
@@ -239,8 +240,8 @@ function InfoBlock({
         {title}
       </h3>
       <ul className="mt-2 space-y-0.5 text-sm font-normal leading-relaxed text-white/95 sm:text-base">
-        {lines.map((line) => (
-          <li key={line}>{line}</li>
+        {lines.map((line, index) => (
+          <li key={`${index}-${line}`}>{line}</li>
         ))}
       </ul>
     </div>
@@ -277,6 +278,7 @@ export default function OutletDetailView({
   onClose: () => void;
 }) {
   const { lang } = useSiteLanguage();
+  const { t, tl } = useSiteText();
   const innerRef = useRef<HTMLDivElement>(null);
   const containerSizeRef = useRef<{ width: number; height: number } | null>(null);
   const closingRef = useRef(false);
@@ -284,15 +286,16 @@ export default function OutletDetailView({
   const [contentVisible, setContentVisible] = useState(!originRect);
 
   const gallery = OUTLET_GALLERIES[panel.id];
-  const name = lang === "ID" ? panel.nameID : panel.nameEN;
-  const address = lang === "ID" ? panel.addressID : panel.addressEN;
-  const navLabel = lang === "ID" ? panel.detailNavID : panel.detailNavEN;
-  const capacity = lang === "ID" ? panel.capacityID : panel.capacityEN;
-  const facilities = lang === "ID" ? panel.facilitiesID : panel.facilitiesEN;
-  const hoursLabel = lang === "ID" ? "Jam Operasional" : "Operational Hours";
-  const capacityLabel = lang === "ID" ? "Kapasitas" : "Capacity";
-  const facilityLabel = lang === "ID" ? "Fasilitas" : "Facility";
-  const mapsLabel = lang === "ID" ? "Buka Google Maps" : "Open Google Maps";
+  const name = t(`home.outlet.${panel.id}.name`);
+  const address = t(`home.outlet.${panel.id}.address`);
+  const navLabel = t(`home.outlet.${panel.id}.detailNav`);
+  const hours = t(`home.outlet.${panel.id}.hours`);
+  const capacity = tl(`home.outlet.${panel.id}.capacity`);
+  const facilities = tl(`home.outlet.${panel.id}.facilities`);
+  const hoursLabel = t("home.outlet.hoursLabel");
+  const capacityLabel = t("home.outlet.capacityLabel");
+  const facilityLabel = t("home.outlet.facilityLabel");
+  const mapsLabel = t("home.outlet.mapsLabel");
 
   const measureContainer = useCallback(() => {
     const el = containerRef.current;
@@ -474,7 +477,7 @@ export default function OutletDetailView({
           <div className="absolute right-[clamp(1.25rem,6vw,7.5rem)] top-1/2 z-10 hidden -translate-y-1/2 flex-col gap-8 sm:flex sm:w-[260px] sm:gap-10 lg:w-[280px]">
             <InfoBlock
               title={hoursLabel}
-              lines={[panel.hours]}
+              lines={[hours]}
               style={slideStyle(contentVisible, 120, 24)}
             />
             <InfoBlock
@@ -492,7 +495,7 @@ export default function OutletDetailView({
           <div className="absolute bottom-[clamp(7rem,22vh,11rem)] left-[clamp(1.25rem,6vw,7.5rem)] right-[clamp(1.25rem,6vw,7.5rem)] z-10 flex flex-col gap-5 sm:hidden">
             <InfoBlock
               title={hoursLabel}
-              lines={[panel.hours]}
+              lines={[hours]}
               style={slideStyle(contentVisible, 120, -12)}
             />
             <InfoBlock

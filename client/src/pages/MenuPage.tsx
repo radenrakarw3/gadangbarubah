@@ -7,6 +7,7 @@ import { Eye, FileText } from "lucide-react";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
 import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import { menuListQueryKey, menuPublicQueryOptions } from "@/lib/menu";
 import type { MenuCategory, MenuItem } from "@shared/schema";
 import menuPdf from "@assets/Menu Gadang Digital 5 September 2025_1758627992252.pdf";
@@ -15,6 +16,7 @@ type PublicMenuCategory = MenuCategory & { items: MenuItem[] };
 
 export default function MenuPage() {
   const { lang } = useSiteLanguage();
+  const { t } = useSiteText();
 
   const { data, isLoading } = useQuery<{
     success: boolean;
@@ -34,13 +36,11 @@ export default function MenuPage() {
         <div className="max-w-5xl mx-auto space-y-12">
           <section className="text-center">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-primary mb-4">
-              Menu
+              {t("menu.title")}
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6" />
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              {lang === "ID"
-                ? "Jelajahi koleksi hidangan autentik Padang kami — dari rendang signature hingga paket praktis untuk dibawa pulang."
-                : "Explore our authentic Padang dishes — from signature rendang to practical takeaway packages."}
+            <p className="whitespace-pre-line text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              {t("menu.subtitle")}
             </p>
           </section>
 
@@ -61,9 +61,7 @@ export default function MenuPage() {
 
           {!isLoading && categories.length === 0 && (
             <p className="text-center text-muted-foreground py-8">
-              {lang === "ID"
-                ? "Menu sedang disiapkan. Silakan lihat menu digital lengkap di bawah."
-                : "Menu is being prepared. Please see the complete digital menu below."}
+              {t("menu.empty")}
             </p>
           )}
 
@@ -118,23 +116,19 @@ export default function MenuPage() {
                   </div>
                 </div>
                 <h2 className="text-2xl font-serif font-medium mb-4">
-                  {lang === "ID" ? "Menu Digital Lengkap" : "Complete Digital Menu"}
+                  {t("menu.pdf.title")}
                 </h2>
-                <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-                  {lang === "ID"
-                    ? "Lihat menu digital dengan harga terbaru dan pilihan lengkap masakan Minang tradisional."
-                    : "See our digital menu with latest prices and complete traditional Minang selections."}
+                <p className="whitespace-pre-line text-muted-foreground mb-8 max-w-xl mx-auto">
+                  {t("menu.pdf.description")}
                 </p>
                 <Button asChild size="lg">
                   <a href={menuPdf} target="_blank" rel="noopener noreferrer">
                     <Eye className="mr-2 h-5 w-5" />
-                    {lang === "ID" ? "Buka Menu PDF" : "Open Menu PDF"}
+                    {t("menu.pdf.button")}
                   </a>
                 </Button>
                 <p className="text-sm text-muted-foreground/80 mt-4">
-                  {lang === "ID"
-                    ? "Update September 2025 • Kompatibel semua perangkat"
-                    : "Updated September 2025 • Compatible with all devices"}
+                  {t("menu.pdf.note")}
                 </p>
               </CardContent>
             </Card>

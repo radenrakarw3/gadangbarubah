@@ -5,30 +5,31 @@ import navLogoIcon from "@assets/gadang-barubah-logo-icon.png";
 import { MAIN_NAV, COMPANY } from "@/lib/siteContent";
 
 import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
+import type { SiteTextKey } from "@shared/site-text-registry";
 import { cn } from "@/lib/utils";
 
-const FIGMA_LEFT_NAV = [
-  { href: "/kemitraan", labelEN: "PARTNERSHIP", labelID: "KEMITRAAN" },
-  { href: "/about", labelEN: "ABOUT US", labelID: "TENTANG KAMI" },
-] as const;
-
-const EN_EXTRA_LABELS: Record<string, string> = {
-  "/": "HOME",
-  "/menu": "MENU",
-  "/catering": "CATERING",
-  "/reservasi": "RESERVE",
-  "/whats-on": "WHAT'S ON",
+const NAV_LABEL_KEYS: Record<(typeof MAIN_NAV)[number]["href"], SiteTextKey> = {
+  "/": "global.nav.home",
+  "/about": "global.nav.about",
+  "/kemitraan": "global.nav.kemitraan",
+  "/whats-on": "global.nav.whatsOn",
+  "/menu": "global.nav.menu",
+  "/catering": "global.nav.catering",
+  "/reservasi": "global.nav.reservation",
 };
+
+const FIGMA_LEFT_NAV = [
+  { href: "/kemitraan" },
+  { href: "/about" },
+] as const;
 
 const EXTRA_NAV = MAIN_NAV.filter(
   (n) => !FIGMA_LEFT_NAV.some((l) => l.href === n.href),
 );
 
-function whatsappContactHref(lang: "ID" | "EN") {
-  const text = encodeURIComponent(
-    lang === "ID" ? "Halo Gadang Barubah! Saya ingin bertanya." : "Hello Gadang Barubah! I have a question.",
-  );
-  return `https://wa.me/${COMPANY.whatsapp}?text=${text}`;
+function whatsappContactHref(greeting: string) {
+  return `https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(greeting)}`;
 }
 
 interface SiteNavProps {
@@ -77,14 +78,8 @@ function NavFullscreenMenu({
   lang: "ID" | "EN";
   setLang: (l: "ID" | "EN") => void;
 }) {
+  const { t } = useSiteText();
   const mobileLinks = [...FIGMA_LEFT_NAV, ...EXTRA_NAV];
-
-  const getLabel = (item: (typeof mobileLinks)[number]) => {
-    if ("labelEN" in item) return lang === "ID" ? item.labelID : item.labelEN;
-    return lang === "EN"
-      ? (EN_EXTRA_LABELS[item.href] ?? item.label.toUpperCase())
-      : item.label;
-  };
 
   if (!open) return null;
 
@@ -133,20 +128,20 @@ function NavFullscreenMenu({
                   className="group flex items-center py-3 sm:py-4 font-heroCta text-2xl sm:text-3xl font-normal uppercase tracking-[0.06em] text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.45)] transition-all hover:translate-x-1 hover:text-[#FFEEDD]"
                 >
                   <span className="mr-4 h-px w-0 bg-[#FFEEDD]/80 transition-all group-hover:w-8" aria-hidden />
-                  {getLabel(item)}
+                  {t(NAV_LABEL_KEYS[item.href])}
                 </Link>
               </li>
             ))}
             <li>
               <a
-                href={whatsappContactHref(lang)}
+                href={whatsappContactHref(t("global.nav.whatsappGreeting"))}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={onClose}
                 className="group flex items-center py-3 sm:py-4 font-heroCta text-2xl sm:text-3xl font-normal uppercase tracking-[0.06em] text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.45)] transition-all hover:translate-x-1 hover:text-[#FFEEDD]"
               >
                 <span className="mr-4 h-px w-0 bg-[#FFEEDD]/80 transition-all group-hover:w-8" aria-hidden />
-                {lang === "ID" ? "KONTAK" : "CONTACT"}
+                {t("global.nav.contact")}
               </a>
             </li>
           </ul>
@@ -156,7 +151,7 @@ function NavFullscreenMenu({
           <div className="mx-auto flex max-w-lg flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <span className="font-heroCta text-xs uppercase tracking-[0.2em] text-white/50">
-                {lang === "ID" ? "Bahasa" : "Language"}
+                {t("global.nav.language")}
               </span>
               <div className="flex gap-2">
                 {(["ID", "EN"] as const).map((code) => (
@@ -181,7 +176,7 @@ function NavFullscreenMenu({
               onClick={onClose}
               className="inline-flex h-[52px] items-center justify-center rounded-lg bg-[rgba(89,0,0,0.95)] px-8 font-heroCta text-base font-bold italic tracking-[0.03em] text-[rgba(210,210,210,0.95)] shadow-lg hover:bg-[#590000] transition-colors sm:shrink-0"
             >
-              {lang === "ID" ? "Reservasi Sekarang" : "Reserve Now"}
+              {t("global.nav.reserveNow")}
             </Link>
           </div>
         </div>
@@ -194,6 +189,7 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
   const [open, setOpen] = useState(false);
   const [pastHero, setPastHero] = useState(false);
   const { lang, setLang } = useSiteLanguage();
+  const { t } = useSiteText();
   const isTransparent = variant === "transparent";
 
   const closeMenu = useCallback(() => setOpen(false), []);
@@ -339,7 +335,7 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
           <div className="flex items-center justify-self-start gap-4 xl:gap-5">
             {FIGMA_LEFT_NAV.map((item) => (
               <Link key={item.href} href={item.href} className={navText}>
-                {lang === "ID" ? item.labelID : item.labelEN}
+                {t(NAV_LABEL_KEYS[item.href])}
               </Link>
             ))}
             {menuTrigger()}
@@ -355,15 +351,15 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
 
           <div className="flex items-center justify-self-end gap-4 xl:gap-5">
             <a
-              href={whatsappContactHref(lang)}
+              href={whatsappContactHref(t("global.nav.whatsappGreeting"))}
               target="_blank"
               rel="noopener noreferrer"
               className={navText}
             >
-              {lang === "ID" ? "KONTAK" : "CONTACT"}
+              {t("global.nav.contact")}
             </a>
             <Link href="/reservasi" className={navText}>
-              {lang === "ID" ? "RESERVASI" : "RESERVE"}
+              {t("global.nav.reservation")}
             </Link>
             {langToggle()}
           </div>
@@ -384,7 +380,7 @@ export default function SiteNav({ variant = "default" }: SiteNavProps) {
                 href="/reservasi"
                 className="inline-flex min-w-[32px] items-center justify-center rounded-md px-2 py-1 font-sans text-[11px] font-semibold leading-none text-[#F2E8E8] transition-colors bg-[#590000] shadow-sm hover:bg-[#6a0000]"
               >
-                {lang === "ID" ? "BOOK" : "BOOK"}
+                {t("global.nav.book")}
               </Link>
               {langBtn("EN", true)}
               {langBtn("ID", true)}

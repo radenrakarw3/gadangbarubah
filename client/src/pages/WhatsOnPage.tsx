@@ -6,6 +6,7 @@ import { Calendar, ChevronRight } from "lucide-react";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
 import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import {
   articleCategory,
   articleExcerpt,
@@ -18,6 +19,7 @@ import type { WhatsOnArticle } from "@shared/schema";
 
 export default function WhatsOnPage() {
   const { lang } = useSiteLanguage();
+  const { t } = useSiteText();
 
   const { data, isLoading, isError } = useQuery<{ success: boolean; articles: WhatsOnArticle[] }>({
     queryKey: whatsOnListQueryKey(),
@@ -34,29 +36,25 @@ export default function WhatsOnPage() {
         <div className="max-w-4xl mx-auto space-y-10">
           <section className="text-center">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-primary mb-4">
-              {lang === "ID" ? "Kabar Terkini" : "What's On"}
+              {t("whatsOn.title")}
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6" />
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {lang === "ID"
-                ? "Berita, tips kuliner, dan update terbaru seputar Gadang Barubah Indonesia."
-                : "News, culinary tips, and latest updates from Gadang Barubah Indonesia."}
+            <p className="whitespace-pre-line text-lg text-muted-foreground max-w-2xl mx-auto">
+              {t("whatsOn.subtitle")}
             </p>
           </section>
 
           {isLoading ? (
             <p className="text-center text-muted-foreground">
-              {lang === "ID" ? "Memuat artikel..." : "Loading articles..."}
+              {t("whatsOn.loadingList")}
             </p>
           ) : isError ? (
             <p className="text-center text-destructive">
-              {lang === "ID" ? "Gagal memuat artikel." : "Failed to load articles."}
+              {t("whatsOn.errorList")}
             </p>
           ) : articles.length === 0 ? (
             <p className="text-center text-muted-foreground">
-              {lang === "ID"
-                ? "Belum ada artikel. Nantikan kabar terbaru dari kami."
-                : "No articles yet. Stay tuned for updates."}
+              {t("whatsOn.empty")}
             </p>
           ) : (
             <div className="space-y-4">
@@ -99,7 +97,7 @@ export default function WhatsOnPage() {
                           href={`/whats-on/${article.slug}`}
                           className="inline-flex items-center text-sm text-primary font-medium shrink-0"
                         >
-                          {lang === "ID" ? "Baca selengkapnya" : "Read more"}
+                          {t("whatsOn.readMore")}
                           <ChevronRight className="h-4 w-4 ml-1" />
                         </Link>
                       </div>

@@ -1,12 +1,23 @@
 import { memo } from "react";
-import { useSiteLanguage } from "@/lib/language";
-import { KEMITRAAN_GALLERY } from "@/lib/kemitraanContent";
+import { useSiteText } from "@/lib/siteText";
+import { KEMITRAAN_GALLERY_FEATURED, KEMITRAAN_GALLERY_ITEMS } from "@/lib/kemitraanContent";
 import { cn } from "@/lib/utils";
 
 function KemitraanEventGallerySection() {
-  const { lang } = useSiteLanguage();
-  const copy = KEMITRAAN_GALLERY[lang];
-  const [featured, ...rest] = copy.items;
+  const { t } = useSiteText();
+  const copy = {
+    title: t("kemitraan.gallery.title"),
+    subtitle: t("kemitraan.gallery.subtitle"),
+  };
+  const featured = {
+    ...KEMITRAAN_GALLERY_FEATURED,
+    label: t("kemitraan.gallery.corp.label"),
+    caption: t("kemitraan.gallery.corp.caption"),
+  };
+  const rest = KEMITRAAN_GALLERY_ITEMS.map((item) => ({
+    ...item,
+    label: t(`kemitraan.gallery.${item.id}.label`),
+  }));
 
   return (
     <section
@@ -16,7 +27,7 @@ function KemitraanEventGallerySection() {
       <div className="mx-auto max-w-[1200px] px-5 sm:px-8 lg:px-12">
         <header className="mb-10 max-w-2xl">
           <h2 className="font-heroCta text-figma-section-title text-[#3D0C0C]">{copy.title}</h2>
-          <p className="mt-3 font-heroCta text-figma-body text-black/70">{copy.subtitle}</p>
+          <p className="mt-3 whitespace-pre-line font-heroCta text-figma-body text-black/70">{copy.subtitle}</p>
         </header>
 
         {/* Bento grid — layout khusus portofolio event */}

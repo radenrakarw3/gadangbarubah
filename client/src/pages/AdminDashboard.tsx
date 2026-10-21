@@ -11,6 +11,7 @@ import {
   ArrowRight,
   Mail,
   Newspaper,
+  Type,
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import AdminShell from "@/components/admin/AdminShell";
@@ -77,6 +78,14 @@ export default function AdminDashboard({ portal }: { portal: AdminPortal }) {
       icon: Newspaper,
       route: "/admin/whats-on",
       color: "bg-red-800",
+    },
+    {
+      id: "site-texts",
+      title: "Kelola Teks Website",
+      description: "Ubah judul, paragraf, dan label di semua halaman publik (ID & EN)",
+      icon: Type,
+      route: "/admin/teks",
+      color: "bg-emerald-700",
     },
     {
       id: "campaigns",

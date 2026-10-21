@@ -181,6 +181,15 @@ export const whatsOnArticles = pgTable("whats_on_articles", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+/** Override teks website dari admin; key & default ada di shared/site-text-registry.ts */
+export const siteTexts = pgTable("site_texts", {
+  key: varchar("key", { length: 120 }).primaryKey(),
+  valueId: text("value_id").notNull(),
+  valueEn: text("value_en").notNull(),
+  updatedBy: varchar("updated_by").references(() => users.id, { onDelete: "set null" }),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -375,5 +384,14 @@ export type MenuItem = typeof menuItems.$inferSelect;
 export type InsertWhatsOnArticle = z.infer<typeof insertWhatsOnArticleSchema>;
 export type UpdateWhatsOnArticle = z.infer<typeof updateWhatsOnArticleSchema>;
 export type WhatsOnArticle = typeof whatsOnArticles.$inferSelect;
+
+export const updateSiteTextSchema = z.object({
+  valueId: z.string().trim().min(1, "Teks (ID) wajib diisi"),
+  valueEn: z.string().trim().min(1, "Teks (EN) wajib diisi"),
+  expectedUpdatedAt: z.string().datetime().nullable().optional(),
+});
+
+export type UpdateSiteText = z.infer<typeof updateSiteTextSchema>;
+export type SiteText = typeof siteTexts.$inferSelect;
 
 

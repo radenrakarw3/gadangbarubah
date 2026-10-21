@@ -1,12 +1,16 @@
 import { memo } from "react";
 import heroFacade from "@assets/hero-facade_1781246285353.webp";
-import { useSiteLanguage } from "@/lib/language";
-import { KEMITRAAN_HERO } from "@/lib/kemitraanContent";
+import { useSiteText } from "@/lib/siteText";
 import { scrollToKemitraanInquiry } from "@/lib/kemitraanSelection";
 
 function KemitraanHeroSection() {
-  const { lang } = useSiteLanguage();
-  const copy = KEMITRAAN_HERO[lang];
+  const { t } = useSiteText();
+  const copy = {
+    eyebrow: t("kemitraan.hero.eyebrow"),
+    headline: t("kemitraan.hero.headline"),
+    subheadline: t("kemitraan.hero.subheadline"),
+    cta: t("kemitraan.hero.cta"),
+  };
 
   const scrollToInquiry = () => {
     scrollToKemitraanInquiry();
@@ -41,7 +45,7 @@ function KemitraanHeroSection() {
         <h1 className="max-w-[16ch] font-heroCta text-[clamp(2rem,5vw,3.25rem)] font-normal leading-[1.15] tracking-[0.01em] text-white">
           {copy.headline}
         </h1>
-        <p className="mt-5 max-w-[52ch] font-heroCta text-base leading-relaxed text-white/80 sm:text-lg">
+        <p className="mt-5 max-w-[52ch] whitespace-pre-line font-heroCta text-base leading-relaxed text-white/80 sm:text-lg">
           {copy.subheadline}
         </p>
         <button

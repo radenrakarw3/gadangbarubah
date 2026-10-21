@@ -5,6 +5,7 @@ import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import {
   articleCategory,
   articleContent,
@@ -23,6 +24,7 @@ interface ArticleDetailPageProps {
 
 export default function ArticleDetailPage({ articleSlug }: ArticleDetailPageProps) {
   const { lang } = useSiteLanguage();
+  const { t } = useSiteText();
   const slug = normalizeArticleSlug(articleSlug);
 
   const { data, isLoading, isError } = useQuery<{ success: boolean; article: WhatsOnArticle }>({
@@ -38,7 +40,7 @@ export default function ArticleDetailPage({ articleSlug }: ArticleDetailPageProp
       <PublicPageLayout>
         <SEOHead pageKey="whatsOn" />
         <div className="px-4 py-20 text-center text-muted-foreground">
-          {lang === "ID" ? "Memuat artikel..." : "Loading article..."}
+          {t("whatsOn.detail.loading")}
         </div>
       </PublicPageLayout>
     );
@@ -50,12 +52,12 @@ export default function ArticleDetailPage({ articleSlug }: ArticleDetailPageProp
         <SEOHead pageKey="notFound" />
         <div className="px-4 py-20 text-center">
           <h1 className="text-2xl font-serif mb-4">
-            {lang === "ID" ? "Artikel tidak ditemukan" : "Article not found"}
+            {t("whatsOn.detail.notFound")}
           </h1>
           <Link href="/whats-on">
             <Button variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {lang === "ID" ? "Kembali ke Kabar Terkini" : "Back to What's On"}
+              {t("whatsOn.detail.backToList")}
             </Button>
           </Link>
         </div>
@@ -77,7 +79,7 @@ export default function ArticleDetailPage({ articleSlug }: ArticleDetailPageProp
           <Link href="/whats-on">
             <Button variant="ghost" size="sm" className="mb-6">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {lang === "ID" ? "Kabar Terkini" : "What's On"}
+              {t("whatsOn.detail.back")}
             </Button>
           </Link>
 

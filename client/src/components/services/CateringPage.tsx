@@ -1,44 +1,41 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { UtensilsCrossed, Users, Calendar, Award } from 'lucide-react';
+import { UtensilsCrossed, Calendar } from 'lucide-react';
 import PublicPageLayout from '../PublicPageLayout';
 import SEOHead from '../SEOHead';
+import { useSiteText } from '@/lib/siteText';
+
+const PACKAGES = [
+  { n: 1, icon: "💒", color: "border-pink-200 bg-pink-50 dark:bg-pink-950/30" },
+  { n: 2, icon: "🏢", color: "border-blue-200 bg-blue-50 dark:bg-blue-950/30" },
+  { n: 3, icon: "🎉", color: "border-green-200 bg-green-50 dark:bg-green-950/30" },
+] as const;
+
+const WHY_ITEMS = [
+  { n: 1, icon: "⭐" },
+  { n: 2, icon: "🕐" },
+  { n: 3, icon: "🧑‍🍳" },
+  { n: 4, icon: "🛡️" },
+] as const;
+
+const MENU_GROUPS = [1, 2, 3, 4] as const;
+const BOOKING_STEPS = [1, 2, 3, 4] as const;
 
 export default function CateringPage() {
+  const { t, tl } = useSiteText();
 
-  const packages = [
-    {
-      name: "Paket Pernikahan",
-      icon: "💒",
-      minOrder: "200 porsi",
-      price: "Mulai Rp 35.000/porsi",
-      includes: ["Menu lengkap 5 item", "Nasi putih", "Kerupuk & sambal", "Kemasan elegan", "Setup buffet"],
-      color: "border-pink-200 bg-pink-50 dark:bg-pink-950/30"
-    },
-    {
-      name: "Paket Corporate",
-      icon: "🏢", 
-      minOrder: "50 porsi",
-      price: "Mulai Rp 25.000/porsi",
-      includes: ["Menu pilihan 3 item", "Nasi putih", "Air mineral", "Lunch box", "On-time delivery"],
-      color: "border-blue-200 bg-blue-50 dark:bg-blue-950/30"
-    },
-    {
-      name: "Paket Arisan/Gathering",
-      icon: "🎉",
-      minOrder: "30 porsi", 
-      price: "Mulai Rp 30.000/porsi",
-      includes: ["Menu tradisional", "Nasi putih", "Dessert", "Peralatan makan", "Dekorasi sederhana"],
-      color: "border-green-200 bg-green-50 dark:bg-green-950/30"
-    }
-  ];
+  const packages = PACKAGES.map((pkg) => ({
+    ...pkg,
+    name: t(`catering.packages.${pkg.n}.name`),
+    minOrder: t(`catering.packages.${pkg.n}.minOrder`),
+    price: t(`catering.packages.${pkg.n}.price`),
+    includes: tl(`catering.packages.${pkg.n}.includes`),
+  }));
 
-  const menuOptions = [
-    { category: "Ayam", items: ["Ayam Pop", "Ayam Gulai", "Ayam Bakar", "Rendang Ayam"] },
-    { category: "Daging", items: ["Rendang Daging", "Dendeng Batokok", "Gulai Daging", "Empal Gepuk"] },
-    { category: "Sayuran", items: ["Gulai Nangka", "Sayur Daun Singkong", "Terong Balado", "Lombok Ijo"] },
-    { category: "Ikan", items: ["Ikan Bakar", "Gulai Ikan", "Ikan Asam Padeh", "Dendeng Ikan"] }
-  ];
+  const menuOptions = MENU_GROUPS.map((n) => ({
+    category: t(`catering.menu.${n}.category`),
+    items: tl(`catering.menu.${n}.items`),
+  }));
 
   return (
     <PublicPageLayout>
@@ -49,46 +46,33 @@ export default function CateringPage() {
           {/* Title */}
           <div className="text-center mb-10">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
-              Catering Nasi Padang & Acara Eksklusif
+              {t("catering.hero.title")}
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Sajikan pengalaman kuliner nasi padang autentik dan masakan Minang istimewa untuk setiap momen berharga Anda di Cikarang
+            <p className="whitespace-pre-line text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              {t("catering.hero.subtitle")}
             </p>
           </div>
 
           {/* Why Choose Us */}
           <Card className="mb-8 bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800">
             <CardContent className="p-6">
-              <h2 className="text-2xl font-bold text-center mb-6">Mengapa Pilih Catering Kami?</h2>
+              <h2 className="text-2xl font-bold text-center mb-6">{t("catering.why.title")}</h2>
               <div className="grid md:grid-cols-4 gap-6 text-center">
-                <div>
-                  <div className="text-3xl mb-2">⭐</div>
-                  <h3 className="font-semibold text-foreground mb-1">Kualitas Terjamin</h3>
-                  <p className="text-sm text-muted-foreground">Rasa autentik dengan bahan segar</p>
-                </div>
-                <div>
-                  <div className="text-3xl mb-2">🕐</div>
-                  <h3 className="font-semibold text-foreground mb-1">Tepat Waktu</h3>
-                  <p className="text-sm text-muted-foreground">Pengiriman sesuai jadwal acara</p>
-                </div>
-                <div>
-                  <div className="text-3xl mb-2">🧑‍🍳</div>
-                  <h3 className="font-semibold text-foreground mb-1">Chef Berpengalaman</h3>
-                  <p className="text-sm text-muted-foreground">Tim chef khusus masakan Padang</p>
-                </div>
-                <div>
-                  <div className="text-3xl mb-2">🛡️</div>
-                  <h3 className="font-semibold text-foreground mb-1">Higienis & Aman</h3>
-                  <p className="text-sm text-muted-foreground">Standar kebersihan tinggi</p>
-                </div>
+                {WHY_ITEMS.map((item) => (
+                  <div key={item.n}>
+                    <div className="text-3xl mb-2">{item.icon}</div>
+                    <h3 className="font-semibold text-foreground mb-1">{t(`catering.why.${item.n}.title`)}</h3>
+                    <p className="text-sm text-muted-foreground">{t(`catering.why.${item.n}.desc`)}</p>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
 
           {/* Catering Packages */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-center mb-6">Paket Catering</h2>
+            <h2 className="text-2xl font-bold text-center mb-6">{t("catering.packages.title")}</h2>
             <div className="grid lg:grid-cols-3 gap-6">
               {packages.map((pkg, index) => (
                 <Card key={index} className={`hover-elevate transition-all duration-300 ${pkg.color} border-2`}>
@@ -97,13 +81,15 @@ export default function CateringPage() {
                       <div className="text-4xl mb-2">{pkg.icon}</div>
                       <h3 className="text-xl font-bold text-foreground mb-2">{pkg.name}</h3>
                       <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Min. Order: {pkg.minOrder}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {t("catering.packages.minOrderLabel")} {pkg.minOrder}
+                        </p>
                         <p className="text-lg font-bold text-primary">{pkg.price}</p>
                       </div>
                     </div>
                     
                     <div className="mb-4">
-                      <h4 className="font-semibold text-foreground mb-2">Termasuk:</h4>
+                      <h4 className="font-semibold text-foreground mb-2">{t("catering.packages.includesLabel")}</h4>
                       <ul className="space-y-1">
                         {pkg.includes.map((item, iIndex) => (
                           <li key={iIndex} className="flex items-start space-x-2">
@@ -115,7 +101,7 @@ export default function CateringPage() {
                     </div>
                     
                     <Button className="w-full hover-elevate" data-testid={`button-package-${index}`}>
-                      Pesan Paket
+                      {t("catering.packages.orderButton")}
                     </Button>
                   </CardContent>
                 </Card>
@@ -125,23 +111,21 @@ export default function CateringPage() {
 
           {/* Highlight Venue Catering */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-center mb-6">Venue Catering</h2>
+            <h2 className="text-2xl font-bold text-center mb-6">{t("catering.venue.title")}</h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <Card className="border-border/30">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-foreground mb-2">On-Site di Outlet</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    VIP room dan area private di Pollux Mall Cikarang untuk gathering, arisan, dan acara
-                    keluarga hingga 30–50 tamu.
+                  <h3 className="font-semibold text-foreground mb-2">{t("catering.venue.onsite.title")}</h3>
+                  <p className="whitespace-pre-line text-sm text-muted-foreground leading-relaxed">
+                    {t("catering.venue.onsite.desc")}
                   </p>
                 </CardContent>
               </Card>
               <Card className="border-border/30">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-foreground mb-2">Off-Site / External Venue</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Tim kami siap setup buffet di kantor, gedung acara, atau lokasi pilihan Anda dengan
-                    peralatan makan lengkap.
+                  <h3 className="font-semibold text-foreground mb-2">{t("catering.venue.offsite.title")}</h3>
+                  <p className="whitespace-pre-line text-sm text-muted-foreground leading-relaxed">
+                    {t("catering.venue.offsite.desc")}
                   </p>
                 </CardContent>
               </Card>
@@ -150,7 +134,7 @@ export default function CateringPage() {
 
           {/* Menu Options */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-center mb-6">Pilihan Menu</h2>
+            <h2 className="text-2xl font-bold text-center mb-6">{t("catering.menu.title")}</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {menuOptions.map((menu, index) => (
                 <Card key={index} className="hover-elevate transition-all duration-300">
@@ -175,67 +159,45 @@ export default function CateringPage() {
             <CardContent className="p-6">
               <h3 className="text-xl font-bold text-center mb-6 flex items-center justify-center space-x-2">
                 <Calendar className="h-5 w-5" />
-                <span>Cara Pesan Catering</span>
+                <span>{t("catering.booking.title")}</span>
               </h3>
               
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Konsultasi & Survey</h4>
-                      <p className="text-sm text-muted-foreground">Diskusi kebutuhan dan survey lokasi</p>
+                  {BOOKING_STEPS.map((n) => (
+                    <div key={n} className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">{n}</div>
+                      <div>
+                        <h4 className="font-semibold text-foreground">{t(`catering.booking.${n}.title`)}</h4>
+                        <p className="text-sm text-muted-foreground">{t(`catering.booking.${n}.desc`)}</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Pilih Menu & Paket</h4>
-                      <p className="text-sm text-muted-foreground">Tentukan menu sesuai budget</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Konfirmasi & DP</h4>
-                      <p className="text-sm text-muted-foreground">Bayar DP 50% untuk booking</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Eksekusi Acara</h4>
-                      <p className="text-sm text-muted-foreground">Tim kami siapkan everything</p>
-                    </div>
-                  </div>
+                  ))}
                   
                   <div className="pt-4 border-t border-border/50">
                     <p className="text-sm text-muted-foreground">
-                      <strong>Booking minimal H-3 untuk hasil optimal</strong>
+                      <strong>{t("catering.booking.note")}</strong>
                     </p>
                   </div>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="bg-card rounded-lg p-4">
-                    <h4 className="font-semibold text-foreground mb-2">Contact Catering:</h4>
+                    <h4 className="font-semibold text-foreground mb-2">{t("catering.contact.title")}</h4>
                     <div className="space-y-1 text-sm text-muted-foreground">
-                      <p>📞 WhatsApp: 0813-7654-3210</p>
-                      <p>📧 Email: catering@gadangbarubah.com</p>
-                      <p>⏰ Jam Kerja: 08:00 - 20:00 WIB</p>
+                      {tl("catering.contact.lines").map((line, index) => (
+                        <p key={index}>{line}</p>
+                      ))}
                     </div>
                   </div>
                   
                   <div className="space-y-2">
                     <Button size="lg" className="w-full hover-elevate" data-testid="button-consultation">
                       <UtensilsCrossed className="mr-2 h-4 w-4" />
-                      Konsultasi Gratis
+                      {t("catering.contact.consultButton")}
                     </Button>
                     <Button variant="outline" size="lg" className="w-full hover-elevate" data-testid="button-price-list">
-                      Download Price List
+                      {t("catering.contact.priceListButton")}
                     </Button>
                   </div>
                 </div>

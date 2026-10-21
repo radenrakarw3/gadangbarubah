@@ -21,6 +21,7 @@ import {
 } from "@shared/reservation-utils";
 import { cn } from "@/lib/utils";
 import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import PrivacyConsentField from "@/components/PrivacyConsentField";
 
 /** Field glass — compact sesuai revisi Figma */
@@ -168,18 +169,20 @@ function QuickReservationBarInner() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const formKey = useRef(0);
 
+  const { t } = useSiteText();
   const placeholders = {
-    nama: lang === "ID" ? "(Nama Anda)" : "(Your Name)",
-    telepon: lang === "ID" ? "(No. Handphone)" : "(Phone Number)",
-    email: lang === "ID" ? "(Email)" : "(Email)",
-    outlet: lang === "ID" ? "Pilih Outlet (v)" : "Choose Outlet (v)",
-    pax: lang === "ID" ? "(Tamu)" : "(Pax)",
-    tanggal: lang === "ID" ? "(Tanggal)" : "(Date)",
-    waktu: lang === "ID" ? "(Jam)" : "(Time)",
-    today: lang === "ID" ? "Hari Ini" : "Today",
-    reserve: lang === "ID" ? "Reservasi Sekarang!" : "Reserve Now!",
-    reserveShort: lang === "ID" ? "Reservasi" : "Reserve",
+    nama: t("home.reservation.name"),
+    telepon: t("home.reservation.phone"),
+    email: t("home.reservation.email"),
+    outlet: t("home.reservation.outlet"),
+    pax: t("home.reservation.pax"),
+    tanggal: t("home.reservation.date"),
+    waktu: t("home.reservation.time"),
+    today: t("home.reservation.today"),
+    reserve: t("home.reservation.submit"),
+    reserveShort: t("home.reservation.openButton"),
   };
+  const paxUnit = t("home.reservation.paxUnit");
 
   const isTodaySelected = tanggal === todayISO();
   const minDate = todayISO();
@@ -205,10 +208,9 @@ function QuickReservationBarInner() {
     () =>
       Array.from({ length: 50 }, (_, i) => {
         const n = String(i + 1);
-        const unit = lang === "ID" ? "Tamu" : "Pax";
-        return { value: n, label: `${n} ${unit}` };
+        return { value: n, label: `${n} ${paxUnit}` };
       }),
-    [lang],
+    [paxUnit],
   );
 
   useEffect(() => {
@@ -383,7 +385,7 @@ function QuickReservationBarInner() {
       >
         <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-3 lg:hidden">
           <p className="font-[Poppins] text-[11px] font-semibold uppercase tracking-[0.14em] text-[#D2D2D2]/75">
-            {lang === "ID" ? "Reservasi meja" : "Table reservation"}
+            {t("home.reservation.formTitle")}
           </p>
           <button
             type="button"

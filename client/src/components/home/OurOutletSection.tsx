@@ -2,7 +2,7 @@ import { memo, useRef, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { HOME_OUTLET_PANELS } from "@/lib/siteContent";
 import { DESKTOP_OUTLET_MIN_H } from "@/lib/outletReveal";
-import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import { cn } from "@/lib/utils";
 import OutletDetailView, { type OpenPanel, type OutletOriginRect } from "./OutletDetailView";
 import cikarangImg from "@assets/outlet-cikarang-1_1781246285353.jpg";
@@ -23,21 +23,20 @@ type Panel = (typeof HOME_OUTLET_PANELS)[number];
 
 function OutletCard({
   panel,
-  lang,
   layout,
   onOpen,
 }: {
   panel: Panel;
-  lang: "ID" | "EN";
   layout: "desktop" | "mobile";
   onOpen: (panel: OpenPanel, event: React.MouseEvent<HTMLButtonElement>) => void;
 }) {
-  const name = lang === "ID" ? panel.nameID : panel.nameEN;
-  const address = lang === "ID" ? panel.addressID : panel.addressEN;
+  const { t } = useSiteText();
+  const name = t(`home.outlet.${panel.id}.name`);
+  const address = t(`home.outlet.${panel.id}.address`);
   const isOpen = panel.status === "open";
   const { src: image, objectPosition } = PANEL_IMAGES[panel.id];
-  const detailHint = lang === "ID" ? "Lihat detail outlet" : "View outlet details";
-  const soonLabel = lang === "ID" ? "Segera Hadir" : "Coming Soon";
+  const detailHint = t("home.outlet.detailHint");
+  const soonLabel = t("home.outlet.comingSoon");
 
   const card = (
     <article
@@ -134,16 +133,13 @@ function OutletCard({
 }
 
 function OurOutletSection() {
-  const { lang } = useSiteLanguage();
+  const { t } = useSiteText();
   const containerRef = useRef<HTMLDivElement>(null);
   const [detailPanel, setDetailPanel] = useState<OpenPanel | null>(null);
   const [originRect, setOriginRect] = useState<OutletOriginRect | null>(null);
 
-  const title = lang === "ID" ? "Outlet Kami" : "Our Outlet";
-  const subtitle =
-    lang === "ID"
-      ? "Kunjungi cabang terdekat atau nantikan lokasi baru kami."
-      : "Visit our nearest branch or stay tuned for new locations.";
+  const title = t("home.outlet.title");
+  const subtitle = t("home.outlet.subtitle");
 
   const handleOpen = (panel: OpenPanel, event: React.MouseEvent<HTMLButtonElement>) => {
     const container = containerRef.current?.getBoundingClientRect();
@@ -194,7 +190,6 @@ function OurOutletSection() {
               <OutletCard
                 key={panel.id}
                 panel={panel}
-                lang={lang}
                 layout="mobile"
                 onOpen={handleOpen}
               />
@@ -206,7 +201,6 @@ function OurOutletSection() {
               <OutletCard
                 key={panel.id}
                 panel={panel}
-                lang={lang}
                 layout="desktop"
                 onOpen={handleOpen}
               />

@@ -11,6 +11,7 @@ import RouteFallback from "@/components/RouteFallback";
 import ScrollToTop from "@/components/ScrollToTop";
 import { LanguageProvider } from "@/lib/language";
 import { AdminAuthProvider } from "@/lib/admin-auth";
+import { prefetchSiteTexts } from "@/lib/siteText";
 import {
   BintaroAdminDashboard,
   BintaroReservationStaff,
@@ -40,6 +41,9 @@ const AdminMenu = lazy(() => import("@/pages/AdminMenu"));
 const AdminWhatsOn = lazy(() => import("@/pages/AdminWhatsOn"));
 const AdminLoginPage = lazy(() => import("@/pages/AdminLoginPage"));
 const NotFound = lazy(() => import("@/pages/not-found"));
+const AdminSiteTexts = lazy(() => import("@/pages/AdminSiteTexts"));
+
+void prefetchSiteTexts();
 
 function withSuspense(Component: ComponentType) {
   return function SuspendedRoute() {
@@ -135,6 +139,10 @@ function Router() {
       <Route
         path="/admin/whats-on"
         component={() => <MainAdminOnlyPage component={AdminWhatsOn} />}
+      />
+      <Route
+        path="/admin/teks"
+        component={() => <MainAdminOnlyPage component={AdminSiteTexts} />}
       />
       <Route path="/admin" component={MainAdminDashboard} />
       <Route component={withSuspense(NotFound)} />

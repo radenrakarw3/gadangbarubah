@@ -16,7 +16,14 @@ import {
   insertWhatsOnArticleSchema,
   updateWhatsOnArticleSchema,
   updateWhatsOnArticlePublishSchema,
+  updateSiteTextSchema,
+  type SiteText,
 } from "@shared/schema";
+import {
+  SITE_TEXT_MAP,
+  missingSiteTextPlaceholders,
+  siteTextMaxLength,
+} from "@shared/site-text-registry";
 import {
   isReservationPublicId,
   toPublicReservationStatus,
@@ -970,6 +977,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     },
   );
+
+  // Limiter sendiri agar sesi edit teks yang panjang tidak menghabiskan kuota admin lain
+  const siteTextAdminRateLimit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 600,
+    message: {
+      success: false,
+      message: "Terlalu banyak permintaan. Coba lagi dalam beberapa menit.",
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  const toAdminSiteText = (row: SiteText) => ({
+    key: row.key,
+    valueId: row.valueId,
+    valueEn: row.valueEn,
+    updatedAt: row.updatedAt.toISOString(),
+  });
+
+  app.get("/api/site-texts", async (_req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    try {
+      const rows = await storage.getSiteTexts();
+      const texts: Record<string, { id: string; en: string }> = {};
+      for (const row of rows) {
+        if (SITE_TEXT_MAP.has(row.key)) texts[row.key] = { id: row.valueId, en: row.valueEn };
+      }
+      res.json({ success: true, texts });
+    } catch (error) {
+      console.error("Get site texts error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil teks website" });
+    }
+  });
+
+  app.get("/api/admin/site-texts", requireMainAdmin, siteTextAdminRateLimit, async (_req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    try {
+      const rows = await storage.getSiteTexts();
+      res.json({ success: true, texts: rows.map(toAdminSiteText) });
+    } catch (error) {
+      console.error("Get admin site texts error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil teks website" });
+    }
+  });
+
+  app.put("/api/admin/site-texts/:key", requireMainAdmin, siteTextAdminRateLimit, async (req, res) => {
+    try {
+      const def = SITE_TEXT_MAP.get(req.params.key);
+      if (!def) {
+        return res.status(404).json({ success: false, message: "Teks tidak dikenal" });
+      }
+
+      const normalize = (value: unknown) =>
+        typeof value === "string" ? value.replace(/\r\n?/g, "\n") : value;
+      const body = updateSiteTextSchema.parse({
+        ...req.body,
+        valueId: normalize(req.body?.valueId),
+        valueEn: normalize(req.body?.valueEn),
+      });
+
+      const maxLength = siteTextMaxLength(def);
+      if (body.valueId.length > maxLength || body.valueEn.length > maxLength) {
+        return res.status(400).json({
+          success: false,
+          message: `Teks maksimal ${maxLength} karakter`,
+        });
+      }
+      if (!def.multiline && !def.list && (/\n/.test(body.valueId) || /\n/.test(body.valueEn))) {
+        return res.status(400).json({ success: false, message: "Teks ini harus satu baris" });
+      }
+      const missingCodes = Array.from(
+        new Set([
+          ...missingSiteTextPlaceholders(def.id, body.valueId),
+          ...missingSiteTextPlaceholders(def.en, body.valueEn),
+        ]),
+      );
+      if (missingCodes.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Kode ${missingCodes.join(", ")} wajib tetap ada di teks`,
+        });
+      }
+
+      const result = await storage.saveSiteText({
+        key: def.key,
+        valueId: body.valueId,
+        valueEn: body.valueEn,
+        updatedBy: req.session.userId ?? null,
+        expectedUpdatedAt:
+          body.expectedUpdatedAt === undefined
+            ? undefined
+            : body.expectedUpdatedAt === null
+              ? null
+              : new Date(body.expectedUpdatedAt),
+      });
+
+      if ("conflict" in result) {
+        return res.status(409).json({
+          success: false,
+          message: "Teks ini baru saja diubah admin lain. Muat ulang halaman untuk melihat versi terbaru.",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Teks berhasil disimpan",
+        text: toAdminSiteText(result.row),
+      });
+    } catch (error: any) {
+      console.error("Save site text error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.errors?.[0]?.message || error.message || "Gagal menyimpan teks",
+      });
+    }
+  });
+
+  app.delete("/api/admin/site-texts/:key", requireMainAdmin, siteTextAdminRateLimit, async (req, res) => {
+    try {
+      if (!SITE_TEXT_MAP.has(req.params.key)) {
+        return res.status(404).json({ success: false, message: "Teks tidak dikenal" });
+      }
+      await storage.deleteSiteText(req.params.key);
+      res.json({ success: true, message: "Teks dikembalikan ke default" });
+    } catch (error: any) {
+      console.error("Reset site text error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.message || "Gagal mengembalikan teks",
+      });
+    }
+  });
 
   app.get("/sitemap.xml", async (_req, res) => {
     const baseUrl = "https://gadangbarubahindonesia.id";

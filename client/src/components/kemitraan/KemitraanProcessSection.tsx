@@ -1,10 +1,16 @@
 import { memo } from "react";
-import { useSiteLanguage } from "@/lib/language";
-import { KEMITRAAN_PROCESS } from "@/lib/kemitraanContent";
+import { useSiteText } from "@/lib/siteText";
+import { KEMITRAAN_PROCESS_STEPS } from "@/lib/kemitraanContent";
 
 function KemitraanProcessSection() {
-  const { lang } = useSiteLanguage();
-  const copy = KEMITRAAN_PROCESS[lang];
+  const { t } = useSiteText();
+  const copy = {
+    title: t("kemitraan.process.title"),
+    steps: KEMITRAAN_PROCESS_STEPS.map((n) => ({
+      title: t(`kemitraan.process.${n}.title`),
+      desc: t(`kemitraan.process.${n}.desc`),
+    })),
+  };
 
   return (
     <section id="kemitraan-process-section" className="scroll-mt-20 border-y border-white/10 bg-[#250404] py-14 sm:scroll-mt-24 sm:py-16">
@@ -15,7 +21,7 @@ function KemitraanProcessSection() {
 
         <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
           {copy.steps.map((step, index) => (
-            <li key={step.title} className="relative flex flex-col">
+            <li key={index} className="relative flex flex-col">
               {index < copy.steps.length - 1 ? (
                 <span
                   className="absolute left-[1.125rem] top-10 hidden h-px w-[calc(100%+1rem)] bg-white/20 lg:block"

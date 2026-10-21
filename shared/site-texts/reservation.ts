@@ -1,0 +1,81 @@
+import { definePageTexts } from "./define";
+
+export const RESERVATION_TEXTS = definePageTexts("reservation", {
+  "reservation.title": { section: "Judul halaman", label: "Judul", id: "Reservasi Meja", en: "Table Reservation" },
+  "reservation.subtitle": {
+    section: "Judul halaman",
+    label: "Subjudul",
+    multiline: true,
+    id: "Pesan meja di cabang Gadang Barubah Cikarang atau Bintaro — meja reguler atau VIP room untuk acara spesial Anda.",
+    en: "Book your table at Gadang Barubah Cikarang or Bintaro branch — regular table or VIP room for your special occasion.",
+  },
+  "reservation.footerNote": {
+    section: "Judul halaman",
+    label: "Catatan di bawah form",
+    id: "Jam operasional: 10:00 – 22:00 WIB • Reservasi VIP room disarankan H-1",
+    en: "Operating hours: 10:00 – 22:00 • VIP room reservation is recommended 1 day in advance",
+  },
+
+  "reservation.form.name": { section: "Form reservasi", label: "Label nama", id: "Nama Lengkap", en: "Full Name" },
+  "reservation.form.namePlaceholder": { section: "Form reservasi", label: "Contoh nama", id: "Contoh: Budi Santoso", en: "Example: John Doe" },
+  "reservation.form.whatsapp": { section: "Form reservasi", label: "Label WhatsApp", id: "Nomor WhatsApp", en: "WhatsApp Number" },
+  "reservation.form.email": { section: "Form reservasi", label: "Label email", id: "Email (opsional)", en: "Email (optional)" },
+  "reservation.form.outlet": { section: "Form reservasi", label: "Label outlet", id: "Outlet", en: "Outlet" },
+  "reservation.form.outletPlaceholder": { section: "Form reservasi", label: "Placeholder outlet", id: "Pilih outlet", en: "Select outlet" },
+  "reservation.form.date": { section: "Form reservasi", label: "Label tanggal", id: "Tanggal", en: "Date" },
+  "reservation.form.today": { section: "Form reservasi", label: "Tombol hari ini", id: "Hari Ini", en: "Today" },
+  "reservation.form.time": { section: "Form reservasi", label: "Label waktu", id: "Waktu", en: "Time" },
+  "reservation.form.timePlaceholder": { section: "Form reservasi", label: "Placeholder waktu", id: "Pilih waktu", en: "Select time" },
+  "reservation.form.guests": { section: "Form reservasi", label: "Label jumlah tamu", id: "Jumlah Tamu", en: "Guests" },
+  "reservation.form.tableType": { section: "Form reservasi", label: "Label tipe meja", id: "Tipe Meja", en: "Table Type" },
+  "reservation.form.tableTypePlaceholder": { section: "Form reservasi", label: "Placeholder tipe meja", id: "Pilih tipe meja", en: "Select table type" },
+  "reservation.form.tableRegular": { section: "Form reservasi", label: "Pilihan meja reguler", id: "Meja Reguler", en: "Regular Table" },
+  "reservation.form.tableVip": { section: "Form reservasi", label: "Pilihan VIP", id: "VIP Room", en: "VIP Room" },
+  "reservation.form.notes": { section: "Form reservasi", label: "Label catatan", id: "Catatan (opsional)", en: "Notes (optional)" },
+  "reservation.form.notesPlaceholder": {
+    section: "Form reservasi",
+    label: "Placeholder catatan",
+    id: "Permintaan khusus, alergi makanan, acara ulang tahun, dll.",
+    en: "Special requests, food allergies, birthday event, etc.",
+  },
+  "reservation.form.submit": { section: "Form reservasi", label: "Tombol kirim", id: "Kirim Permintaan Reservasi", en: "Submit Reservation Request" },
+  "reservation.form.submitting": { section: "Form reservasi", label: "Teks saat mengirim", id: "Mengirim...", en: "Submitting..." },
+
+  "reservation.success.title": {
+    section: "Setelah reservasi terkirim",
+    label: "Judul",
+    id: "Permintaan Reservasi Diterima",
+    en: "Reservation Request Received",
+  },
+  "reservation.success.message": {
+    section: "Setelah reservasi terkirim",
+    label: "Pesan ({id} = ID reservasi)",
+    id: "Tim kami akan menghubungi Anda via WhatsApp untuk konfirmasi. Simpan ID reservasi: {id}",
+    en: "Our team will contact you via WhatsApp for confirmation. Save your reservation ID: {id}",
+  },
+  "reservation.success.whatsappButton": {
+    section: "Setelah reservasi terkirim",
+    label: "Tombol konfirmasi WhatsApp",
+    id: "Konfirmasi via WhatsApp",
+    en: "Confirm via WhatsApp",
+  },
+  "reservation.success.whatsappMessage": {
+    section: "Setelah reservasi terkirim",
+    label: "Pesan WhatsApp ({id} = ID reservasi)",
+    id: "Halo Gadang Barubah, saya sudah mengisi form reservasi (ID: {id}). Mohon konfirmasi.",
+    en: "Halo Gadang Barubah, saya sudah mengisi form reservasi (ID: {id}). Mohon konfirmasi.",
+  },
+  "reservation.success.checkStatus": {
+    section: "Setelah reservasi terkirim",
+    label: "Tombol cek status",
+    id: "Cek status reservasi",
+    en: "Check reservation status",
+  },
+  "reservation.success.statusLabel": { section: "Setelah reservasi terkirim", label: "Label status", id: "Status", en: "Status" },
+  "reservation.success.newReservation": {
+    section: "Setelah reservasi terkirim",
+    label: "Tombol reservasi lain",
+    id: "Buat Reservasi Lain",
+    en: "Create Another Reservation",
+  },
+});

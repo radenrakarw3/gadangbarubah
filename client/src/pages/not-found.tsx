@@ -2,10 +2,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { pageSEOConfigs } from "@/lib/seo";
-import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 
 export default function NotFound() {
-  const { lang } = useSiteLanguage();
+  const { t } = useSiteText();
   const seoConfig = pageSEOConfigs.notFound;
   
   return (
@@ -31,14 +31,12 @@ export default function NotFound() {
           <div className="flex mb-4 gap-2">
             <AlertCircle className="h-8 w-8 text-red-500" />
             <h1 className="text-2xl font-bold text-gray-900">
-              {lang === "ID" ? "404 Halaman Tidak Ditemukan" : "404 Page Not Found"}
+              {t("notFound.title")}
             </h1>
           </div>
 
-          <p className="mt-4 text-sm text-gray-600">
-            {lang === "ID"
-              ? "Halaman yang Anda cari tidak tersedia atau sudah dipindahkan."
-              : "The page you are looking for is unavailable or has been moved."}
+          <p className="mt-4 whitespace-pre-line text-sm text-gray-600">
+            {t("notFound.description")}
           </p>
         </CardContent>
       </Card>

@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { memo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import { cn } from "@/lib/utils";
 import { menuFeaturedQueryKey, menuPublicQueryOptions } from "@/lib/menu";
 import type { MenuItem } from "@shared/schema";
@@ -43,8 +44,7 @@ function CarouselNavButton({
   );
 }
 
-function ViewFullMenuCard({ lang, onClick }: { lang: "ID" | "EN"; onClick: () => void }) {
-  const label = lang === "ID" ? "Lihat Menu Selengkapnya" : "View Full Menu";
+function ViewFullMenuCard({ label, onClick }: { label: string; onClick: () => void }) {
 
   return (
     <article className="flex w-[min(40vw,140px)] shrink-0 snap-start flex-col items-center sm:w-[150px] xl:w-[140px] 2xl:w-[160px]">
@@ -74,6 +74,7 @@ function SignatureMenuSection() {
   const [, navigate] = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const { lang } = useSiteLanguage();
+  const { t } = useSiteText();
 
   const { data } = useQuery<{ success: boolean; items: MenuItem[] }>({
     queryKey: menuFeaturedQueryKey(),
@@ -82,8 +83,7 @@ function SignatureMenuSection() {
 
   const featuredItems = data?.items ?? [];
 
-  const title =
-    lang === "ID" ? "Signature Menu Gadang Barubah" : "Signature Menu Gadang Barubah";
+  const title = t("home.signature.title");
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
@@ -196,7 +196,7 @@ function SignatureMenuSection() {
             );
           })}
 
-          <ViewFullMenuCard lang={lang} onClick={() => navigate("/menu")} />
+          <ViewFullMenuCard label={t("home.signature.viewFullMenu")} onClick={() => navigate("/menu")} />
         </div>
       </div>
 

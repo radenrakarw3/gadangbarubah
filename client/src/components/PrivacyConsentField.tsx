@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Checkbox } from "@/components/ui/checkbox";
+import { renderTemplate, useSiteText } from "@/lib/siteText";
 import { cn } from "@/lib/utils";
 
 interface PrivacyConsentFieldProps {
@@ -17,13 +18,13 @@ interface PrivacyConsentFieldProps {
 export default function PrivacyConsentField({
   checked,
   onCheckedChange,
-  lang,
   id = "privacy-consent",
   className,
   variant = "light",
   compact = false,
 }: PrivacyConsentFieldProps) {
   const isDark = variant === "dark";
+  const { t } = useSiteText();
 
   return (
     <div className={cn("flex", compact ? "items-center gap-2" : "items-start gap-2.5", className)}>
@@ -46,31 +47,18 @@ export default function PrivacyConsentField({
           isDark ? "text-[#D2D2D2]/90" : "text-[#5c4040]/90",
         )}
       >
-        {lang === "ID" ? (
-          <>
-            Saya setuju dengan{" "}
+        {renderTemplate(t("global.consent.text"), {
+          terms: (
             <Link href="/terms" className="underline underline-offset-2 hover:opacity-80">
-              Syarat &amp; Ketentuan
-            </Link>{" "}
-            dan{" "}
-            <Link href="/privacy" className="underline underline-offset-2 hover:opacity-80">
-              Kebijakan Privasi
+              {t("global.consent.terms")}
             </Link>
-            .
-          </>
-        ) : (
-          <>
-            I agree to the{" "}
-            <Link href="/terms" className="underline underline-offset-2 hover:opacity-80">
-              Terms &amp; Conditions
-            </Link>{" "}
-            and{" "}
+          ),
+          privacy: (
             <Link href="/privacy" className="underline underline-offset-2 hover:opacity-80">
-              Privacy Policy
+              {t("global.consent.privacy")}
             </Link>
-            .
-          </>
-        )}
+          ),
+        })}
       </label>
     </div>
   );

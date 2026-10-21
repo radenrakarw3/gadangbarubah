@@ -6,6 +6,8 @@ import {
   menuCategories,
   menuItems,
   whatsOnArticles,
+  siteTexts,
+  type SiteText,
   type User,
   type InsertUser,
   type InsertReservation,
@@ -120,6 +122,17 @@ export interface IStorage {
   updateWhatsOnArticleImage(id: string, imagePath: string): Promise<WhatsOnArticle>;
   updateWhatsOnArticlePublish(id: string, isPublished: boolean): Promise<WhatsOnArticle>;
   deleteWhatsOnArticle(id: string): Promise<WhatsOnArticle | undefined>;
+
+  getSiteTexts(): Promise<SiteText[]>;
+  saveSiteText(data: {
+    key: string;
+    valueId: string;
+    valueEn: string;
+    updatedBy: string | null;
+    /** undefined = timpa tanpa cek; null = harus belum ada override; Date = harus sama dengan updatedAt di DB */
+    expectedUpdatedAt?: Date | null;
+  }): Promise<{ row: SiteText } | { conflict: true }>;
+  deleteSiteText(key: string): Promise<SiteText | undefined>;
 
   getAdminStats(outlet?: string): Promise<{
     totalReservations: number;
@@ -733,6 +746,59 @@ export class DatabaseStorage implements IStorage {
     const [deleted] = await requireDb()
       .delete(whatsOnArticles)
       .where(eq(whatsOnArticles.id, id))
+      .returning();
+    return deleted;
+  }
+
+  async getSiteTexts(): Promise<SiteText[]> {
+    return requireDb().select().from(siteTexts).orderBy(asc(siteTexts.key));
+  }
+
+  async saveSiteText(data: {
+    key: string;
+    valueId: string;
+    valueEn: string;
+    updatedBy: string | null;
+    expectedUpdatedAt?: Date | null;
+  }): Promise<{ row: SiteText } | { conflict: true }> {
+    const db = requireDb();
+    const values = {
+      valueId: data.valueId,
+      valueEn: data.valueEn,
+      updatedBy: data.updatedBy,
+      updatedAt: new Date(),
+    };
+
+    if (data.expectedUpdatedAt === undefined) {
+      const [row] = await db
+        .insert(siteTexts)
+        .values({ key: data.key, ...values })
+        .onConflictDoUpdate({ target: siteTexts.key, set: values })
+        .returning();
+      return { row };
+    }
+
+    if (data.expectedUpdatedAt === null) {
+      const [row] = await db
+        .insert(siteTexts)
+        .values({ key: data.key, ...values })
+        .onConflictDoNothing({ target: siteTexts.key })
+        .returning();
+      return row ? { row } : { conflict: true };
+    }
+
+    const [row] = await db
+      .update(siteTexts)
+      .set(values)
+      .where(and(eq(siteTexts.key, data.key), eq(siteTexts.updatedAt, data.expectedUpdatedAt)))
+      .returning();
+    return row ? { row } : { conflict: true };
+  }
+
+  async deleteSiteText(key: string): Promise<SiteText | undefined> {
+    const [deleted] = await requireDb()
+      .delete(siteTexts)
+      .where(eq(siteTexts.key, key))
       .returning();
     return deleted;
   }

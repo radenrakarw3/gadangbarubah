@@ -1,11 +1,19 @@
 import { memo } from "react";
 import { Check } from "lucide-react";
-import { useSiteLanguage } from "@/lib/language";
-import { KEMITRAAN_WHY } from "@/lib/kemitraanContent";
+import { useSiteText } from "@/lib/siteText";
+import { KEMITRAAN_WHY_HIGHLIGHTS } from "@/lib/kemitraanContent";
 
 function KemitraanWhySection() {
-  const { lang } = useSiteLanguage();
-  const copy = KEMITRAAN_WHY[lang];
+  const { t, tl } = useSiteText();
+  const copy = {
+    title: t("kemitraan.why.title"),
+    intro: t("kemitraan.why.intro"),
+    bullets: tl("kemitraan.why.bullets"),
+    highlights: KEMITRAAN_WHY_HIGHLIGHTS.map((n) => ({
+      value: t(`kemitraan.why.highlight${n}.value`),
+      label: t(`kemitraan.why.highlight${n}.label`),
+    })),
+  };
 
   return (
     <section id="kemitraan-why-section" className="scroll-mt-20 bg-[#f5ebe6] py-14 sm:scroll-mt-24 sm:py-20">
@@ -13,11 +21,11 @@ function KemitraanWhySection() {
         <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start lg:gap-16">
           <div>
             <h2 className="font-heroCta text-figma-section-title text-[#3D0C0C]">{copy.title}</h2>
-            <p className="mt-4 font-heroCta text-figma-body text-justify text-black/80">{copy.intro}</p>
+            <p className="mt-4 whitespace-pre-line font-heroCta text-figma-body text-justify text-black/80">{copy.intro}</p>
 
             <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-              {copy.bullets.map((item) => (
-                <li key={item} className="flex gap-2.5 font-heroCta text-sm text-black/85 sm:text-base">
+              {copy.bullets.map((item, index) => (
+                <li key={`${index}-${item}`} className="flex gap-2.5 font-heroCta text-sm text-black/85 sm:text-base">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#3F0000]" strokeWidth={2.5} aria-hidden />
                   {item}
                 </li>
@@ -26,9 +34,9 @@ function KemitraanWhySection() {
           </div>
 
           <div className="grid grid-cols-3 gap-3 sm:gap-4">
-            {copy.highlights.map((item) => (
+            {copy.highlights.map((item, index) => (
               <div
-                key={item.label}
+                key={index}
                 className="flex flex-col items-center justify-center rounded-lg border border-[#3F0000]/10 bg-white/60 px-3 py-6 text-center sm:py-8"
               >
                 <span className="font-heroCta text-2xl font-medium text-[#3F0000] sm:text-3xl">{item.value}</span>

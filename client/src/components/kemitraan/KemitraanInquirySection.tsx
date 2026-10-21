@@ -13,9 +13,9 @@ import PrivacyConsentField from "@/components/PrivacyConsentField";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, parseApiError } from "@/lib/queryClient";
 import { CATERING_TYPES, COMPANY } from "@/lib/siteContent";
-import { KEMITRAAN_INQUIRY } from "@/lib/kemitraanContent";
 import { takePendingKemitraanService } from "@/lib/kemitraanSelection";
 import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import { cn } from "@/lib/utils";
 import sideImage from "@assets/catering-buffet_1781246285353.jpg";
 
@@ -28,7 +28,14 @@ const SELECT = cn(FIELD, "justify-between");
 function KemitraanInquirySection() {
   const { toast } = useToast();
   const { lang } = useSiteLanguage();
-  const copy = KEMITRAAN_INQUIRY[lang];
+  const { t } = useSiteText();
+  const copy = {
+    title: t("kemitraan.inquiry.title"),
+    subtitle: t("kemitraan.inquiry.subtitle"),
+    sideTitle: t("kemitraan.inquiry.sideTitle"),
+    sideBody: t("kemitraan.inquiry.sideBody"),
+    waCta: t("kemitraan.inquiry.waCta"),
+  };
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     nama: "",
@@ -42,14 +49,14 @@ function KemitraanInquirySection() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const labels = {
-    nama: lang === "ID" ? "Nama PIC" : "PIC Name",
-    telepon: lang === "ID" ? "No. Telepon" : "Phone Number",
-    tanggalEvent: lang === "ID" ? "Tanggal Event" : "Event Date",
-    eventDetail: lang === "ID" ? "Detail Acara" : "Event Details",
-    lokasiEvent: lang === "ID" ? "Lokasi" : "Location",
-    service: lang === "ID" ? "Jenis Layanan" : "Service Type",
-    pax: lang === "ID" ? "Jumlah Pax" : "Guest Count",
-    submit: lang === "ID" ? "Kirim Permintaan Kemitraan" : "Submit Partnership Request",
+    nama: t("kemitraan.inquiry.name"),
+    telepon: t("kemitraan.inquiry.phone"),
+    tanggalEvent: t("kemitraan.inquiry.eventDate"),
+    eventDetail: t("kemitraan.inquiry.eventDetail"),
+    lokasiEvent: t("kemitraan.inquiry.location"),
+    service: t("kemitraan.inquiry.service"),
+    pax: t("kemitraan.inquiry.pax"),
+    submit: t("kemitraan.inquiry.submit"),
   };
 
   const handleChooseService = useCallback((cateringType: string) => {
@@ -71,11 +78,7 @@ function KemitraanInquirySection() {
   }, [handleChooseService]);
 
   const waHref = () => {
-    const text = encodeURIComponent(
-      lang === "ID"
-        ? "Halo Gadang Barubah, saya ingin diskusi kemitraan catering/event."
-        : "Hello Gadang Barubah, I'd like to discuss event/catering partnership.",
-    );
+    const text = encodeURIComponent(t("kemitraan.inquiry.waGreeting"));
     return `https://wa.me/${COMPANY.cateringWhatsapp}?text=${text}`;
   };
 
@@ -115,7 +118,8 @@ function KemitraanInquirySection() {
 
     setLoading(true);
     try {
-      const tipeLabel = CATERING_TYPES.find((t) => t.value === form.tipe)?.label ?? form.tipe;
+      const tipe = CATERING_TYPES.find((type) => type.value === form.tipe);
+      const tipeLabel = tipe ? t(`catering.types.${tipe.value}`) : form.tipe;
       const res = await apiRequest("POST", "/api/catering-inquiries", {
         nama: form.nama.trim(),
         telepon: form.telepon,
@@ -161,7 +165,7 @@ function KemitraanInquirySection() {
           <div className="rounded-xl border border-black/8 bg-white p-6 shadow-sm sm:p-8">
             <header className="mb-8">
               <h2 className="font-inquiry text-figma-inquiry-title text-[#3D0C0C]">{copy.title}</h2>
-              <p className="mt-2 font-heroCta text-figma-body text-black/65">{copy.subtitle}</p>
+              <p className="mt-2 whitespace-pre-line font-heroCta text-figma-body text-black/65">{copy.subtitle}</p>
             </header>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -227,9 +231,9 @@ function KemitraanInquirySection() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="z-[200]">
-                      {CATERING_TYPES.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>
-                          {t.label}
+                      {CATERING_TYPES.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {t(`catering.types.${type.value}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -269,7 +273,7 @@ function KemitraanInquirySection() {
             </div>
             <div className="rounded-xl border border-[#3F0000]/10 bg-[#f5ebe6] p-6">
               <h3 className="font-heroCta text-lg text-[#3D0C0C]">{copy.sideTitle}</h3>
-              <p className="mt-2 font-heroCta text-sm leading-relaxed text-black/70">{copy.sideBody}</p>
+              <p className="mt-2 whitespace-pre-line font-heroCta text-sm leading-relaxed text-black/70">{copy.sideBody}</p>
               <a
                 href={waHref()}
                 target="_blank"

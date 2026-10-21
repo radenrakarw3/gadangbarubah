@@ -22,6 +22,7 @@ import rentalRoomImg from "@assets/DSC03147_1758567860387.jpg";
 import stallImg from "@assets/DSC05600_1758565473997.jpg";
 import deliveryImg from "@assets/DSC07153_1758564588952.jpg";
 import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import { cn } from "@/lib/utils";
 import PrivacyConsentField from "@/components/PrivacyConsentField";
 
@@ -125,6 +126,7 @@ function CateringForm({
   lang: "ID" | "EN";
   className?: string;
 }) {
+  const { t } = useSiteText();
   return (
     <form onSubmit={onSubmit} className={cn("relative w-full max-w-[651px]", className)}>
       <ReservationHoneypot />
@@ -132,7 +134,7 @@ function CateringForm({
         <h2 className="font-[var(--font-inquiry)] text-[clamp(1.75rem,2.2vw,2.625rem)] font-medium leading-[1.2] tracking-[0.01em] text-black">
           {copy.title}
         </h2>
-        <p className="mx-auto mt-3 max-w-[433px] font-[var(--font-inquiry)] text-base font-medium leading-8 tracking-[0.01em] text-black">
+        <p className="mx-auto mt-3 max-w-[433px] whitespace-pre-line font-[var(--font-inquiry)] text-base font-medium leading-8 tracking-[0.01em] text-black">
           {copy.subtitle}
         </p>
       </header>
@@ -190,9 +192,9 @@ function CateringForm({
             <SelectValue placeholder={copy.service} />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={6} className={FIGMA_SELECT_MENU}>
-            {CATERING_TYPES.map((t) => (
-              <SelectItem key={t.value} value={t.value} className={FIGMA_SELECT_ITEM}>
-                {t.label}
+            {CATERING_TYPES.map((type) => (
+              <SelectItem key={type.value} value={type.value} className={FIGMA_SELECT_ITEM}>
+                {t(`catering.types.${type.value}`)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -227,16 +229,15 @@ const MOBILE_COLLAGE_H = "h-[480px] sm:h-[560px]";
 const DESKTOP_COLLAGE_MIN_H = "min-h-[700px]";
 
 function ServiceTile({  service,
-  lang,
   onSelect,
   className,
 }: {
   service: Service;
-  lang: "ID" | "EN";
   onSelect: (service: Service, event: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
 }) {
-  const name = lang === "ID" ? service.nameID : service.nameEN;
+  const { t } = useSiteText();
+  const name = t(`home.services.${service.id}.name`);
   const image = SERVICE_IMAGES[service.id];
 
   return (
@@ -269,12 +270,10 @@ function ServiceTile({  service,
 }
 
 function ServiceCollage({
-  lang,
   onSelect,
   layout = "mobile",
   className,
 }: {
-  lang: "ID" | "EN";
   onSelect: (service: Service, event: React.MouseEvent<HTMLButtonElement>) => void;
   layout?: "mobile" | "desktop";
   className?: string;
@@ -295,7 +294,6 @@ function ServiceCollage({
         <ServiceTile
           key={service.id}
           service={service}
-          lang={lang}
           onSelect={onSelect}
           className="min-h-0"
         />
@@ -304,7 +302,6 @@ function ServiceCollage({
         <ServiceTile
           key={service.id}
           service={service}
-          lang={lang}
           onSelect={onSelect}
           className="min-h-0"
         />
@@ -314,7 +311,6 @@ function ServiceCollage({
 }
 function ServiceExpandedPanel({
   service,
-  lang,
   layout,
   originRect,
   containerRef,
@@ -322,7 +318,6 @@ function ServiceExpandedPanel({
   onChooseService,
 }: {
   service: Service;
-  lang: "ID" | "EN";
   layout: "mobile" | "desktop";
   originRect: ServiceOriginRect | null;
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -335,10 +330,11 @@ function ServiceExpandedPanel({
   const [expanded, setExpanded] = useState(!originRect);
   const [contentVisible, setContentVisible] = useState(!originRect);
 
-  const name = lang === "ID" ? service.nameID : service.nameEN;
-  const description = lang === "ID" ? service.descriptionID : service.descriptionEN;
-  const chooseLabel = lang === "ID" ? "Pilih layanan ini" : "Choose this service";
-  const closeLabel = lang === "ID" ? "Kembali ke layanan" : "Back to services";
+  const { t } = useSiteText();
+  const name = t(`home.services.${service.id}.name`);
+  const description = t(`home.services.${service.id}.description`);
+  const chooseLabel = t("home.catering.chooseService");
+  const closeLabel = t("home.catering.backToServices");
   const image = SERVICE_IMAGES[service.id];
   const isDesktop = layout === "desktop";
 
@@ -500,7 +496,7 @@ function ServiceExpandedPanel({
           <h3 className="font-heroCta text-[clamp(1.5rem,5vw,2.75rem)] font-normal leading-tight tracking-[0.01em] text-white">
             {name}
           </h3>
-          <p className="mt-2 max-w-xl font-[var(--font-inquiry)] text-sm leading-relaxed text-white/90 sm:mt-3 sm:text-lg">
+          <p className="mt-2 max-w-xl whitespace-pre-line font-[var(--font-inquiry)] text-sm leading-relaxed text-white/90 sm:mt-3 sm:text-lg">
             {description}
           </p>
           <div className="mt-4 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-center sm:gap-4">
@@ -529,12 +525,10 @@ function ServiceExpandedPanel({
 }
 
 function CateringServiceSlot({
-  lang,
   layout,
   onChooseService,
   className,
 }: {
-  lang: "ID" | "EN";
   layout: "mobile" | "desktop";
   onChooseService: (cateringType: string) => void;
   className?: string;
@@ -583,7 +577,6 @@ function CateringServiceSlot({
       )}
     >
       <ServiceCollage
-        lang={lang}
         onSelect={handleSelect}
         layout={layout}
         className={cn("h-full", activeService ? "pointer-events-none" : undefined)}
@@ -591,7 +584,6 @@ function CateringServiceSlot({
       {activeService ? (
         <ServiceExpandedPanel
           service={activeService}
-          lang={lang}
           layout={layout}
           originRect={originRect}
           containerRef={containerRef}
@@ -605,6 +597,7 @@ function CateringServiceSlot({
 function CateringInquirySection() {
   const { toast } = useToast();
   const { lang } = useSiteLanguage();
+  const { t } = useSiteText();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     nama: "",
@@ -618,20 +611,17 @@ function CateringInquirySection() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const copy = {
-    title: lang === "ID" ? "Rencanakan Katering Anda Bersama Kami" : "Plan Your Catering With Us",
-    subtitle:
-      lang === "ID"
-        ? "Ceritakan kebutuhan acara Anda — tim kami siap menyesuaikan menu dan jumlah tamu."
-        : "Tell us about your event — our team will tailor the menu and guest count for you.",
-    nama: lang === "ID" ? "(Nama PIC)" : "(PIC Name)",
-    telepon: lang === "ID" ? "(No.hp PIC)" : "(PIC Phone)",
-    tanggalEvent: lang === "ID" ? "(Tanggal Event)" : "(Event Date)",
-    eventDetail: lang === "ID" ? "(Event Detail)" : "(Event Detail)",
-    lokasiEvent: lang === "ID" ? "(Lokasi Event)" : "(Event Location)",
-    service: lang === "ID" ? "(Pilih Layanan)" : "(Choose Service)",
-    pax: lang === "ID" ? "(Jumlah Pax)" : "(Guest Pax)",
-    submit: lang === "ID" ? "Reservasi Sekarang!" : "Reserve Now!",
-    collageTitle: lang === "ID" ? "Layanan Kami" : "Our Services",
+    title: t("home.catering.title"),
+    subtitle: t("home.catering.subtitle"),
+    nama: t("home.catering.name"),
+    telepon: t("home.catering.phone"),
+    tanggalEvent: t("home.catering.eventDate"),
+    eventDetail: t("home.catering.eventDetail"),
+    lokasiEvent: t("home.catering.eventLocation"),
+    service: t("home.catering.service"),
+    pax: t("home.catering.pax"),
+    submit: t("home.catering.submit"),
+    collageTitle: t("home.catering.collageTitle"),
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -673,7 +663,8 @@ function CateringInquirySection() {
 
     setLoading(true);
     try {
-      const tipeLabel = CATERING_TYPES.find((t) => t.value === form.tipe)?.label ?? form.tipe;
+      const tipe = CATERING_TYPES.find((type) => type.value === form.tipe);
+      const tipeLabel = tipe ? t(`catering.types.${tipe.value}`) : form.tipe;
       const res = await apiRequest("POST", "/api/catering-inquiries", {
         nama: form.nama.trim(),
         telepon: form.telepon,
@@ -744,7 +735,6 @@ function CateringInquirySection() {
             {copy.collageTitle}
           </h3>
           <CateringServiceSlot
-            lang={lang}
             layout="mobile"
             onChooseService={handleChooseService}
             className="overflow-hidden rounded-lg"
@@ -759,7 +749,7 @@ function CateringInquirySection() {
         </div>
 
         <div className="col-span-2 min-h-0">
-          <CateringServiceSlot lang={lang} layout="desktop" onChooseService={handleChooseService} />
+          <CateringServiceSlot layout="desktop" onChooseService={handleChooseService} />
         </div>
       </div>
     </section>

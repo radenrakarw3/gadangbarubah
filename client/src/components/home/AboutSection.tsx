@@ -2,7 +2,7 @@ import { memo } from "react";
 import { ChevronDown } from "lucide-react";
 import aboutImage from "@assets/about-interior_1781246285353.jpg";
 import aboutTitle from "@assets/about-title-gadang-barubah.svg";
-import { useSiteLanguage } from "@/lib/language";
+import { useSiteText } from "@/lib/siteText";
 import { useRevealOutlet, useOutletVisible } from "@/lib/outletReveal";
 
 import { cn } from "@/lib/utils";
@@ -20,15 +20,10 @@ function AboutTitleGraphic({ className }: { className?: string }) {
   );
 }
 
-/** Copy Figma Frame 5 — ID mengikuti teks desain */
-const ABOUT_COPY = {
-  ID: `Sudah sejak lama masakan Padang menjadi kecintaan banyak orang, bukan hanya di Ranah Minang, tetapi juga merasuk ke hati para perantau dan selebriti tanah air. Salah satunya adalah Deddy Corbuzier, yang berkali-kali mengungkapkan betapa lezatnya gulai, rendang, dan sambal lado hijau. Dari obrolan santai tentang cita rasa, lahirlah sebuah impian mendirikan rumah makan Padang yang tidak hanya memanjakan lidah, tetapi juga menjadi simbol inovasi. Impian itu bagaikan kabar baik yang terus disambut dari kecintaan Deddy pada masakan Minang, tercetuslah gagasan untuk menghadirkan Gadang Barubah. Bukan sekadar restoran, Gadang Barubah hadir untuk mengangkat warisan kuliner Minang ke tingkat yang lebih tinggi, memadukan resep turun-temurun dengan sentuhan modern, namun tetap berpijak pada cita rasa asli. Mulai dari rendang dengan bumbu kaya rasa, gulai yang harum menggoda, hingga hidangan daging spesial, setiap suapan menjadi perjalanan rasa dari Ranah Minang menuju hati dunia.`,
-  EN: `For generations, Padang cuisine has been loved far beyond Minang land—by migrants and public figures across Indonesia. Deddy Corbuzier often spoke of his love for gulai, rendang, and green chili sambal. From those conversations came a dream: a Padang restaurant that delights the palate and stands for innovation. That dream became Gadang Barubah—not merely a restaurant, but a place to elevate Minang culinary heritage, blending time-honored recipes with a modern touch while staying true to authentic flavor. From richly spiced rendang and fragrant gulai to signature meat dishes, every bite is a journey from the Minang heartland to the world.`,
-} as const;
-
 function AboutSection() {
-  const { lang } = useSiteLanguage();
-  const outletLabel = lang === "ID" ? "Outlet Kami" : "Our Outlet";
+  const { t } = useSiteText();
+  const aboutCopy = t("home.about.body");
+  const outletLabel = t("home.about.outletButton");
   const revealOutlet = useRevealOutlet();
   const outletVisible = useOutletVisible();
 
@@ -53,8 +48,8 @@ function AboutSection() {
           <h2 className="mb-4 flex justify-center sm:mb-6">
             <AboutTitleGraphic className="max-w-[min(92vw,420px)]" />
           </h2>
-          <p className="text-figma-body text-justify text-black">
-            {ABOUT_COPY[lang]}
+          <p className="text-figma-body whitespace-pre-line text-justify text-black">
+            {aboutCopy}
           </p>
           <button
             type="button"
@@ -87,8 +82,8 @@ function AboutSection() {
               <AboutTitleGraphic className="max-w-[min(100%,340px)] 2xl:max-w-[380px]" />
             </h2>
 
-            <p className="font-heroCta text-justify text-base font-normal leading-snug tracking-[0.02em] text-black sm:text-lg xl:text-[clamp(1rem,1.1vw,1.25rem)] xl:leading-[1.45]">
-              {ABOUT_COPY[lang]}
+            <p className="font-heroCta whitespace-pre-line text-justify text-base font-normal leading-snug tracking-[0.02em] text-black sm:text-lg xl:text-[clamp(1rem,1.1vw,1.25rem)] xl:leading-[1.45]">
+              {aboutCopy}
             </p>
 
             <button
