@@ -74,13 +74,13 @@ export const KEMITRAAN_TEXTS = definePageTexts("kemitraan", {
     id: "Lorem ipsum gerai live cooking di festival, bazaar, dan event outdoor.",
     en: "Lorem ipsum live cooking stalls at festivals, bazaars, and outdoor events.",
   },
-  "kemitraan.services.rental-room.name": { section: "Layanan kemitraan", label: "Sewa venue — nama", id: "Sewa Venue", en: "Venue Rental" },
+  "kemitraan.services.rental-room.name": { section: "Layanan kemitraan", label: "Frozen Food — nama", id: "Frozen Food", en: "Frozen Food" },
   "kemitraan.services.rental-room.desc": {
     section: "Layanan kemitraan",
-    label: "Sewa venue — deskripsi",
+    label: "Frozen Food — deskripsi",
     multiline: true,
-    id: "Lorem ipsum ruang VIP untuk private dining dan gathering intim.",
-    en: "Lorem ipsum VIP rooms for private dining and intimate gatherings.",
+    id: "Produk frozen food siap masak — pesan via Linktree e-commerce resmi.",
+    en: "Ready-to-cook frozen food — order via our official Linktree storefront.",
   },
   "kemitraan.services.home-delivery.name": { section: "Layanan kemitraan", label: "Delivery — nama", id: "Corporate Delivery", en: "Corporate Delivery" },
   "kemitraan.services.home-delivery.desc": {

@@ -16,6 +16,7 @@ import { securityLoggingMiddleware, costMonitoringMiddleware } from "./monitorin
 import { getSEOConfigByPath, generateSEOTags } from "../shared/seo";
 import { Pool } from "@neondatabase/serverless";
 import createMemoryStore from "memorystore";
+import multer from "multer";
 
 // Railway/Neon inject env vars — .env hanya untuk development lokal
 if (isDevelopment()) {
@@ -28,7 +29,7 @@ app.set("env", isProduction() ? "production" : "development");
 // Enable trust proxy for accurate IP detection (important for rate limiting)
 app.set('trust proxy', 1);
 
-// Upload campaign (disk) — di luar dist/public agar path konsisten di production
+// Upload lama (disk) — upload baru disimpan di DB via /api/files/:id
 const uploadsRoot = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsRoot)) {
   fs.mkdirSync(uploadsRoot, { recursive: true });
@@ -216,12 +217,26 @@ app.get("*", async (req, res, next) => {
   await seedMenuIfEmpty();
   await seedWhatsOnIfEmpty();
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+  app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
+    if (res.headersSent) {
+      return next(err);
+    }
 
-    res.status(status).json({ message });
-    throw err;
+    if (err instanceof multer.MulterError) {
+      const message =
+        err.code === "LIMIT_FILE_SIZE"
+          ? "Ukuran file terlalu besar"
+          : `Upload gagal: ${err.message}`;
+      return res.status(400).json({ success: false, message });
+    }
+
+    if (typeof err?.message === "string" && err.message.startsWith("Hanya file")) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+
+    const status = err.status || err.statusCode || 500;
+    console.error("Unhandled error:", err);
+    res.status(status).json({ success: false, message: err.message || "Internal Server Error" });
   });
 
   // importantly only setup vite in development and after

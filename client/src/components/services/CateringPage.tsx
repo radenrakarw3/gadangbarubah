@@ -1,206 +1,108 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { UtensilsCrossed, Calendar } from 'lucide-react';
-import PublicPageLayout from '../PublicPageLayout';
-import SEOHead from '../SEOHead';
-import { useSiteText } from '@/lib/siteText';
-
-const PACKAGES = [
-  { n: 1, icon: "💒", color: "border-pink-200 bg-pink-50 dark:bg-pink-950/30" },
-  { n: 2, icon: "🏢", color: "border-blue-200 bg-blue-50 dark:bg-blue-950/30" },
-  { n: 3, icon: "🎉", color: "border-green-200 bg-green-50 dark:bg-green-950/30" },
-] as const;
-
-const WHY_ITEMS = [
-  { n: 1, icon: "⭐" },
-  { n: 2, icon: "🕐" },
-  { n: 3, icon: "🧑‍🍳" },
-  { n: 4, icon: "🛡️" },
-] as const;
-
-const MENU_GROUPS = [1, 2, 3, 4] as const;
-const BOOKING_STEPS = [1, 2, 3, 4] as const;
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Calendar, UtensilsCrossed } from "lucide-react";
+import { Link } from "wouter";
+import PublicPageLayout from "../PublicPageLayout";
+import SEOHead from "../SEOHead";
+import { COMPANY, HOME_CATERING_SERVICES, contactByKey } from "@/lib/siteContent";
+import { useSiteLanguage } from "@/lib/language";
 
 export default function CateringPage() {
-  const { t, tl } = useSiteText();
+  const { lang } = useSiteLanguage();
+  const b2b = contactByKey("acara");
+  const waConsultHref = `https://wa.me/${COMPANY.cateringWhatsapp}?text=${encodeURIComponent(
+    lang === "ID"
+      ? "Halo Richman Saputra (Sales B2B Gadang Barubah), saya ingin konsultasi katering/acara."
+      : "Hello Richman Saputra (GB B2B Sales), I'd like to discuss catering/events.",
+  )}`;
 
-  const packages = PACKAGES.map((pkg) => ({
-    ...pkg,
-    name: t(`catering.packages.${pkg.n}.name`),
-    minOrder: t(`catering.packages.${pkg.n}.minOrder`),
-    price: t(`catering.packages.${pkg.n}.price`),
-    includes: tl(`catering.packages.${pkg.n}.includes`),
-  }));
-
-  const menuOptions = MENU_GROUPS.map((n) => ({
-    category: t(`catering.menu.${n}.category`),
-    items: tl(`catering.menu.${n}.items`),
-  }));
+  const services = HOME_CATERING_SERVICES.filter((s) => !("externalHref" in s && s.externalHref));
 
   return (
     <PublicPageLayout>
       <SEOHead pageKey="catering" />
 
-      <div className="px-4 sm:px-6 lg:px-8 py-10">
-        <div className="max-w-4xl mx-auto">
-          {/* Title */}
-          <div className="text-center mb-10">
-            <h1 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-4">
-              {t("catering.hero.title")}
+      <div className="px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl space-y-10">
+          <div className="text-center">
+            <h1 className="mb-4 font-serif text-3xl font-medium text-foreground sm:text-4xl">
+              {lang === "ID"
+                ? "Katering & Acara Gadang Barubah"
+                : "Gadang Barubah Catering & Events"}
             </h1>
-            <div className="w-24 h-px bg-primary mx-auto mb-6"></div>
-            <p className="whitespace-pre-line text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              {t("catering.hero.subtitle")}
+            <div className="mx-auto mb-6 h-px w-24 bg-primary" />
+            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground">
+              {lang === "ID"
+                ? "Layanan katering Padang untuk pernikahan, corporate, gathering, dan acara outdoor — didukung outlet Cikarang & Bintaro serta Sales B2B."
+                : "Padang catering for weddings, corporate events, gatherings, and outdoor occasions — supported by Cikarang & Bintaro outlets and B2B Sales."}
             </p>
           </div>
 
-          {/* Why Choose Us */}
-          <Card className="mb-8 bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800">
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-bold text-center mb-6">{t("catering.why.title")}</h2>
-              <div className="grid md:grid-cols-4 gap-6 text-center">
-                {WHY_ITEMS.map((item) => (
-                  <div key={item.n}>
-                    <div className="text-3xl mb-2">{item.icon}</div>
-                    <h3 className="font-semibold text-foreground mb-1">{t(`catering.why.${item.n}.title`)}</h3>
-                    <p className="text-sm text-muted-foreground">{t(`catering.why.${item.n}.desc`)}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Catering Packages */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-center mb-6">{t("catering.packages.title")}</h2>
-            <div className="grid lg:grid-cols-3 gap-6">
-              {packages.map((pkg, index) => (
-                <Card key={index} className={`hover-elevate transition-all duration-300 ${pkg.color} border-2`}>
-                  <CardContent className="p-6">
-                    <div className="text-center mb-4">
-                      <div className="text-4xl mb-2">{pkg.icon}</div>
-                      <h3 className="text-xl font-bold text-foreground mb-2">{pkg.name}</h3>
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">
-                          {t("catering.packages.minOrderLabel")} {pkg.minOrder}
-                        </p>
-                        <p className="text-lg font-bold text-primary">{pkg.price}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-foreground mb-2">{t("catering.packages.includesLabel")}</h4>
-                      <ul className="space-y-1">
-                        {pkg.includes.map((item, iIndex) => (
-                          <li key={iIndex} className="flex items-start space-x-2">
-                            <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0 mt-2"></div>
-                            <span className="text-sm text-muted-foreground">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <Button className="w-full hover-elevate" data-testid={`button-package-${index}`}>
-                      {t("catering.packages.orderButton")}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Highlight Venue Catering */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-center mb-6">{t("catering.venue.title")}</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Card className="border-border/30">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-foreground mb-2">{t("catering.venue.onsite.title")}</h3>
-                  <p className="whitespace-pre-line text-sm text-muted-foreground leading-relaxed">
-                    {t("catering.venue.onsite.desc")}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {services.map((service) => (
+              <Card key={service.id} className="border-border/40">
+                <CardContent className="flex h-full flex-col p-5">
+                  <h2 className="font-serif text-xl font-medium text-foreground">
+                    {lang === "ID" ? service.nameID : service.nameEN}
+                  </h2>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                    {lang === "ID" ? service.descriptionID : service.descriptionEN}
                   </p>
                 </CardContent>
               </Card>
-              <Card className="border-border/30">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-foreground mb-2">{t("catering.venue.offsite.title")}</h3>
-                  <p className="whitespace-pre-line text-sm text-muted-foreground leading-relaxed">
-                    {t("catering.venue.offsite.desc")}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+            ))}
+            <Card className="border-border/40">
+              <CardContent className="flex h-full flex-col p-5">
+                <h2 className="font-serif text-xl font-medium text-foreground">Frozen Food</h2>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                  {lang === "ID"
+                    ? "Produk beku siap saji — pesan melalui Linktree e-commerce kami."
+                    : "Ready-to-cook frozen products — order via our e-commerce Linktree."}
+                </p>
+                <Button asChild variant="outline" className="mt-4">
+                  <a
+                    href="https://linktr.ee/gadangbarubahindonesia"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {lang === "ID" ? "Buka Linktree" : "Open Linktree"}
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Menu Options */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-center mb-6">{t("catering.menu.title")}</h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {menuOptions.map((menu, index) => (
-                <Card key={index} className="hover-elevate transition-all duration-300">
-                  <CardContent className="p-4">
-                    <h3 className="text-lg font-bold text-foreground mb-3 text-center">{menu.category}</h3>
-                    <ul className="space-y-2">
-                      {menu.items.map((item, iIndex) => (
-                        <li key={iIndex} className="text-sm text-muted-foreground flex items-center space-x-2">
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0"></div>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Booking Info */}
-          <Card className="bg-primary/10 border-primary/20">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-bold text-center mb-6 flex items-center justify-center space-x-2">
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="space-y-5 p-6">
+              <h3 className="flex items-center justify-center gap-2 text-center text-xl font-semibold">
                 <Calendar className="h-5 w-5" />
-                <span>{t("catering.booking.title")}</span>
+                {lang === "ID" ? "Cara Memesan" : "How to Order"}
               </h3>
-              
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  {BOOKING_STEPS.map((n) => (
-                    <div key={n} className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">{n}</div>
-                      <div>
-                        <h4 className="font-semibold text-foreground">{t(`catering.booking.${n}.title`)}</h4>
-                        <p className="text-sm text-muted-foreground">{t(`catering.booking.${n}.desc`)}</p>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  <div className="pt-4 border-t border-border/50">
-                    <p className="text-sm text-muted-foreground">
-                      <strong>{t("catering.booking.note")}</strong>
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="bg-card rounded-lg p-4">
-                    <h4 className="font-semibold text-foreground mb-2">{t("catering.contact.title")}</h4>
-                    <div className="space-y-1 text-sm text-muted-foreground">
-                      {tl("catering.contact.lines").map((line, index) => (
-                        <p key={index}>{line}</p>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Button size="lg" className="w-full hover-elevate" data-testid="button-consultation">
-                      <UtensilsCrossed className="mr-2 h-4 w-4" />
-                      {t("catering.contact.consultButton")}
-                    </Button>
-                    <Button variant="outline" size="lg" className="w-full hover-elevate" data-testid="button-price-list">
-                      {t("catering.contact.priceListButton")}
-                    </Button>
-                  </div>
-                </div>
+              <ol className="mx-auto max-w-xl space-y-3 text-sm text-muted-foreground">
+                <li>1. {lang === "ID" ? "Pilih jenis layanan di beranda atau chat Sales B2B." : "Choose a service on the homepage or chat B2B Sales."}</li>
+                <li>2. {lang === "ID" ? "Isi form acara — data tersimpan di sistem kami." : "Fill the event form — your request is saved in our system."}</li>
+                <li>3. {lang === "ID" ? "Lanjutkan konfirmasi via WhatsApp dengan link bukti status." : "Continue confirmation on WhatsApp with a status proof link."}</li>
+              </ol>
+              <div className="rounded-lg bg-card p-4 text-center text-sm">
+                <p className="text-muted-foreground">
+                  {lang === "ID" ? "Kontak Sales B2B" : "B2B Sales contact"}
+                </p>
+                <p className="mt-1 font-medium">
+                  {b2b.name} — {b2b.display}
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+                <Button size="lg" asChild>
+                  <a href={waConsultHref} target="_blank" rel="noopener noreferrer">
+                    <UtensilsCrossed className="mr-2 h-4 w-4" />
+                    {lang === "ID" ? "Konsultasi Gratis" : "Free Consultation"}
+                  </a>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="/#catering-inquiry-section">
+                    {lang === "ID" ? "Isi Form Acara" : "Fill Event Form"}
+                  </Link>
+                </Button>
               </div>
             </CardContent>
           </Card>

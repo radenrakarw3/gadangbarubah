@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { pageSEOConfigs } from '@/lib/seo';
+import { COMPANY } from '@/lib/siteContent';
 
 interface SEOHeadProps {
   pageKey: keyof typeof pageSEOConfigs;
@@ -7,6 +8,8 @@ interface SEOHeadProps {
 
 export default function SEOHead({ pageKey }: SEOHeadProps) {
   const seoConfig = pageSEOConfigs[pageKey];
+  const phone = `+${COMPANY.whatsapp}`;
+  const waUrl = `https://wa.me/${COMPANY.whatsapp}`;
 
   return (
     <Helmet>
@@ -50,7 +53,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           "description": "Rumah makan Padang dengan cabang di berbagai kota Indonesia. Nasi padang autentik, rendang, dan masakan Minang tradisional dengan cita rasa yang tak tertandingi.",
           "image": "https://gadangbarubahindonesia.id/og-image.jpg",
           "url": "https://gadangbarubahindonesia.id",
-          "telephone": "+6289509766739",
+          "telephone": phone,
           "priceRange": "$$",
           "servesCuisine": ["Indonesian", "Padang", "Minangkabau", "Asian"],
           "address": {
@@ -58,7 +61,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
             "addressRegion": "Indonesia",
             "addressCountry": "ID"
           },
-          "openingHours": "Mo-Su 10:00-22:00",
+          "openingHours": "Mo-Su 11:00-22:00",
           "hasMenu": "https://gadangbarubahindonesia.id/menu",
           "acceptsReservations": true,
           "paymentAccepted": ["Cash", "Credit Card", "Debit Card"],
@@ -66,7 +69,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           "keywords": "rumah makan padang, nasi padang, restoran padang, rendang, gulai, masakan minang, gadang barubah, cabang indonesia",
           "sameAs": [
             "https://www.instagram.com/gadangbarubahindonesia",
-            "https://wa.me/6289509766739"
+            waUrl
           ]
         })}
       </script>
@@ -91,13 +94,13 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
           },
           "contactPoint": {
             "@type": "ContactPoint",
-            "telephone": "+6289509766739",
+            "telephone": phone,
             "contactType": "customer service",
             "availableLanguage": "Indonesian"
           },
           "sameAs": [
             "https://www.instagram.com/gadangbarubahindonesia",
-            "https://wa.me/6289509766739"
+            waUrl
           ]
         })}
       </script>
@@ -131,7 +134,7 @@ export default function SEOHead({ pageKey }: SEOHeadProps) {
       <meta property="business:contact_data:region" content="Sumatera Barat" />
       <meta property="business:contact_data:postal_code" content="25111" />
       <meta property="business:contact_data:country_name" content="Indonesia" />
-      <meta property="business:contact_data:phone_number" content="+62812-3456-7890" />
+      <meta property="business:contact_data:phone_number" content={phone} />
       
       {/* Restaurant specific meta */}
       <meta property="restaurant:cuisine" content="Indonesian, Minangkabau, Padang" />

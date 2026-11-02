@@ -104,7 +104,7 @@ export const CATERING_TEXTS = definePageTexts("catering", {
   "catering.types.snack-box": { section: "Pilihan layanan (dropdown form)", label: "Snack Box", ...same("Snack Box") },
   "catering.types.buffet": { section: "Pilihan layanan (dropdown form)", label: "Buffet", ...same("Buffet") },
   "catering.types.stall": { section: "Pilihan layanan (dropdown form)", label: "Stall", ...same("Stall") },
-  "catering.types.rental-room": { section: "Pilihan layanan (dropdown form)", label: "Rental Room", ...same("Rental Room / Sewa Ruang") },
+  "catering.types.rental-room": { section: "Pilihan layanan (dropdown form)", label: "Frozen Food", ...same("Frozen Food") },
   "catering.types.home-delivery": { section: "Pilihan layanan (dropdown form)", label: "Home Delivery", ...same("Home Delivery Service") },
   "catering.types.tumpeng": { section: "Pilihan layanan (dropdown form)", label: "Nasi Tumpeng", ...same("Nasi Tumpeng") },
 });

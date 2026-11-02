@@ -1,13 +1,13 @@
 import { sql } from "drizzle-orm";
 
-import { pgTable, text, varchar, date, integer, timestamp, json, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, date, integer, timestamp, json, boolean, customType } from "drizzle-orm/pg-core";
 
 import { createInsertSchema } from "drizzle-zod";
 
 import { z } from "zod";
 
 import { RESERVATION_STATUSES } from "./reservation-status";
-import { CATERING_INQUIRY_TYPES } from "./catering";
+import { CATERING_INQUIRY_SOURCES, CATERING_INQUIRY_TYPES } from "./catering";
 import { RESERVATION_OUTLET_IDS } from "./reservation-utils";
 
 export const ADMIN_ROLES = ["admin_main", "admin_cikarang", "admin_bintaro"] as const;
@@ -106,6 +106,7 @@ export const cateringInquiries = pgTable("catering_inquiries", {
   lokasiEvent: text("lokasi_event").notNull(),
   tipeLayanan: varchar("tipe_layanan", { length: 40 }).notNull(),
   pax: integer("pax").notNull(),
+  source: varchar("source", { length: 20 }).notNull().default("acara"),
   status: varchar("status", { length: 20 }).notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -190,7 +191,28 @@ export const siteTexts = pgTable("site_texts", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
+/** File gambar upload admin (popup, berita, menu) — disimpan di DB karena disk Railway tidak persisten */
+export const uploadedFiles = pgTable("uploaded_files", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  mimeType: varchar("mime_type", { length: 80 }).notNull(),
+  size: integer("size").notNull(),
+  data: bytea("data").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/** Pointer aset visual situs (hero, cover outlet) — blob tetap di uploaded_files */
+export const siteMediaAssets = pgTable("site_media_assets", {
+  key: varchar("key", { length: 80 }).primaryKey(),
+  imagePath: text("image_path").notNull(),
+  label: text("label").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 export const insertUserSchema = createInsertSchema(users).pick({
 
@@ -267,6 +289,7 @@ export const insertCateringInquirySchema = z.object({
     errorMap: () => ({ message: "Pilih layanan catering yang valid" }),
   }),
   pax: z.coerce.number().int().min(1, "Minimal 1 pax").max(5000, "Maksimal 5000 pax"),
+  source: z.enum(CATERING_INQUIRY_SOURCES).optional().default("acara"),
 });
 
 
@@ -394,4 +417,5 @@ export const updateSiteTextSchema = z.object({
 export type UpdateSiteText = z.infer<typeof updateSiteTextSchema>;
 export type SiteText = typeof siteTexts.$inferSelect;
 
-
+export type UploadedFile = typeof uploadedFiles.$inferSelect;
+export type SiteMediaAsset = typeof siteMediaAssets.$inferSelect;

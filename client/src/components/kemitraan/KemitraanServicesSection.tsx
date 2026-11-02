@@ -11,8 +11,12 @@ function KemitraanServicesSection() {
   const sectionTitle = t("kemitraan.services.title");
   const sectionSubtitle = t("kemitraan.services.subtitle");
 
-  const handleSelect = (cateringType: string) => {
-    setPendingKemitraanService(cateringType);
+  const handleSelect = (service: (typeof KEMITRAAN_SERVICES)[number]) => {
+    if ("externalHref" in service && service.externalHref) {
+      window.open(service.externalHref, "_blank", "noopener,noreferrer");
+      return;
+    }
+    setPendingKemitraanService(service.cateringType);
     scrollToKemitraanInquiry(true);
   };
 
@@ -32,7 +36,7 @@ function KemitraanServicesSection() {
               <button
                 key={service.id}
                 type="button"
-                onClick={() => handleSelect(service.cateringType)}
+                onClick={() => handleSelect(service)}
                 className="group flex flex-col overflow-hidden rounded-lg border border-white/15 bg-[#3a0808]/50 text-left transition-colors hover:border-white/30 hover:bg-[#450a0a]/70"
               >
                 <div className="relative aspect-[16/10] overflow-hidden">

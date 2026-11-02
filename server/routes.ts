@@ -28,6 +28,11 @@ import {
   isReservationPublicId,
   toPublicReservationStatus,
 } from "@shared/public-reservation";
+import {
+  isCateringPublicId,
+  toPublicCateringStatus,
+} from "@shared/public-catering";
+import { isSiteMediaKey, SITE_MEDIA_CATALOG } from "@shared/site-media";
 import rateLimit from "express-rate-limit";
 import { honeypot, memberEndpointSecurity } from "./security";
 import { isReservationStatus } from "@shared/reservation-status";
@@ -46,6 +51,7 @@ import {
   notifyStaffNewReservationAsync,
 } from "./reservation-notify";
 import { notifyStaffNewCateringAsync } from "./catering-notify";
+import { CATERING_INQUIRY_STATUSES } from "@shared/catering";
 import {
   isValidWhatsApp,
   normalizeWhatsAppInput,
@@ -54,17 +60,34 @@ import {
 import { upload, validateImageDimensions } from "./upload-middleware";
 import { menuUpload } from "./menu-upload-middleware";
 import { articleUpload } from "./article-upload-middleware";
-import fs from "fs";
-import path from "path";
-
-function deleteUploadedFile(imagePath: string) {
-  const fullPath = path.join(process.cwd(), imagePath.replace(/^\//, ""));
-  if (fs.existsSync(fullPath)) {
-    fs.unlinkSync(fullPath);
-  }
-}
+import { deleteStoredFile, getUploadedFile, saveUploadedFile } from "./file-store";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  app.use(["/api/auth", "/api/admin"], (_req, res, next) => {
+    res.setHeader("Cache-Control", "no-store");
+    next();
+  });
+
+  app.get("/api/files/:id", async (req, res) => {
+    try {
+      if (!/^[0-9a-f-]{36}$/i.test(req.params.id)) {
+        return res.status(404).end();
+      }
+      const file = await getUploadedFile(req.params.id);
+      if (!file) {
+        return res.status(404).end();
+      }
+      res.setHeader("Content-Type", file.mimeType);
+      res.setHeader("Content-Length", String(file.size));
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.end(file.data);
+    } catch (error) {
+      console.error("Get uploaded file error:", error);
+      res.status(500).end();
+    }
+  });
+
   const loginRateLimit = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 5,
@@ -294,6 +317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lokasiEvent: validated.lokasiEvent.trim(),
         tipeLayanan: validated.tipe,
         pax: validated.pax,
+        source: validated.source,
       });
 
       notifyStaffNewCateringAsync(inquiry);
@@ -328,6 +352,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ success: false, message: "Gagal mengambil data inquiry catering" });
     }
   });
+
+  app.patch(
+    "/api/admin/catering-inquiries/:id/status",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    async (req, res) => {
+      try {
+        const status = req.body?.status;
+        if (!CATERING_INQUIRY_STATUSES.includes(status)) {
+          return res.status(400).json({ success: false, message: "Status tidak valid" });
+        }
+        const data = await storage.updateCateringInquiryStatus(req.params.id, status);
+        res.json({ success: true, message: "Status permintaan diperbarui", data });
+      } catch (error: any) {
+        console.error("Update catering inquiry status error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.message || "Gagal memperbarui status permintaan",
+        });
+      }
+    },
+  );
+
+  app.get("/api/catering-inquiries/:id/status", reservationStatusRateLimit, async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (!isCateringPublicId(id)) {
+        return res.status(400).json({ success: false, message: "ID permintaan tidak valid" });
+      }
+      const inquiry = await storage.getCateringInquiryById(id);
+      if (!inquiry) {
+        return res.status(404).json({ success: false, message: "Permintaan tidak ditemukan" });
+      }
+      const payload = toPublicCateringStatus(inquiry);
+      if (!payload) {
+        return res.status(500).json({ success: false, message: "Status permintaan tidak valid" });
+      }
+      res.json({ success: true, data: payload });
+    } catch (error) {
+      console.error("Get public catering status error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil status permintaan" });
+    }
+  });
+
+  app.get("/api/admin/reservations", requireMainAdmin, memberEndpointSecurity, async (req, res) => {
+    try {
+      const outlet =
+        typeof req.query.outlet === "string" && req.query.outlet.length > 0
+          ? req.query.outlet
+          : undefined;
+      const status =
+        typeof req.query.status === "string" && req.query.status.length > 0
+          ? (req.query.status as any)
+          : undefined;
+      const date =
+        typeof req.query.date === "string" && req.query.date.length > 0
+          ? req.query.date
+          : undefined;
+      const data = await storage.getReservations({ outlet, status, date });
+      res.json({ success: true, data });
+    } catch (error) {
+      console.error("Get admin reservations error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil data reservasi" });
+    }
+  });
+
+  app.get("/api/site-media", async (_req, res) => {
+    try {
+      const assets = await storage.getSiteMediaAssets();
+      const map: Record<string, string> = {};
+      for (const asset of assets) map[asset.key] = asset.imagePath;
+      res.json({ success: true, data: map });
+    } catch (error) {
+      console.error("Get site media error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil aset media" });
+    }
+  });
+
+  app.get("/api/admin/site-media", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
+    try {
+      const assets = await storage.getSiteMediaAssets();
+      const byKey = new Map(assets.map((a) => [a.key, a]));
+      const data = SITE_MEDIA_CATALOG.map((item) => ({
+        ...item,
+        imagePath: byKey.get(item.key)?.imagePath ?? null,
+        updatedAt: byKey.get(item.key)?.updatedAt ?? null,
+      }));
+      res.json({ success: true, data });
+    } catch (error) {
+      console.error("Get admin site media error:", error);
+      res.status(500).json({ success: false, message: "Gagal mengambil aset media" });
+    }
+  });
+
+  app.post(
+    "/api/admin/site-media/:key",
+    requireMainAdmin,
+    memberEndpointSecurity,
+    menuUpload.single("image"),
+    async (req, res) => {
+      let imagePath: string | null = null;
+      try {
+        const key = req.params.key;
+        if (!isSiteMediaKey(key)) {
+          return res.status(400).json({ success: false, message: "Key media tidak valid" });
+        }
+        if (!req.file) {
+          return res.status(400).json({ success: false, message: "File gambar wajib diupload" });
+        }
+        const catalog = SITE_MEDIA_CATALOG.find((item) => item.key === key)!;
+        imagePath = await saveUploadedFile(req.file);
+        const { asset, previousImagePath } = await storage.upsertSiteMediaAsset({
+          key,
+          imagePath,
+          label: catalog.labelID,
+        });
+        if (previousImagePath) await deleteStoredFile(previousImagePath);
+        res.json({ success: true, message: "Foto berhasil diperbarui", data: asset });
+      } catch (error: any) {
+        await deleteStoredFile(imagePath);
+        console.error("Upsert site media error:", error);
+        res.status(400).json({
+          success: false,
+          message: error.message || "Gagal mengupload foto",
+        });
+      }
+    },
+  );
 
   app.get("/api/admin/stats", requireMainAdmin, memberEndpointSecurity, async (_req, res) => {
     try {
@@ -473,18 +625,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     memberEndpointSecurity,
     upload.single("image"),
     async (req, res) => {
+      let imagePath: string | null = null;
       try {
         if (!req.file) {
           return res.status(400).json({ success: false, message: "File gambar harus diupload" });
         }
 
-        const validation = validateImageDimensions(req.file.path);
+        const validation = validateImageDimensions(req.file.buffer);
         if (!validation.valid) {
           return res.status(400).json({ success: false, message: validation.error });
         }
 
         const validatedData = insertCampaignSchema.parse(req.body);
-        const imagePath = `/uploads/campaigns/${req.file.filename}`;
+        imagePath = await saveUploadedFile(req.file);
         const campaign = await storage.createCampaign(
           validatedData,
           imagePath,
@@ -493,7 +646,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         res.json({ success: true, message: "Campaign berhasil dibuat", campaign });
       } catch (error: any) {
-        if (req.file) fs.unlinkSync(req.file.path);
+        await deleteStoredFile(imagePath);
         console.error("Create campaign error:", error);
         res.status(400).json({
           success: false,
@@ -564,14 +717,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const campaigns = await storage.getCampaigns();
       const campaign = campaigns.find((c) => c.id === req.params.id);
 
-      if (campaign) {
-        const imagePath = path.join(process.cwd(), campaign.imagePath.replace(/^\//, ""));
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        }
-      }
-
       await storage.deleteCampaign(req.params.id);
+      if (campaign) await deleteStoredFile(campaign.imagePath);
       res.json({ success: true, message: "Campaign berhasil dihapus" });
     } catch (error: any) {
       console.error("Delete campaign error:", error);
@@ -688,6 +835,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     memberEndpointSecurity,
     menuUpload.single("image"),
     async (req, res) => {
+      let imagePath: string | null = null;
       try {
         if (!req.file) {
           return res.status(400).json({ success: false, message: "Foto menu harus diupload" });
@@ -698,11 +846,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           isFeatured: parseMenuFormBoolean(req.body.isFeatured),
           isActive: parseMenuFormBoolean(req.body.isActive),
         });
-        const imagePath = `/uploads/menu/${req.file.filename}`;
+        imagePath = await saveUploadedFile(req.file);
         const item = await storage.createMenuItem(data, imagePath);
         res.json({ success: true, message: "Item menu berhasil ditambahkan", item });
       } catch (error: any) {
-        if (req.file) fs.unlinkSync(req.file.path);
+        await deleteStoredFile(imagePath);
         console.error("Create menu item error:", error);
         res.status(400).json({
           success: false,
@@ -737,6 +885,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     memberEndpointSecurity,
     menuUpload.single("image"),
     async (req, res) => {
+      let imagePath: string | null = null;
       try {
         if (!req.file) {
           return res.status(400).json({ success: false, message: "Foto menu harus diupload" });
@@ -744,16 +893,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const existing = await storage.getMenuItemById(req.params.id);
         if (!existing) {
-          fs.unlinkSync(req.file.path);
           return res.status(404).json({ success: false, message: "Item menu tidak ditemukan" });
         }
 
-        const imagePath = `/uploads/menu/${req.file.filename}`;
+        imagePath = await saveUploadedFile(req.file);
         const item = await storage.updateMenuItemImage(req.params.id, imagePath);
-        deleteUploadedFile(existing.imagePath);
+        await deleteStoredFile(existing.imagePath);
         res.json({ success: true, message: "Foto menu berhasil diperbarui", item });
       } catch (error: any) {
-        if (req.file) fs.unlinkSync(req.file.path);
+        await deleteStoredFile(imagePath);
         console.error("Update menu item image error:", error);
         res.status(400).json({
           success: false,
@@ -790,7 +938,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const deleted = await storage.deleteMenuItem(req.params.id);
         if (deleted) {
-          deleteUploadedFile(deleted.imagePath);
+          await deleteStoredFile(deleted.imagePath);
         }
         res.json({ success: true, message: "Item menu berhasil dihapus" });
       } catch (error: any) {
@@ -871,15 +1019,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     memberEndpointSecurity,
     articleUpload.single("image"),
     async (req, res) => {
+      let imagePath: string | null = null;
       try {
         const body = insertWhatsOnArticleSchema.parse({
           ...req.body,
           isPublished: parseWhatsOnPublished(req.body.isPublished),
         });
-        const imagePath = req.file ? `/uploads/articles/${req.file.filename}` : null;
+        imagePath = req.file ? await saveUploadedFile(req.file) : null;
         const article = await storage.createWhatsOnArticle(body, imagePath);
         res.json({ success: true, message: "Artikel berhasil ditambahkan", article });
       } catch (error: any) {
+        await deleteStoredFile(imagePath);
         console.error("Create whats-on article error:", error);
         res.status(400).json({
           success: false,
@@ -914,6 +1064,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     memberEndpointSecurity,
     articleUpload.single("image"),
     async (req, res) => {
+      let imagePath: string | null = null;
       try {
         if (!req.file) {
           return res.status(400).json({ success: false, message: "Foto artikel harus diupload" });
@@ -922,11 +1073,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!existing) {
           return res.status(404).json({ success: false, message: "Artikel tidak ditemukan" });
         }
-        if (existing.imagePath) deleteUploadedFile(existing.imagePath);
-        const imagePath = `/uploads/articles/${req.file.filename}`;
+        imagePath = await saveUploadedFile(req.file);
         const article = await storage.updateWhatsOnArticleImage(req.params.id, imagePath);
+        await deleteStoredFile(existing.imagePath);
         res.json({ success: true, message: "Foto artikel berhasil diperbarui", article });
       } catch (error: any) {
+        await deleteStoredFile(imagePath);
         console.error("Update whats-on article image error:", error);
         res.status(400).json({
           success: false,
@@ -966,7 +1118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     async (req, res) => {
       try {
         const deleted = await storage.deleteWhatsOnArticle(req.params.id);
-        if (deleted?.imagePath) deleteUploadedFile(deleted.imagePath);
+        await deleteStoredFile(deleted?.imagePath);
         res.json({ success: true, message: "Artikel berhasil dihapus" });
       } catch (error: any) {
         console.error("Delete whats-on article error:", error);

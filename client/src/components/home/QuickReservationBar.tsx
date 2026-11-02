@@ -23,6 +23,8 @@ import { cn } from "@/lib/utils";
 import { useSiteLanguage } from "@/lib/language";
 import { useSiteText } from "@/lib/siteText";
 import PrivacyConsentField from "@/components/PrivacyConsentField";
+import { cancelWhatsAppTab, completeWhatsAppTab, openPendingWhatsAppTab } from "@/lib/whatsapp";
+import { buildReservationWhatsAppUrl } from "@/lib/reservation-wa";
 
 /** Field glass — compact sesuai revisi Figma */
 const FIGMA_CONTROL =
@@ -308,6 +310,7 @@ function QuickReservationBarInner() {
       return;
     }
 
+    const waTab = openPendingWhatsAppTab();
     setLoading(true);
     try {
       const payload = {
@@ -324,19 +327,28 @@ function QuickReservationBarInner() {
       };
       const res = await apiRequest("POST", "/api/reservations", payload);
       const result = await res.json();
-      if (result.success) {
-        toast({
-          title: lang === "ID" ? "Reservasi terkirim" : "Reservation submitted",
-          description:
-            lang === "ID"
-              ? "Tim kami akan menghubungi Anda via WhatsApp."
-              : "Our team will contact you via WhatsApp.",
-        });
-        resetForm();
-      } else {
-        throw new Error(result.message);
+      if (!result.success || !result.data?.id) {
+        throw new Error(result.message || "Reservation failed");
       }
+
+      completeWhatsAppTab(
+        waTab,
+        buildReservationWhatsAppUrl({
+          reservationId: result.data.id,
+          outletId: outlet,
+          namaLengkap: nama,
+        }),
+      );
+      toast({
+        title: lang === "ID" ? "Reservasi terkirim" : "Reservation submitted",
+        description:
+          lang === "ID"
+            ? "Data tersimpan. Lanjutkan konfirmasi di WhatsApp."
+            : "Saved. Continue confirmation on WhatsApp.",
+      });
+      resetForm();
     } catch (err) {
+      cancelWhatsAppTab(waTab);
       toast({
         title: lang === "ID" ? "Gagal mengirim reservasi" : "Reservation failed",
         description: parseApiError(err),

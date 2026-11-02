@@ -5,9 +5,10 @@ import { trackContactMethod, trackServiceView } from '@/lib/analytics';
 import { Store, Truck, Handshake, Crown, UtensilsCrossed, ArrowRight, ArrowLeft, ShoppingBag } from 'lucide-react';
 import Logo from './Logo';
 import SEOHead from './SEOHead';
-import { BacklinksFooter } from './BacklinksFooter';
+import SiteFooter from './SiteFooter';
 import { StructuredData } from './StructuredData';
 import { useSiteLanguage } from '@/lib/language';
+import { COMPANY, FROZEN_FOOD_LINKTREE } from '@/lib/siteContent';
 import restaurantBgImage from '@assets/DSC03165_1758566711557.jpg';
 import rendangKiloanImage from '@assets/DSC02799_1758569186868.jpg';
 
@@ -30,7 +31,7 @@ const services = [
     id: 'partnership',
     name: 'Business Partnership',
     icon: Handshake,
-    description: 'Kemitraan operasional B2B — catering acara, tenant event, sewa venue, dan layanan corporate bersama Gadang Barubah.',
+    description: 'Kemitraan B2B — buffet acara, mealbox, snacks, dan sewa venue bersama Gadang Barubah.',
     path: '/kemitraan'
   },
   {
@@ -56,7 +57,7 @@ export default function UniPage() {
   const handleServiceClick = (service: typeof services[0]) => {
     // Services that redirect to WhatsApp
     const whatsAppServices = ['delivery', 'catering'];
-    const whatsAppNumber = '6289509766739'; // format untuk WhatsApp API (62 untuk Indonesia + nomor tanpa 0)
+    const whatsAppNumber = service.id === 'catering' ? COMPANY.cateringWhatsapp : COMPANY.whatsapp;
     
     if (whatsAppServices.includes(service.id)) {
       // Track WhatsApp contact method usage
@@ -223,7 +224,7 @@ export default function UniPage() {
                         data-testid="button-order-rendang"
                       >
                         <a
-                          href={`https://api.whatsapp.com/send?phone=6289509766739&text=${encodeURIComponent('Halo, saya tertarik untuk memesan Rendang Kiloan Gadang Barubah. Mohon informasi harga dan ketersediaan.')}`}
+                          href={FROZEN_FOOD_LINKTREE}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -242,8 +243,7 @@ export default function UniPage() {
       {/* SEO Structured Data */}
       <StructuredData />
       
-      {/* Footer dengan Backlinks untuk SEO */}
-      <BacklinksFooter />
+      <SiteFooter />
     </div>
   );
 }

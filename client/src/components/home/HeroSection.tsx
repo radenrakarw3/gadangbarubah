@@ -10,12 +10,15 @@ import heroHeadline from "@assets/hero-headline-en.svg";
 import QuickReservationBar from "./QuickReservationBar";
 
 import { useSiteLanguage } from "@/lib/language";
+import { mediaUrl, useSiteMediaMap } from "@/lib/site-media";
 
 
 
 function HeroSectionInner() {
 
   const { lang } = useSiteLanguage();
+  const { data: mediaData } = useSiteMediaMap();
+  const cmsHero = mediaUrl(mediaData?.data, "hero.main", "");
 
   const headlineAlt =
 
@@ -35,6 +38,17 @@ function HeroSectionInner() {
 
         <div className="home-img-wrap absolute inset-0">
 
+          {cmsHero ? (
+            <img
+              src={cmsHero}
+              alt="Interior Gadang Barubah — ruang makan Padang modern dan autentik"
+              className="h-full w-full object-cover object-center"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              draggable={false}
+            />
+          ) : (
           <picture>
 
             <source
@@ -70,6 +84,7 @@ function HeroSectionInner() {
             />
 
           </picture>
+          )}
 
         </div>
 

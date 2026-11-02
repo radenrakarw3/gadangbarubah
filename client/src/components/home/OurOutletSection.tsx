@@ -2,7 +2,8 @@ import { memo, useRef, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { HOME_OUTLET_PANELS } from "@/lib/siteContent";
 import { DESKTOP_OUTLET_MIN_H } from "@/lib/outletReveal";
-import { useSiteText } from "@/lib/siteText";
+import { useSiteLanguage } from "@/lib/language";
+import { mediaUrl, useSiteMediaMap } from "@/lib/site-media";
 import { cn } from "@/lib/utils";
 import OutletDetailView, { type OpenPanel, type OutletOriginRect } from "./OutletDetailView";
 import cikarangImg from "@assets/outlet-cikarang-1_1781246285353.jpg";
@@ -12,31 +13,43 @@ import fourthOutletImg from "@assets/DSC03147_1758567860387.jpg";
 
 type PanelImage = { src: string; objectPosition?: string };
 
-const PANEL_IMAGES: Record<(typeof HOME_OUTLET_PANELS)[number]["id"], PanelImage> = {
+const DEFAULT_PANEL_IMAGES: Record<(typeof HOME_OUTLET_PANELS)[number]["id"], PanelImage> = {
   cikarang: { src: cikarangImg, objectPosition: "center center" },
   bintaro: { src: bintaroImg, objectPosition: "center center" },
   "puri-indah": { src: puriIndahImg, objectPosition: "center center" },
   "fourth-outlet": { src: fourthOutletImg, objectPosition: "center center" },
 };
 
+const PANEL_MEDIA_KEY: Record<(typeof HOME_OUTLET_PANELS)[number]["id"], string> = {
+  cikarang: "outlet.cikarang.cover",
+  bintaro: "outlet.bintaro.cover",
+  "puri-indah": "outlet.puri-indah.cover",
+  "fourth-outlet": "outlet.fourth.cover",
+};
+
 type Panel = (typeof HOME_OUTLET_PANELS)[number];
 
 function OutletCard({
   panel,
+  lang,
   layout,
   onOpen,
+  imageOverride,
 }: {
   panel: Panel;
+  lang: "ID" | "EN";
   layout: "desktop" | "mobile";
   onOpen: (panel: OpenPanel, event: React.MouseEvent<HTMLButtonElement>) => void;
+  imageOverride?: string;
 }) {
-  const { t } = useSiteText();
-  const name = t(`home.outlet.${panel.id}.name`);
-  const address = t(`home.outlet.${panel.id}.address`);
+  const name = lang === "ID" ? panel.nameID : panel.nameEN;
+  const address = lang === "ID" ? panel.addressID : panel.addressEN;
   const isOpen = panel.status === "open";
-  const { src: image, objectPosition } = PANEL_IMAGES[panel.id];
-  const detailHint = t("home.outlet.detailHint");
-  const soonLabel = t("home.outlet.comingSoon");
+  const fallback = DEFAULT_PANEL_IMAGES[panel.id];
+  const image = imageOverride || fallback.src;
+  const objectPosition = fallback.objectPosition;
+  const detailHint = lang === "ID" ? "Lihat detail outlet" : "View outlet details";
+  const soonLabel = lang === "ID" ? "Segera Hadir" : "Coming Soon";
 
   const card = (
     <article
@@ -133,13 +146,20 @@ function OutletCard({
 }
 
 function OurOutletSection() {
-  const { t } = useSiteText();
+  const { lang } = useSiteLanguage();
+  const { data: mediaData } = useSiteMediaMap();
   const containerRef = useRef<HTMLDivElement>(null);
   const [detailPanel, setDetailPanel] = useState<OpenPanel | null>(null);
   const [originRect, setOriginRect] = useState<OutletOriginRect | null>(null);
 
-  const title = t("home.outlet.title");
-  const subtitle = t("home.outlet.subtitle");
+  const title = lang === "ID" ? "Outlet Kami" : "Our Outlet";
+  const subtitle =
+    lang === "ID"
+      ? "Kunjungi cabang terdekat atau nantikan lokasi baru kami."
+      : "Visit our nearest branch or stay tuned for new locations.";
+
+  const coverFor = (id: Panel["id"]) =>
+    mediaUrl(mediaData?.data, PANEL_MEDIA_KEY[id], DEFAULT_PANEL_IMAGES[id].src);
 
   const handleOpen = (panel: OpenPanel, event: React.MouseEvent<HTMLButtonElement>) => {
     const container = containerRef.current?.getBoundingClientRect();
@@ -168,7 +188,7 @@ function OurOutletSection() {
   return (
     <section className="relative bg-[#300505]">
       {!detailPanel ? (
-        <div className="px-4 py-10 sm:px-8 xl:hidden">
+        <div className="px-4 py-10 sm:px-8 xl:py-12">
           <header className="mb-8 text-center">
             <h2 className="text-figma-section-title text-white">{title}</h2>
             <p className="mx-auto mt-2 max-w-md font-heroCta text-sm leading-relaxed text-white/70">
@@ -190,8 +210,10 @@ function OurOutletSection() {
               <OutletCard
                 key={panel.id}
                 panel={panel}
+                lang={lang}
                 layout="mobile"
                 onOpen={handleOpen}
+                imageOverride={coverFor(panel.id)}
               />
             ))}
           </div>
@@ -201,8 +223,10 @@ function OurOutletSection() {
               <OutletCard
                 key={panel.id}
                 panel={panel}
+                lang={lang}
                 layout="desktop"
                 onOpen={handleOpen}
+                imageOverride={coverFor(panel.id)}
               />
             ))}
           </div>

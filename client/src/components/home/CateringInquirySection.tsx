@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";import {
 import { ReservationHoneypot, RESERVATION_HONEYPOT_FIELD } from "@/components/ReservationHoneypot";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, parseApiError } from "@/lib/queryClient";
+import { cancelWhatsAppTab, completeWhatsAppTab, openPendingWhatsAppTab } from "@/lib/whatsapp";
 import {
   CATERING_TYPES,
   COMPANY,
@@ -18,11 +19,10 @@ import {
 import mealboxImg from "@assets/Nasi Box_1758628102653.jpg";
 import buffetImg from "@assets/catering-buffet_1781246285353.jpg";
 import snackboxImg from "@assets/DSC03165_1758567860370.jpg";
-import rentalRoomImg from "@assets/DSC03147_1758567860387.jpg";
+import frozenFoodImg from "@assets/DSC02799_1758569186868.jpg";
 import stallImg from "@assets/DSC05600_1758565473997.jpg";
 import deliveryImg from "@assets/DSC07153_1758564588952.jpg";
 import { useSiteLanguage } from "@/lib/language";
-import { useSiteText } from "@/lib/siteText";
 import { cn } from "@/lib/utils";
 import PrivacyConsentField from "@/components/PrivacyConsentField";
 
@@ -30,10 +30,13 @@ const SERVICE_IMAGES: Record<(typeof HOME_CATERING_SERVICES)[number]["id"], stri
   mealbox: mealboxImg,
   buffet: buffetImg,
   snackbox: snackboxImg,
-  "rental-room": rentalRoomImg,
+  "frozen-food": frozenFoodImg,
   stall: stallImg,
   "home-delivery": deliveryImg,
 };
+
+/** Tipe form inquiry — Frozen Food (rental-room) keluar ke Linktree, bukan form. */
+const FORM_CATERING_TYPES = CATERING_TYPES.filter((t) => t.value !== "rental-room");
 
 /** Field form — Figma Frame 7 */
 const FIGMA_CATERING_FIELD =
@@ -126,15 +129,18 @@ function CateringForm({
   lang: "ID" | "EN";
   className?: string;
 }) {
-  const { t } = useSiteText();
   return (
-    <form onSubmit={onSubmit} className={cn("relative w-full max-w-[651px]", className)}>
+    <form
+      onSubmit={onSubmit}
+      data-catering-form
+      className={cn("relative w-full max-w-[651px] scroll-mt-24", className)}
+    >
       <ReservationHoneypot />
       <header className="mb-8 text-center xl:mb-10">
         <h2 className="font-[var(--font-inquiry)] text-[clamp(1.75rem,2.2vw,2.625rem)] font-medium leading-[1.2] tracking-[0.01em] text-black">
           {copy.title}
         </h2>
-        <p className="mx-auto mt-3 max-w-[433px] whitespace-pre-line font-[var(--font-inquiry)] text-base font-medium leading-8 tracking-[0.01em] text-black">
+        <p className="mx-auto mt-3 max-w-[433px] font-[var(--font-inquiry)] text-base font-medium leading-8 tracking-[0.01em] text-black">
           {copy.subtitle}
         </p>
       </header>
@@ -159,10 +165,11 @@ function CateringForm({
         />
         <Input
           id="catering-tanggal"
-          placeholder={copy.tanggalEvent}
+          type="date"
+          aria-label={copy.tanggalEvent}
           value={form.tanggalEvent}
           onChange={(e) => setForm({ ...form, tanggalEvent: e.target.value })}
-          className={FIGMA_CATERING_FIELD}
+          className={cn(FIGMA_CATERING_FIELD, "text-center [color-scheme:dark]")}
         />
         <Input
           id="catering-event-detail"
@@ -188,13 +195,17 @@ function CateringForm({
           className={FIGMA_CATERING_FIELD}
         />
         <Select value={form.tipe} onValueChange={(v) => setForm({ ...form, tipe: v })}>
-          <SelectTrigger className={FIGMA_CATERING_SELECT} aria-label={copy.service}>
+          <SelectTrigger
+            className={FIGMA_CATERING_SELECT}
+            aria-label={copy.service}
+            data-catering-service-select
+          >
             <SelectValue placeholder={copy.service} />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={6} className={FIGMA_SELECT_MENU}>
-            {CATERING_TYPES.map((type) => (
-              <SelectItem key={type.value} value={type.value} className={FIGMA_SELECT_ITEM}>
-                {t(`catering.types.${type.value}`)}
+            {FORM_CATERING_TYPES.map((t) => (
+              <SelectItem key={t.value} value={t.value} className={FIGMA_SELECT_ITEM}>
+                {t.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -229,15 +240,16 @@ const MOBILE_COLLAGE_H = "h-[480px] sm:h-[560px]";
 const DESKTOP_COLLAGE_MIN_H = "min-h-[700px]";
 
 function ServiceTile({  service,
+  lang,
   onSelect,
   className,
 }: {
   service: Service;
+  lang: "ID" | "EN";
   onSelect: (service: Service, event: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
 }) {
-  const { t } = useSiteText();
-  const name = t(`home.services.${service.id}.name`);
+  const name = lang === "ID" ? service.nameID : service.nameEN;
   const image = SERVICE_IMAGES[service.id];
 
   return (
@@ -270,10 +282,12 @@ function ServiceTile({  service,
 }
 
 function ServiceCollage({
+  lang,
   onSelect,
   layout = "mobile",
   className,
 }: {
+  lang: "ID" | "EN";
   onSelect: (service: Service, event: React.MouseEvent<HTMLButtonElement>) => void;
   layout?: "mobile" | "desktop";
   className?: string;
@@ -294,6 +308,7 @@ function ServiceCollage({
         <ServiceTile
           key={service.id}
           service={service}
+          lang={lang}
           onSelect={onSelect}
           className="min-h-0"
         />
@@ -302,6 +317,7 @@ function ServiceCollage({
         <ServiceTile
           key={service.id}
           service={service}
+          lang={lang}
           onSelect={onSelect}
           className="min-h-0"
         />
@@ -311,6 +327,7 @@ function ServiceCollage({
 }
 function ServiceExpandedPanel({
   service,
+  lang,
   layout,
   originRect,
   containerRef,
@@ -318,6 +335,7 @@ function ServiceExpandedPanel({
   onChooseService,
 }: {
   service: Service;
+  lang: "ID" | "EN";
   layout: "mobile" | "desktop";
   originRect: ServiceOriginRect | null;
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -330,11 +348,10 @@ function ServiceExpandedPanel({
   const [expanded, setExpanded] = useState(!originRect);
   const [contentVisible, setContentVisible] = useState(!originRect);
 
-  const { t } = useSiteText();
-  const name = t(`home.services.${service.id}.name`);
-  const description = t(`home.services.${service.id}.description`);
-  const chooseLabel = t("home.catering.chooseService");
-  const closeLabel = t("home.catering.backToServices");
+  const name = lang === "ID" ? service.nameID : service.nameEN;
+  const description = lang === "ID" ? service.descriptionID : service.descriptionEN;
+  const chooseLabel = lang === "ID" ? "Pilih layanan ini" : "Choose this service";
+  const closeLabel = lang === "ID" ? "Kembali ke layanan" : "Back to services";
   const image = SERVICE_IMAGES[service.id];
   const isDesktop = layout === "desktop";
 
@@ -496,7 +513,7 @@ function ServiceExpandedPanel({
           <h3 className="font-heroCta text-[clamp(1.5rem,5vw,2.75rem)] font-normal leading-tight tracking-[0.01em] text-white">
             {name}
           </h3>
-          <p className="mt-2 max-w-xl whitespace-pre-line font-[var(--font-inquiry)] text-sm leading-relaxed text-white/90 sm:mt-3 sm:text-lg">
+          <p className="mt-2 max-w-xl font-[var(--font-inquiry)] text-sm leading-relaxed text-white/90 sm:mt-3 sm:text-lg">
             {description}
           </p>
           <div className="mt-4 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-center sm:gap-4">
@@ -525,10 +542,12 @@ function ServiceExpandedPanel({
 }
 
 function CateringServiceSlot({
+  lang,
   layout,
   onChooseService,
   className,
 }: {
+  lang: "ID" | "EN";
   layout: "mobile" | "desktop";
   onChooseService: (cateringType: string) => void;
   className?: string;
@@ -542,6 +561,11 @@ function CateringServiceSlot({
     service: Service,
     event: React.MouseEvent<HTMLButtonElement>,
   ) => {
+    if ("externalHref" in service && service.externalHref) {
+      window.open(service.externalHref, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     const container = containerRef.current?.getBoundingClientRect();
     const tile = event.currentTarget.getBoundingClientRect();
 
@@ -577,6 +601,7 @@ function CateringServiceSlot({
       )}
     >
       <ServiceCollage
+        lang={lang}
         onSelect={handleSelect}
         layout={layout}
         className={cn("h-full", activeService ? "pointer-events-none" : undefined)}
@@ -584,6 +609,7 @@ function CateringServiceSlot({
       {activeService ? (
         <ServiceExpandedPanel
           service={activeService}
+          lang={lang}
           layout={layout}
           originRect={originRect}
           containerRef={containerRef}
@@ -597,7 +623,6 @@ function CateringServiceSlot({
 function CateringInquirySection() {
   const { toast } = useToast();
   const { lang } = useSiteLanguage();
-  const { t } = useSiteText();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     nama: "",
@@ -605,23 +630,26 @@ function CateringInquirySection() {
     tanggalEvent: "",
     eventDetail: "",
     lokasiEvent: "",
-    tipe: CATERING_TYPES[0].value as string,
+    tipe: FORM_CATERING_TYPES[0].value as string,
     pax: "",
   });
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const copy = {
-    title: t("home.catering.title"),
-    subtitle: t("home.catering.subtitle"),
-    nama: t("home.catering.name"),
-    telepon: t("home.catering.phone"),
-    tanggalEvent: t("home.catering.eventDate"),
-    eventDetail: t("home.catering.eventDetail"),
-    lokasiEvent: t("home.catering.eventLocation"),
-    service: t("home.catering.service"),
-    pax: t("home.catering.pax"),
-    submit: t("home.catering.submit"),
-    collageTitle: t("home.catering.collageTitle"),
+    title: lang === "ID" ? "Rencanakan Acara Anda Bersama Kami" : "Plan Your Event With Us",
+    subtitle:
+      lang === "ID"
+        ? "Ceritakan kebutuhan acara Anda — tim kami siap menyesuaikan menu dan jumlah tamu."
+        : "Tell us about your event — our team will tailor the menu and guest count for you.",
+    nama: lang === "ID" ? "(Nama PIC)" : "(PIC Name)",
+    telepon: lang === "ID" ? "(No.hp PIC)" : "(PIC Phone)",
+    tanggalEvent: lang === "ID" ? "(Tanggal Event)" : "(Event Date)",
+    eventDetail: lang === "ID" ? "(Event Detail)" : "(Event Detail)",
+    lokasiEvent: lang === "ID" ? "(Lokasi Event)" : "(Event Location)",
+    service: lang === "ID" ? "(Pilih Layanan)" : "(Choose Service)",
+    pax: lang === "ID" ? "(Jumlah Pax)" : "(Guest Pax)",
+    submit: lang === "ID" ? "Pesan Sekarang" : "Order Now",
+    collageTitle: lang === "ID" ? "Layanan Kami" : "Our Services",
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -650,8 +678,8 @@ function CateringInquirySection() {
         title: lang === "ID" ? "Data belum lengkap" : "Incomplete data",
         description:
           lang === "ID"
-            ? "Lengkapi semua field form catering."
-            : "Please complete all catering form fields.",
+            ? "Lengkapi semua field form acara."
+            : "Please complete all event form fields.",
         variant: "destructive",
       });
       return;
@@ -661,10 +689,10 @@ function CateringInquirySection() {
     const honeypot = String(new FormData(formEl).get(RESERVATION_HONEYPOT_FIELD) ?? "").trim();
     if (honeypot) return;
 
+    const waTab = openPendingWhatsAppTab();
     setLoading(true);
     try {
-      const tipe = CATERING_TYPES.find((type) => type.value === form.tipe);
-      const tipeLabel = tipe ? t(`catering.types.${tipe.value}`) : form.tipe;
+      const tipeLabel = FORM_CATERING_TYPES.find((t) => t.value === form.tipe)?.label ?? form.tipe;
       const res = await apiRequest("POST", "/api/catering-inquiries", {
         nama: form.nama.trim(),
         telepon: form.telepon,
@@ -673,6 +701,7 @@ function CateringInquirySection() {
         lokasiEvent: form.lokasiEvent.trim(),
         tipe: form.tipe,
         pax: parseInt(form.pax, 10) || 1,
+        source: "acara",
         [RESERVATION_HONEYPOT_FIELD]: "",
       });
       const result = await res.json();
@@ -680,22 +709,37 @@ function CateringInquirySection() {
         throw new Error(result.message);
       }
 
+      const inquiryId = result.data?.id as string | undefined;
+      const statusUrl = inquiryId
+        ? `${window.location.origin}/cek-inquiry/${inquiryId}`
+        : "";
       const message = encodeURIComponent(
         lang === "ID"
-          ? `Halo Gadang Barubah, saya ingin konsultasi catering:\n\nNama PIC: ${form.nama}\nNo.hp PIC: ${form.telepon}\nTanggal Event: ${form.tanggalEvent}\nEvent Detail: ${form.eventDetail}\nLokasi Event: ${form.lokasiEvent}\nLayanan: ${tipeLabel}\nJumlah Pax: ${form.pax}\nRef: ${result.data?.shortId ?? ""}`
-          : `Hello Gadang Barubah, I want to discuss catering:\n\nPIC Name: ${form.nama}\nPIC Phone: ${form.telepon}\nEvent Date: ${form.tanggalEvent}\nEvent Detail: ${form.eventDetail}\nEvent Location: ${form.lokasiEvent}\nService: ${tipeLabel}\nGuest Pax: ${form.pax}\nRef: ${result.data?.shortId ?? ""}`,
+          ? `Halo Richman Saputra (Sales B2B), saya ingin konsultasi catering:\n\nNama PIC: ${form.nama}\nNo.hp PIC: ${form.telepon}\nTanggal Event: ${form.tanggalEvent}\nEvent Detail: ${form.eventDetail}\nLokasi Event: ${form.lokasiEvent}\nLayanan: ${tipeLabel}\nJumlah Pax: ${form.pax}\nRef: ${result.data?.shortId ?? ""}\nCek status: ${statusUrl}`
+          : `Hello Richman Saputra (B2B Sales), I want to discuss catering:\n\nPIC Name: ${form.nama}\nPIC Phone: ${form.telepon}\nEvent Date: ${form.tanggalEvent}\nEvent Detail: ${form.eventDetail}\nEvent Location: ${form.lokasiEvent}\nService: ${tipeLabel}\nGuest Pax: ${form.pax}\nRef: ${result.data?.shortId ?? ""}\nStatus: ${statusUrl}`,
       );
-      window.open(`https://wa.me/${COMPANY.cateringWhatsapp}?text=${message}`, "_blank");
+      completeWhatsAppTab(waTab, `https://wa.me/${COMPANY.cateringWhatsapp}?text=${message}`);
+      setForm({
+        nama: "",
+        telepon: "",
+        tanggalEvent: "",
+        eventDetail: "",
+        lokasiEvent: "",
+        tipe: FORM_CATERING_TYPES[0].value as string,
+        pax: "",
+      });
+      setPrivacyAccepted(false);
       toast({
-        title: lang === "ID" ? "Inquiry catering terkirim" : "Catering inquiry sent",
+        title: lang === "ID" ? "Permintaan acara terkirim" : "Event inquiry sent",
         description:
           lang === "ID"
-            ? "Data tersimpan. Lanjutkan pesan di WhatsApp bila perlu."
-            : "Your request was saved. Continue on WhatsApp if needed.",
+            ? `Data tersimpan (ID ${result.data?.shortId ?? ""}). Lanjutkan di WhatsApp.`
+            : `Saved (ID ${result.data?.shortId ?? ""}). Continue on WhatsApp.`,
       });
     } catch (err) {
+      cancelWhatsAppTab(waTab);
       toast({
-        title: lang === "ID" ? "Gagal mengirim inquiry" : "Inquiry failed",
+        title: lang === "ID" ? "Gagal mengirim permintaan" : "Inquiry failed",
         description: parseApiError(err),
         variant: "destructive",
       });
@@ -706,7 +750,17 @@ function CateringInquirySection() {
 
   const handleChooseService = (cateringType: string) => {
     setForm((prev) => ({ ...prev, tipe: cateringType }));
-    document.getElementById("catering-inquiry-section")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    // Form mobile & desktop sama-sama dirender; pilih yang sedang terlihat (offsetParent null = display:none)
+    const visibleForm = Array.from(
+      document.querySelectorAll<HTMLFormElement>("[data-catering-form]"),
+    ).find((el) => el.offsetParent !== null);
+    if (!visibleForm) return;
+    visibleForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => {
+      visibleForm
+        .querySelector<HTMLElement>("[data-catering-service-select]")
+        ?.focus({ preventScroll: true });
+    }, 500);
   };
 
   const formProps = {
@@ -725,31 +779,37 @@ function CateringInquirySection() {
       id="catering-inquiry-section"
       className="relative scroll-mt-20 overflow-hidden bg-white sm:scroll-mt-24"
     >
-      {/* Mobile / tablet */}
+      {/* Mobile / tablet — pilih layanan dulu, lalu isi form */}
       <div className="xl:hidden">
-        <div className="bg-[#D9D9D9] px-4 py-10 sm:px-8 sm:py-14">
-          <CateringForm {...formProps} className="mx-auto" />
-        </div>
         <div className="bg-white px-4 py-8 sm:px-8">
           <h3 className="mb-4 text-center font-heroCta text-lg tracking-[0.01em] text-[#3D0C0C]">
             {copy.collageTitle}
           </h3>
           <CateringServiceSlot
+            lang={lang}
             layout="mobile"
             onChooseService={handleChooseService}
             className="overflow-hidden rounded-lg"
           />
         </div>
+        <div className="bg-[#D9D9D9] px-4 py-10 sm:px-8 sm:py-14">
+          <CateringForm {...formProps} className="mx-auto" />
+        </div>
       </div>
 
       {/* Desktop — grid 4 kolom selaras dengan outlet section (col 1–2 form, col 3–4 kolase) */}
+      <div className="hidden bg-white py-8 xl:block">
+        <h3 className="text-center font-heroCta text-2xl tracking-[0.01em] text-[#3D0C0C]">
+          {copy.collageTitle}
+        </h3>
+      </div>
       <div className={cn("mx-auto hidden w-full max-w-[1920px] xl:grid xl:grid-cols-4 xl:items-stretch", DESKTOP_COLLAGE_MIN_H)}>
         <div className="col-span-2 flex items-center justify-center bg-[#D9D9D9] px-[clamp(2rem,5vw,5rem)] py-12">
           <CateringForm {...formProps} />
         </div>
 
         <div className="col-span-2 min-h-0">
-          <CateringServiceSlot layout="desktop" onChooseService={handleChooseService} />
+          <CateringServiceSlot lang={lang} layout="desktop" onChooseService={handleChooseService} />
         </div>
       </div>
     </section>

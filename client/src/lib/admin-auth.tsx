@@ -73,12 +73,11 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     try {
       const res = await apiFetch("/api/auth/logout", { method: "POST" });
+      if (!res.ok) return false;
       clearSession();
       queryClient.clear();
-      return res.ok;
+      return true;
     } catch {
-      clearSession();
-      queryClient.clear();
       return false;
     }
   }, [clearSession]);

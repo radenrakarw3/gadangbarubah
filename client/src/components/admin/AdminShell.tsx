@@ -1,11 +1,9 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, LogOut } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/Logo";
-import { useToast } from "@/hooks/use-toast";
-import { useAdminAuth } from "@/lib/admin-auth";
-import { loginPathForPortal, portalFromPath } from "@shared/admin-portals";
+import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
 
 interface AdminShellProps {
   title: string;
@@ -31,28 +29,7 @@ export default function AdminShell({
   children,
   maxWidth = "6xl",
 }: AdminShellProps) {
-  const [location, navigate] = useLocation();
-  const { toast } = useToast();
-  const { logout } = useAdminAuth();
-  const [loggingOut, setLoggingOut] = useState(false);
-
-  const handleLogout = async () => {
-    setLoggingOut(true);
-    try {
-      const ok = await logout();
-      if (ok) {
-        toast({ title: "Logout berhasil" });
-        const portal = portalFromPath(location) ?? "main";
-        navigate(loginPathForPortal(portal));
-      } else {
-        toast({ title: "Logout gagal", variant: "destructive" });
-      }
-    } catch {
-      toast({ title: "Logout gagal", variant: "destructive" });
-    } finally {
-      setLoggingOut(false);
-    }
-  };
+  const [, navigate] = useLocation();
 
   return (
     <div className="min-h-screen bg-ivory">
@@ -71,19 +48,7 @@ export default function AdminShell({
                 ) : null}
               </div>
             </div>
-            {showLogout ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleLogout}
-                disabled={loggingOut}
-                aria-label="Logout"
-              >
-                <LogOut className="h-5 w-5" />
-              </Button>
-            ) : (
-              <div className="w-9" aria-hidden />
-            )}
+            {showLogout ? <AdminLogoutButton /> : <div className="w-9" aria-hidden />}
           </div>
         </header>
         {children}

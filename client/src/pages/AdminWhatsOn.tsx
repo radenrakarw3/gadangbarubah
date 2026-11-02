@@ -15,6 +15,7 @@ import {
   PowerOff,
   ExternalLink,
 } from "lucide-react";
+import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -285,10 +286,13 @@ export default function AdminWhatsOn() {
                 </p>
               </div>
             </div>
-            <Button onClick={openCreate}>
-              <Plus className="mr-2 h-4 w-4" />
-              Artikel Baru
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={openCreate}>
+                <Plus className="mr-2 h-4 w-4" />
+                Artikel Baru
+              </Button>
+              <AdminLogoutButton />
+            </div>
           </div>
         </header>
 

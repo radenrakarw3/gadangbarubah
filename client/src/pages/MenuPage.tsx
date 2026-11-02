@@ -7,16 +7,32 @@ import { Eye, FileText } from "lucide-react";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
 import { useSiteLanguage } from "@/lib/language";
-import { useSiteText } from "@/lib/siteText";
 import { menuListQueryKey, menuPublicQueryOptions } from "@/lib/menu";
 import type { MenuCategory, MenuItem } from "@shared/schema";
-import menuPdf from "@assets/Menu Gadang Digital 5 September 2025_1758627992252.pdf";
+import menuPdfCikarang from "@assets/menu-cikarang.pdf";
+import menuPdfBintaro from "@assets/menu-bintaro.pdf";
+
+const MENU_PDF_UPDATED = { ID: "Update November 2026", EN: "Updated November 2026" } as const;
+
+const MENU_PDFS = [
+  {
+    id: "cikarang",
+    href: menuPdfCikarang,
+    labelID: "Menu Cikarang (PDF)",
+    labelEN: "Cikarang Menu (PDF)",
+  },
+  {
+    id: "bintaro",
+    href: menuPdfBintaro,
+    labelID: "Menu Bintaro (PDF)",
+    labelEN: "Bintaro Menu (PDF)",
+  },
+] as const;
 
 type PublicMenuCategory = MenuCategory & { items: MenuItem[] };
 
 export default function MenuPage() {
   const { lang } = useSiteLanguage();
-  const { t } = useSiteText();
 
   const { data, isLoading } = useQuery<{
     success: boolean;
@@ -36,11 +52,13 @@ export default function MenuPage() {
         <div className="max-w-5xl mx-auto space-y-12">
           <section className="text-center">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-primary mb-4">
-              {t("menu.title")}
+              Menu
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6" />
-            <p className="whitespace-pre-line text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              {t("menu.subtitle")}
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              {lang === "ID"
+                ? "Jelajahi koleksi hidangan autentik Padang kami — dari rendang signature hingga paket praktis untuk dibawa pulang."
+                : "Explore our authentic Padang dishes — from signature rendang to practical takeaway packages."}
             </p>
           </section>
 
@@ -61,7 +79,9 @@ export default function MenuPage() {
 
           {!isLoading && categories.length === 0 && (
             <p className="text-center text-muted-foreground py-8">
-              {t("menu.empty")}
+              {lang === "ID"
+                ? "Menu sedang disiapkan. Silakan lihat menu digital lengkap di bawah."
+                : "Menu is being prepared. Please see the complete digital menu below."}
             </p>
           )}
 
@@ -116,19 +136,26 @@ export default function MenuPage() {
                   </div>
                 </div>
                 <h2 className="text-2xl font-serif font-medium mb-4">
-                  {t("menu.pdf.title")}
+                  {lang === "ID" ? "Menu Digital Lengkap" : "Complete Digital Menu"}
                 </h2>
-                <p className="whitespace-pre-line text-muted-foreground mb-8 max-w-xl mx-auto">
-                  {t("menu.pdf.description")}
+                <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+                  {lang === "ID"
+                    ? "Lihat menu digital dengan harga terbaru dan pilihan lengkap masakan Minang tradisional."
+                    : "See our digital menu with latest prices and complete traditional Minang selections."}
                 </p>
-                <Button asChild size="lg">
-                  <a href={menuPdf} target="_blank" rel="noopener noreferrer">
-                    <Eye className="mr-2 h-5 w-5" />
-                    {t("menu.pdf.button")}
-                  </a>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  {MENU_PDFS.map((pdf) => (
+                    <Button key={pdf.id} asChild size="lg">
+                      <a href={pdf.href} target="_blank" rel="noopener noreferrer">
+                        <Eye className="mr-2 h-5 w-5" />
+                        {lang === "ID" ? pdf.labelID : pdf.labelEN}
+                      </a>
+                    </Button>
+                  ))}
+                </div>
                 <p className="text-sm text-muted-foreground/80 mt-4">
-                  {t("menu.pdf.note")}
+                  {MENU_PDF_UPDATED[lang]} •{" "}
+                  {lang === "ID" ? "Kompatibel semua perangkat" : "Compatible with all devices"}
                 </p>
               </CardContent>
             </Card>

@@ -53,7 +53,7 @@ export const HOME_TEXTS = definePageTexts("home", {
   "home.outlet.cikarang.name": { section: "Outlet Cikarang", label: "Nama", id: "Cikarang", en: "Cikarang" },
   "home.outlet.cikarang.address": { section: "Outlet Cikarang", label: "Alamat", id: "Main Gate, Pollux Mall Cikarang", en: "Main Gate, Pollux Mall Cikarang" },
   "home.outlet.cikarang.detailNav": { section: "Outlet Cikarang", label: "Tombol kembali di detail", id: "Tentang Gadang Barubah Cikarang", en: "About Gadang Barubah Cikarang" },
-  "home.outlet.cikarang.hours": { section: "Outlet Cikarang", label: "Jam operasional", id: "11.00 - 22.00", en: "11.00 - 22.00" },
+  "home.outlet.cikarang.hours": { section: "Outlet Cikarang", label: "Jam operasional", id: "11:00 - 22:00", en: "11:00 - 22:00" },
   "home.outlet.cikarang.capacity": { section: "Outlet Cikarang", label: "Kapasitas", list: true, id: "24 Meja\n120 Kursi", en: "24 Table\n120 Seat" },
   "home.outlet.cikarang.facilities": {
     section: "Outlet Cikarang",
@@ -66,7 +66,7 @@ export const HOME_TEXTS = definePageTexts("home", {
   "home.outlet.bintaro.name": { section: "Outlet Bintaro", label: "Nama", id: "Bintaro", en: "Bintaro" },
   "home.outlet.bintaro.address": { section: "Outlet Bintaro", label: "Alamat", id: "Jl. Menteng Raya, no.28 (Sektor 7)", en: "Jl. Menteng Raya, no.28 (Sector 7)" },
   "home.outlet.bintaro.detailNav": { section: "Outlet Bintaro", label: "Tombol kembali di detail", id: "Tentang Gadang Barubah Bintaro", en: "About Gadang Barubah Bintaro" },
-  "home.outlet.bintaro.hours": { section: "Outlet Bintaro", label: "Jam operasional", id: "11.00 - 22.00", en: "11.00 - 22.00" },
+  "home.outlet.bintaro.hours": { section: "Outlet Bintaro", label: "Jam operasional", id: "11:00 - 22:00", en: "11:00 - 22:00" },
   "home.outlet.bintaro.capacity": { section: "Outlet Bintaro", label: "Kapasitas", list: true, id: "20 Meja\n100 Kursi", en: "20 Table\n100 Seat" },
   "home.outlet.bintaro.facilities": {
     section: "Outlet Bintaro",
@@ -125,13 +125,13 @@ export const HOME_TEXTS = definePageTexts("home", {
     id: "Camilan khas Minang dalam kemasan elegan untuk hospitality, goodie bag acara, atau suguhan tamu. Pilihan kudapan fresh dengan presentasi rapi.",
     en: "Minang-style snacks in elegant packaging for hospitality, event goodie bags, or guest treats. Fresh selections with neat presentation.",
   },
-  "home.services.rental-room.name": { section: "Layanan katering (Beranda)", label: "Rental Room — nama", id: "Rental Room", en: "Rental Room" },
+  "home.services.rental-room.name": { section: "Layanan katering (Beranda)", label: "Frozen Food — nama", id: "Frozen Food", en: "Frozen Food" },
   "home.services.rental-room.description": {
     section: "Layanan katering (Beranda)",
-    label: "Rental Room — deskripsi",
+    label: "Frozen Food — deskripsi",
     multiline: true,
-    id: "Sewa ruang VIP di outlet Gadang Barubah untuk private dining, arisan, gathering keluarga, atau acara intim. Ruangan ber-AC dengan kapasitas fleksibel dan layanan penuh.",
-    en: "VIP room rental at Gadang Barubah outlets for private dining, gatherings, and intimate events. Air-conditioned space with flexible capacity and full service.",
+    id: "Produk frozen food siap masak — pesan via Linktree e-commerce resmi Gadang Barubah.",
+    en: "Ready-to-cook frozen food — order via Gadang Barubah official Linktree storefront.",
   },
   "home.services.stall.name": { section: "Layanan katering (Beranda)", label: "Stall — nama", id: "Stall", en: "Stall" },
   "home.services.stall.description": {

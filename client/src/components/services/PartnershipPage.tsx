@@ -150,9 +150,7 @@ export default function PartnershipPage() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-2">Hubungi Tim Kemitraan:</h4>
                     <div className="space-y-2 text-sm text-muted-foreground">
-                      <p>📞 WhatsApp: 0811-2233-4455</p>
-                      <p>📧 Email: partnership@gadangbarubah.com</p>
-                      <p>🏢 Office: Jl. M. Hatta No. 789, Padang</p>
+                      <p>📞 WhatsApp: 0896-0103-9424</p>
                     </div>
                   </div>
                   

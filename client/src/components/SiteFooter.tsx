@@ -1,25 +1,23 @@
 import { Link } from "wouter";
 import { Instagram } from "lucide-react";
 import navLogoIcon from "@assets/gadang-barubah-logo-icon.png";
-import { FOOTER_NAV_LEFT, SOCIAL_LINKS } from "@/lib/siteContent";
-import { useSiteText } from "@/lib/siteText";
-import type { SiteTextKey } from "@shared/site-text-registry";
+import { FooterContactCards } from "@/components/ContactChooser";
+import { COMPANY, FOOTER_NAV_LEFT, SOCIAL_LINKS } from "@/lib/siteContent";
+import { useSiteLanguage } from "@/lib/language";
 
-const FOOTER_COL1_KEYS: Record<(typeof FOOTER_NAV_LEFT)[number]["href"], SiteTextKey> = {
-  "/": "global.nav.home",
-  "/about": "global.nav.about",
-  "/kemitraan": "global.nav.kemitraan",
-  "/whats-on": "global.nav.whatsOn",
-  "/menu": "global.nav.menu",
-  "/catering": "global.nav.catering",
+const FOOTER_COL1_EN: Record<string, string> = {
+  "/about": "About Us",
+  "/menu": "Menu",
+  "/reservasi": "Reserve",
+  "/whats-on": "What's On",
+  "/catering": "Catering",
+  "/kemitraan": "Partnership",
+  "/career": "Careers",
 };
 
 const FOOTER_COL2 = [
-  { href: "/reservasi", key: "global.footer.member" },
-  { href: "/admin", key: "global.footer.login" },
-  { href: "/reservasi", key: "global.footer.register" },
-  { href: "/faq", key: "global.footer.faq" },
-] as const satisfies ReadonlyArray<{ href: string; key: SiteTextKey }>;
+  { href: "/faq", labelID: "FAQ", labelEN: "FAQ's" },
+] as const;
 
 const linkClass =
   "block py-1 font-heroCta text-[15px] font-normal leading-[1.35] tracking-[0.01em] text-black hover:text-[#3F0000] transition-colors sm:text-base xl:text-[18px] xl:leading-[40px]";
@@ -55,9 +53,16 @@ function SocialIcon({
 }
 
 export default function SiteFooter() {
-  const { t } = useSiteText();
+  const { lang } = useSiteLanguage();
   const year = new Date().getFullYear();
-  const copyright = t("global.footer.copyright", { year });
+
+  const col1Label = (href: string, label: string) =>
+    lang === "EN" ? (FOOTER_COL1_EN[href] ?? label) : label;
+
+  const copyright =
+    lang === "ID"
+      ? `© ${year} Gadang Barubah, Inc. Hak Cipta Dilindungi.`
+      : `© ${year} Gadang Barubah, Inc. All Rights Reserved.`;
 
   return (
     <footer className="mt-auto w-full shrink-0 border-t border-black/5 bg-white text-black">
@@ -85,46 +90,56 @@ export default function SiteFooter() {
         <div className="mt-auto grid grid-cols-2 gap-x-8 gap-y-6 py-8 sm:gap-x-12 lg:grid-cols-[auto_auto_1fr] lg:items-end lg:gap-x-16 xl:gap-x-[clamp(3rem,8vw,120px)] xl:py-0 xl:pb-[88px] xl:pt-10">
           <nav className="flex flex-col gap-0">
             <p className="mb-1 font-heroCta text-xs uppercase tracking-widest text-black/40 xl:hidden">
-              {t("global.footer.navigateHeading")}
+              {lang === "ID" ? "Navigasi" : "Navigate"}
             </p>
             {FOOTER_NAV_LEFT.map((item) => (
               <Link key={item.href} href={item.href} className={linkClass}>
-                {t(FOOTER_COL1_KEYS[item.href])}
+                {col1Label(item.href, item.label)}
               </Link>
             ))}
           </nav>
 
           <nav className="flex flex-col gap-0">
             <p className="mb-1 font-heroCta text-xs uppercase tracking-widest text-black/40 xl:hidden">
-              {t("global.footer.memberHeading")}
+              {lang === "ID" ? "Bantuan" : "Help"}
             </p>
             {FOOTER_COL2.map((item) => (
               <Link
-                key={item.key}
+                key={`${item.href}-${item.labelEN}`}
                 href={item.href}
                 className={linkClass}
               >
-                {t(item.key)}
+                {lang === "ID" ? item.labelID : item.labelEN}
               </Link>
             ))}
           </nav>
 
           <div className="col-span-2 flex flex-col justify-end text-left lg:col-span-1 lg:ml-auto lg:max-w-[497px] lg:self-end lg:text-right">
             <p className="font-heroCta text-[15px] font-normal text-black sm:text-base xl:text-[18px] xl:leading-[40px]">
-              {t("global.company.name")}
+              {COMPANY.name}
             </p>
-            <p className="whitespace-pre-line font-heroCta text-sm font-light leading-relaxed text-black sm:text-[15px] xl:text-[18px] xl:leading-[40px]">
-              {t("global.company.address")}
+            <p className="font-heroCta text-sm font-light leading-relaxed text-black sm:text-[15px] xl:text-[18px] xl:leading-[40px]">
+              {COMPANY.address}
             </p>
           </div>
         </div>
 
+        <section
+          aria-label={lang === "ID" ? "Kontak" : "Contact"}
+          className="border-t border-black/5 py-6 xl:pb-10"
+        >
+          <p className="mb-4 font-heroCta text-xs uppercase tracking-widest text-black/40">
+            {lang === "ID" ? "Kontak" : "Contact"}
+          </p>
+          <FooterContactCards />
+        </section>
+
         <div className="flex flex-col gap-3 border-t border-black/5 py-5 sm:flex-row sm:items-center sm:justify-between xl:pb-12">
           <Link href="/terms" className="font-heroCta text-sm italic text-[#7E7E7E] hover:text-black xl:text-base">
-            {t("global.footer.terms")}
+            {lang === "ID" ? "Syarat dan Ketentuan" : "Terms and Conditions"}
           </Link>
           <Link href="/privacy" className="font-heroCta text-sm italic text-[#7E7E7E] hover:text-black xl:text-base xl:text-right">
-            {t("global.footer.privacy")}
+            {lang === "ID" ? "Kebijakan Privasi" : "Privacy Policy"}
           </Link>
         </div>
       </div>

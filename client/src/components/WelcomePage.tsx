@@ -1,6 +1,7 @@
 import SEOHead from "./SEOHead";
 import SiteNav from "./SiteNav";
 import SiteFooter from "./SiteFooter";
+import CampaignPopup from "./CampaignPopup";
 import HeroSection from "./home/HeroSection";
 import SectionSeam from "./home/SectionSeam";
 import LazyWhenVisible from "./home/LazyWhenVisible";
@@ -41,6 +42,7 @@ export default function WelcomePage() {
           <SectionSeam variant="contact-to-footer" />
           <SiteFooter />
         </div>
+        <CampaignPopup />
       </OutletRevealProvider>
     </>
   );

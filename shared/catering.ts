@@ -12,14 +12,18 @@ export const CATERING_INQUIRY_TYPES = [
 export type CateringInquiryType = (typeof CATERING_INQUIRY_TYPES)[number];
 
 export const CATERING_INQUIRY_TYPE_LABELS: Record<CateringInquiryType, string> = {
-  "saji-gadang": "Saji Gadang / Nasi Box",
-  "snack-box": "Snack Box",
+  "saji-gadang": "Mealbox (Saji Gadang)",
+  "snack-box": "Snacks",
   buffet: "Buffet",
   stall: "Stall",
-  "rental-room": "Rental Room / Sewa Ruang",
+  "rental-room": "Frozen Food",
   "home-delivery": "Home Delivery Service",
   tumpeng: "Nasi Tumpeng",
 };
+
+/** Asal form: "acara" = form beranda/katering, "kemitraan" = halaman /kemitraan */
+export const CATERING_INQUIRY_SOURCES = ["acara", "kemitraan"] as const;
+export type CateringInquirySource = (typeof CATERING_INQUIRY_SOURCES)[number];
 
 export const CATERING_INQUIRY_STATUSES = ["pending", "contacted", "closed"] as const;
 export type CateringInquiryStatus = (typeof CATERING_INQUIRY_STATUSES)[number];

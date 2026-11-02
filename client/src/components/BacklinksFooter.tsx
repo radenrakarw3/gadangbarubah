@@ -1,4 +1,9 @@
 import { MapPin, Phone, Instagram, Facebook, Clock } from "lucide-react";
+import { COMPANY } from "@/lib/siteContent";
+
+function waHref(text: string) {
+  return `https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(text)}`;
+}
 
 export function BacklinksFooter() {
   return (
@@ -28,19 +33,19 @@ export function BacklinksFooter() {
               </a>
               
               <a 
-                href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20menu%20dan%20reservasi" 
+                href={waHref("Halo Gadang Barubah, saya ingin bertanya tentang menu dan reservasi")} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-cream/80 hover:text-gold transition-colors group"
                 data-testid="link-whatsapp-footer"
               >
                 <Phone className="w-5 h-5 text-gold" />
-                <span className="group-hover:underline">089509766739</span>
+                <span className="group-hover:underline">{COMPANY.phoneDisplay}</span>
               </a>
               
               <div className="flex items-center gap-3 text-cream/80">
                 <Clock className="w-5 h-5 text-gold" />
-                <span>Buka Setiap Hari: 10:00 - 22:00 WIB</span>
+                <span>Buka Setiap Hari: 11:00 - 22:00 WIB</span>
               </div>
             </div>
           </div>
@@ -128,7 +133,7 @@ export function BacklinksFooter() {
             <h3 className="text-xl font-bold text-gold mb-4">Menu Kami</h3>
             <div className="space-y-3">
               <a 
-                href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20menu%20signature%20Minang" 
+                href={waHref("Halo Gadang Barubah, saya ingin bertanya tentang menu signature Minang")} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="block text-cream/80 hover:text-gold transition-colors hover:underline"
@@ -138,7 +143,7 @@ export function BacklinksFooter() {
               </a>
               
               <a 
-                href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20nasi%20padang%20tradisional" 
+                href={waHref("Halo Gadang Barubah, saya ingin bertanya tentang nasi padang tradisional")} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="block text-cream/80 hover:text-gold transition-colors hover:underline"
@@ -148,7 +153,7 @@ export function BacklinksFooter() {
               </a>
               
               <a 
-                href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20dessert%20dan%20klepon" 
+                href={waHref("Halo Gadang Barubah, saya ingin bertanya tentang dessert dan klepon")} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="block text-cream/80 hover:text-gold transition-colors hover:underline"
@@ -158,7 +163,7 @@ export function BacklinksFooter() {
               </a>
               
               <a 
-                href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20layanan%20catering" 
+                href={`https://wa.me/${COMPANY.cateringWhatsapp}?text=${encodeURIComponent("Halo Gadang Barubah, saya ingin bertanya tentang layanan catering")}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="block text-cream/80 hover:text-gold transition-colors hover:underline"
@@ -178,19 +183,19 @@ export function BacklinksFooter() {
           
           {/* SEO Internal Links */}
           <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <a href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya%20tentang%20restoran" target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-about">
+            <a href={waHref("Halo Gadang Barubah, saya ingin bertanya tentang restoran")} target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-about">
               Tentang Gadang Barubah
             </a>
             <span className="text-cream/40">|</span>
-            <a href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20melihat%20menu%20lengkap" target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-full-menu">
+            <a href={waHref("Halo Gadang Barubah, saya ingin melihat menu lengkap")} target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-full-menu">
               Menu Lengkap
             </a>
             <span className="text-cream/40">|</span>
-            <a href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20reservasi%20meja" target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-reservation">
+            <a href={waHref("Halo Gadang Barubah, saya ingin reservasi meja")} target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-reservation">
               Reservasi Meja
             </a>
             <span className="text-cream/40">|</span>
-            <a href="https://wa.me/6289509766739?text=Halo%20Gadang%20Barubah,%20saya%20ingin%20bertanya" target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-contact">
+            <a href={waHref("Halo Gadang Barubah, saya ingin bertanya")} target="_blank" rel="noopener noreferrer" className="text-cream/60 hover:text-gold transition-colors" data-testid="link-contact">
               Hubungi Kami
             </a>
           </div>

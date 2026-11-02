@@ -43,6 +43,7 @@ import {
   Power,
   PowerOff,
 } from "lucide-react";
+import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
 import { Helmet } from "react-helmet-async";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest, parseApiError } from "@/lib/queryClient";
@@ -406,12 +407,13 @@ export default function AdminMenu() {
             <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div>
+            <div className="flex-1">
               <h1 className="text-xl font-bold">Kelola Menu</h1>
               <p className="text-sm text-muted-foreground">
                 Atur kategori, foto, dan deskripsi menu untuk halaman publik
               </p>
             </div>
+            <AdminLogoutButton />
           </div>
         </div>
 

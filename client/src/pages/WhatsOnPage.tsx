@@ -6,7 +6,6 @@ import { Calendar, ChevronRight } from "lucide-react";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
 import { useSiteLanguage } from "@/lib/language";
-import { useSiteText } from "@/lib/siteText";
 import {
   articleCategory,
   articleExcerpt,
@@ -16,10 +15,11 @@ import {
   whatsOnPublicQueryOptions,
 } from "@/lib/whats-on";
 import type { WhatsOnArticle } from "@shared/schema";
+import { contactByKey } from "@/lib/siteContent";
 
 export default function WhatsOnPage() {
   const { lang } = useSiteLanguage();
-  const { t } = useSiteText();
+  const pr = contactByKey("pr");
 
   const { data, isLoading, isError } = useQuery<{ success: boolean; articles: WhatsOnArticle[] }>({
     queryKey: whatsOnListQueryKey(),
@@ -36,25 +36,29 @@ export default function WhatsOnPage() {
         <div className="max-w-4xl mx-auto space-y-10">
           <section className="text-center">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-primary mb-4">
-              {t("whatsOn.title")}
+              {lang === "ID" ? "Kabar Terkini" : "What's On"}
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6" />
-            <p className="whitespace-pre-line text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t("whatsOn.subtitle")}
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              {lang === "ID"
+                ? "Berita, tips kuliner, dan update terbaru seputar Gadang Barubah Indonesia."
+                : "News, culinary tips, and latest updates from Gadang Barubah Indonesia."}
             </p>
           </section>
 
           {isLoading ? (
             <p className="text-center text-muted-foreground">
-              {t("whatsOn.loadingList")}
+              {lang === "ID" ? "Memuat artikel..." : "Loading articles..."}
             </p>
           ) : isError ? (
             <p className="text-center text-destructive">
-              {t("whatsOn.errorList")}
+              {lang === "ID" ? "Gagal memuat artikel." : "Failed to load articles."}
             </p>
           ) : articles.length === 0 ? (
             <p className="text-center text-muted-foreground">
-              {t("whatsOn.empty")}
+              {lang === "ID"
+                ? "Belum ada artikel. Nantikan kabar terbaru dari kami."
+                : "No articles yet. Stay tuned for updates."}
             </p>
           ) : (
             <div className="space-y-4">
@@ -97,7 +101,7 @@ export default function WhatsOnPage() {
                           href={`/whats-on/${article.slug}`}
                           className="inline-flex items-center text-sm text-primary font-medium shrink-0"
                         >
-                          {t("whatsOn.readMore")}
+                          {lang === "ID" ? "Baca selengkapnya" : "Read more"}
                           <ChevronRight className="h-4 w-4 ml-1" />
                         </Link>
                       </div>
@@ -107,6 +111,23 @@ export default function WhatsOnPage() {
               ))}
             </div>
           )}
+
+          <section
+            className="rounded-lg border border-border/40 bg-muted/30 px-5 py-6 text-center"
+            data-testid="whats-on-pr-contact"
+          >
+            <p className="text-sm text-muted-foreground mb-1">
+              {lang === "ID" ? pr.labelID : pr.labelEN}
+            </p>
+            <a
+              href={`https://wa.me/${pr.whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-primary hover:underline"
+            >
+              {pr.name} — {pr.display}
+            </a>
+          </section>
         </div>
       </div>
     </PublicPageLayout>

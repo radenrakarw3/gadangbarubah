@@ -31,6 +31,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { ArrowLeft, Plus, UserCog, Trash2, Loader2 } from "lucide-react";
+import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
 import { Helmet } from "react-helmet-async";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
@@ -181,6 +182,7 @@ export default function AdminUsers() {
                   <p className="text-sm text-muted-foreground">Admin Panel</p>
                 </div>
               </div>
+              <AdminLogoutButton />
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <DialogTrigger asChild>
                   <Button size="icon" data-testid="button-create-user">
@@ -247,13 +249,13 @@ export default function AdminUsers() {
                                 </option>
                                 <option value="admin_cikarang">
                                   {lang === "ID"
-                                    ? "Admin Cikarang (reservasi Cikarang)"
-                                    : "Cikarang Admin (Cikarang reservations)"}
+                                    ? "Kasir/PIC Cikarang (database reservasi)"
+                                    : "Cikarang Cashier/PIC (reservation DB)"}
                                 </option>
                                 <option value="admin_bintaro">
                                   {lang === "ID"
-                                    ? "Admin Bintaro (reservasi Bintaro)"
-                                    : "Bintaro Admin (Bintaro reservations)"}
+                                    ? "Kasir/PIC Bintaro (database reservasi)"
+                                    : "Bintaro Cashier/PIC (reservation DB)"}
                                 </option>
                               </select>
                             </FormControl>

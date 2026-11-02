@@ -7,7 +7,9 @@ import {
   menuItems,
   whatsOnArticles,
   siteTexts,
+  siteMediaAssets,
   type SiteText,
+  type SiteMediaAsset,
   type User,
   type InsertUser,
   type InsertReservation,
@@ -25,7 +27,11 @@ import {
   type UpdateWhatsOnArticle,
   type WhatsOnArticle,
 } from "@shared/schema";
-import type { CateringInquiryType } from "@shared/catering";
+import type {
+  CateringInquirySource,
+  CateringInquiryStatus,
+  CateringInquiryType,
+} from "@shared/catering";
 import {
   canTransition,
   isReservationStatus,
@@ -83,8 +89,11 @@ export interface IStorage {
     lokasiEvent: string;
     tipeLayanan: CateringInquiryType;
     pax: number;
+    source: CateringInquirySource;
   }): Promise<CateringInquiry>;
   getCateringInquiries(): Promise<CateringInquiry[]>;
+  getCateringInquiryById(id: string): Promise<CateringInquiry | undefined>;
+  updateCateringInquiryStatus(id: string, status: CateringInquiryStatus): Promise<CateringInquiry>;
 
   createCampaign(campaign: InsertCampaign, imagePath: string, createdBy: string): Promise<Campaign>;
   getCampaigns(): Promise<Campaign[]>;
@@ -133,6 +142,14 @@ export interface IStorage {
     expectedUpdatedAt?: Date | null;
   }): Promise<{ row: SiteText } | { conflict: true }>;
   deleteSiteText(key: string): Promise<SiteText | undefined>;
+
+  getSiteMediaAssets(): Promise<SiteMediaAsset[]>;
+  getSiteMediaAsset(key: string): Promise<SiteMediaAsset | undefined>;
+  upsertSiteMediaAsset(data: {
+    key: string;
+    imagePath: string;
+    label: string;
+  }): Promise<{ asset: SiteMediaAsset; previousImagePath: string | null }>;
 
   getAdminStats(outlet?: string): Promise<{
     totalReservations: number;
@@ -314,6 +331,7 @@ export class DatabaseStorage implements IStorage {
     lokasiEvent: string;
     tipeLayanan: CateringInquiryType;
     pax: number;
+    source: CateringInquirySource;
   }): Promise<CateringInquiry> {
     const [row] = await requireDb()
       .insert(cateringInquiries)
@@ -325,6 +343,7 @@ export class DatabaseStorage implements IStorage {
         lokasiEvent: data.lokasiEvent,
         tipeLayanan: data.tipeLayanan,
         pax: data.pax,
+        source: data.source,
         status: "pending",
       })
       .returning();
@@ -336,6 +355,27 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(cateringInquiries)
       .orderBy(desc(cateringInquiries.createdAt));
+  }
+
+  async getCateringInquiryById(id: string): Promise<CateringInquiry | undefined> {
+    const [row] = await requireDb()
+      .select()
+      .from(cateringInquiries)
+      .where(eq(cateringInquiries.id, id));
+    return row;
+  }
+
+  async updateCateringInquiryStatus(
+    id: string,
+    status: CateringInquiryStatus,
+  ): Promise<CateringInquiry> {
+    const [row] = await requireDb()
+      .update(cateringInquiries)
+      .set({ status })
+      .where(eq(cateringInquiries.id, id))
+      .returning();
+    if (!row) throw new Error("Permintaan tidak ditemukan");
+    return row;
   }
 
   async updateReservationStatus(id: string, status: ReservationStatus): Promise<Reservation> {
@@ -748,6 +788,47 @@ export class DatabaseStorage implements IStorage {
       .where(eq(whatsOnArticles.id, id))
       .returning();
     return deleted;
+  }
+
+  async getSiteMediaAssets(): Promise<SiteMediaAsset[]> {
+    return requireDb().select().from(siteMediaAssets).orderBy(asc(siteMediaAssets.key));
+  }
+
+  async getSiteMediaAsset(key: string): Promise<SiteMediaAsset | undefined> {
+    const [row] = await requireDb()
+      .select()
+      .from(siteMediaAssets)
+      .where(eq(siteMediaAssets.key, key));
+    return row;
+  }
+
+  async upsertSiteMediaAsset(data: {
+    key: string;
+    imagePath: string;
+    label: string;
+  }): Promise<{ asset: SiteMediaAsset; previousImagePath: string | null }> {
+    const existing = await this.getSiteMediaAsset(data.key);
+    if (existing) {
+      const [asset] = await requireDb()
+        .update(siteMediaAssets)
+        .set({
+          imagePath: data.imagePath,
+          label: data.label,
+          updatedAt: new Date(),
+        })
+        .where(eq(siteMediaAssets.key, data.key))
+        .returning();
+      return { asset, previousImagePath: existing.imagePath };
+    }
+    const [asset] = await requireDb()
+      .insert(siteMediaAssets)
+      .values({
+        key: data.key,
+        imagePath: data.imagePath,
+        label: data.label,
+      })
+      .returning();
+    return { asset, previousImagePath: null };
   }
 
   async getSiteTexts(): Promise<SiteText[]> {

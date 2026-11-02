@@ -14,6 +14,7 @@ import { apiFetch } from '@/lib/api';
 import { format } from 'date-fns';
 import type { Campaign } from '@shared/schema';
 import { useSiteLanguage } from '@/lib/language';
+import AdminLogoutButton from '@/components/admin/AdminLogoutButton';
 
 export default function AdminCampaigns() {
   const [, navigate] = useLocation();
@@ -35,6 +36,16 @@ export default function AdminCampaigns() {
 
   const campaigns = campaignsData?.campaigns || [];
 
+  const isLiveNow = (campaign: Campaign) => {
+    if (campaign.status !== "active") return false;
+    const now = Date.now();
+    const from = new Date(campaign.validFrom).getTime();
+    const until = new Date(campaign.validUntil).getTime();
+    return from <= now && now <= until;
+  };
+
+  const hasLiveCampaign = campaigns.some(isLiveNow);
+
   const uploadMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const res = await apiFetch('/api/admin/campaigns', {
@@ -52,7 +63,7 @@ export default function AdminCampaigns() {
     onSuccess: () => {
       toast({
         title: "Campaign berhasil dibuat",
-        description: "Popup campaign telah ditambahkan ke sistem",
+        description: "Klik \"Aktifkan\" pada daftar di bawah agar popup tampil di beranda.",
       });
       setFormData({ title: '', validFrom: '', validUntil: '' });
       setSelectedFile(null);
@@ -70,12 +81,16 @@ export default function AdminCampaigns() {
 
   const toggleStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: 'active' | 'inactive' }) => {
-      return apiRequest('PATCH', `/api/admin/campaigns/${id}/status`, { status });
+      const res = await apiRequest('PATCH', `/api/admin/campaigns/${id}/status`, { status });
+      return res.json();
     },
-    onSuccess: (data: any) => {
+    onSuccess: (data: any, variables) => {
       toast({
         title: "Status berhasil diubah",
-        description: data.message,
+        description:
+          variables.status === "active"
+            ? "Campaign aktif. Uji di beranda: buka /?campaign=1 (atau tab baru jika sudah menutup popup)."
+            : data.message,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/campaigns'] });
     },
@@ -200,6 +215,7 @@ export default function AdminCampaigns() {
                 <h1 className="font-semibold text-lg">Kelola Popup Campaign</h1>
                 <p className="text-xs text-muted-foreground">Upload popup untuk landing page</p>
               </div>
+              <AdminLogoutButton />
             </div>
           </div>
 
@@ -320,6 +336,16 @@ export default function AdminCampaigns() {
 
             <div className="space-y-3">
               <h2 className="font-semibold text-lg">Campaign Terdaftar</h2>
+              <p className="text-xs text-muted-foreground">
+                Popup tampil di beranda hanya jika berstatus Aktif dan tanggal hari ini (WIB) berada dalam periode campaign. Hanya satu campaign yang bisa aktif. Setelah upload, klik Aktifkan. Uji cepat: buka beranda dengan <code className="rounded bg-muted px-1">/?campaign=1</code>.
+              </p>
+              {!hasLiveCampaign && campaigns.length > 0 ? (
+                <Card className="border-amber-300/60 bg-amber-50 dark:bg-amber-950/20">
+                  <CardContent className="p-4 text-sm text-amber-900 dark:text-amber-100">
+                    Tidak ada campaign yang sedang tayang. Pastikan ada yang berstatus Aktif dan rentang tanggal mencakup hari ini.
+                  </CardContent>
+                </Card>
+              ) : null}
               {campaigns.length === 0 ? (
                 <Card>
                   <CardContent className="p-6 text-center text-muted-foreground">
@@ -344,9 +370,16 @@ export default function AdminCampaigns() {
                                 {format(new Date(campaign.validFrom), 'dd MMM yyyy')} - {format(new Date(campaign.validUntil), 'dd MMM yyyy')}
                               </p>
                             </div>
-                            <Badge variant={campaign.status === 'active' ? 'default' : 'secondary'}>
-                              {campaign.status === 'active' ? 'Aktif' : 'Nonaktif'}
-                            </Badge>
+                            <div className="flex flex-col items-end gap-1">
+                              <Badge variant={campaign.status === 'active' ? 'default' : 'secondary'}>
+                                {campaign.status === 'active' ? 'Aktif' : 'Nonaktif'}
+                              </Badge>
+                              {isLiveNow(campaign) ? (
+                                <Badge variant="outline" className="border-green-600 text-green-700">
+                                  Tayang sekarang
+                                </Badge>
+                              ) : null}
+                            </div>
                           </div>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <Eye className="h-3 w-3" />

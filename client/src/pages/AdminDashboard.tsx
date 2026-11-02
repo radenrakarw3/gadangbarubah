@@ -11,7 +11,9 @@ import {
   ArrowRight,
   Mail,
   Newspaper,
-  Type,
+  ClipboardList,
+  ImageIcon,
+  Database,
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import AdminShell from "@/components/admin/AdminShell";
@@ -64,6 +66,30 @@ export default function AdminDashboard({ portal }: { portal: AdminPortal }) {
 
   const adminFeatures = [
     {
+      id: "bookings",
+      title: "Database Pemesanan",
+      description: "Reservasi outlet & katering B2B — filter kategori + link bukti",
+      icon: Database,
+      route: "/admin/bookings",
+      color: "bg-teal-700",
+    },
+    {
+      id: "inquiries",
+      title: "Permintaan Acara & Kemitraan",
+      description: "Lihat dan tindak lanjuti form Katering & Acara serta Kemitraan",
+      icon: ClipboardList,
+      route: "/admin/inquiries",
+      color: "bg-emerald-700",
+    },
+    {
+      id: "media",
+      title: "Ganti Foto Situs",
+      description: "Upload foto hero dan cover outlet tanpa ubah kode",
+      icon: ImageIcon,
+      route: "/admin/media",
+      color: "bg-indigo-600",
+    },
+    {
       id: "menu",
       title: "Kelola Menu",
       description: "Atur kategori, foto, dan deskripsi menu untuk halaman publik",
@@ -80,14 +106,6 @@ export default function AdminDashboard({ portal }: { portal: AdminPortal }) {
       color: "bg-red-800",
     },
     {
-      id: "site-texts",
-      title: "Kelola Teks Website",
-      description: "Ubah judul, paragraf, dan label di semua halaman publik (ID & EN)",
-      icon: Type,
-      route: "/admin/teks",
-      color: "bg-emerald-700",
-    },
-    {
       id: "campaigns",
       title: "Kelola Popup",
       description: "Upload dan kelola popup campaign untuk landing page",
@@ -97,8 +115,8 @@ export default function AdminDashboard({ portal }: { portal: AdminPortal }) {
     },
     {
       id: "users",
-      title: "Kelola Admin",
-      description: "Tambah atau hapus akun administrator",
+      title: "Kelola Admin & Kasir",
+      description: "Tambah akun admin utama atau kasir/PIC cabang",
       icon: UserCog,
       route: "/admin/users",
       color: "bg-slate-600",
@@ -114,10 +132,10 @@ export default function AdminDashboard({ portal }: { portal: AdminPortal }) {
   ].filter(() => isMain);
 
   const dashboardSubtitle = isMain
-    ? "Kelola konten landing page, akun admin, dan email"
+    ? "Kelola konten landing page, database pemesanan, akun admin/kasir, dan email"
     : portal === "cikarang"
-      ? "Pantau operasional reservasi cabang Cikarang"
-      : "Pantau operasional reservasi cabang Bintaro";
+      ? "Portal kasir/PIC — pantau & maintain database reservasi Cikarang"
+      : "Portal kasir/PIC — pantau & maintain database reservasi Bintaro";
 
   return (
     <>
@@ -141,6 +159,15 @@ export default function AdminDashboard({ portal }: { portal: AdminPortal }) {
 
           {showReservations && portalConfig.reservationsPath ? (
             <>
+              <Card className="border-dashed border-primary/30 bg-muted/20">
+                <CardContent className="p-4 text-sm text-muted-foreground">
+                  Portal kasir/PIC: login di{" "}
+                  <code className="rounded bg-muted px-1.5 py-0.5 text-foreground">
+                    {portalConfig.basePath}
+                  </code>{" "}
+                  untuk maintain database reservasi cabang.
+                </CardContent>
+              </Card>
               <Card className="border-gold/30 bg-gradient-to-br from-card to-gold/5">
                 <CardContent className="p-5 sm:p-6">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-4">

@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, parseApiError } from "@/lib/queryClient";
-import { COMPANY, OUTLETS, todayISO } from "@/lib/siteContent";
+import { OUTLETS, todayISO, whatsappForOutlet } from "@/lib/siteContent";
 import {
   availableTimeSlotsForDate,
   isValidWhatsApp,
@@ -36,9 +36,10 @@ import {
   validateReservationDateTime,
 } from "@shared/reservation-utils";
 import { useSiteLanguage } from "@/lib/language";
-import { renderTemplate, useSiteText } from "@/lib/siteText";
 import PrivacyConsentField from "@/components/PrivacyConsentField";
 import type { PublicReservationStatusPayload } from "@shared/public-reservation";
+import { cancelWhatsAppTab, completeWhatsAppTab, openPendingWhatsAppTab } from "@/lib/whatsapp";
+import { buildReservationWhatsAppUrl } from "@/lib/reservation-wa";
 
 function ReservationStatusPanel({
   reservationId,
@@ -47,7 +48,6 @@ function ReservationStatusPanel({
   reservationId: string;
   lang: "ID" | "EN";
 }) {
-  const { t } = useSiteText();
   const [data, setData] = useState<PublicReservationStatusPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,12 +73,12 @@ function ReservationStatusPanel({
     <div className="space-y-2 text-left max-w-md mx-auto">
       <Button variant="outline" size="sm" onClick={checkStatus} disabled={loading}>
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-        {t("reservation.success.checkStatus")}
+        {lang === "ID" ? "Cek status reservasi" : "Check reservation status"}
       </Button>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       {data ? (
         <p className="text-sm text-muted-foreground">
-          {t("reservation.success.statusLabel")}: <strong>{data.statusLabel}</strong> ·{" "}
+          {lang === "ID" ? "Status" : "Status"}: <strong>{data.statusLabel}</strong> ·{" "}
           {data.tanggalReservasi} {data.waktuReservasi} WIB · {data.outletLabel}
         </p>
       ) : null}
@@ -130,8 +130,9 @@ type ReservationFormData = z.infer<typeof reservationFormSchema>;
 export default function ReservationPage() {
   const { toast } = useToast();
   const { lang } = useSiteLanguage();
-  const { t } = useSiteText();
   const [submittedId, setSubmittedId] = useState<string | null>(null);
+  const [submittedOutlet, setSubmittedOutlet] = useState<string>(OUTLETS[0].id);
+  const [submittedNama, setSubmittedNama] = useState("");
 
   const form = useForm<ReservationFormData>({
     resolver: zodResolver(reservationFormSchema),
@@ -155,31 +156,56 @@ export default function ReservationPage() {
     mutationFn: async (data: ReservationFormData) => {
       const honeypot = honeypotRef.current?.value?.trim() ?? "";
       if (honeypot) {
-        return { success: true, data: null };
+        return { success: true, data: null, skipped: true as const };
       }
 
-      const emailTrimmed = data.email?.trim() ?? "";
-      const payload = {
-        namaLengkap: data.namaLengkap.trim(),
-        noWhatsApp: normalizeWhatsAppInput(data.noWhatsApp),
-        outlet: data.outlet,
-        tanggalReservasi: data.tanggalReservasi,
-        waktuReservasi: data.waktuReservasi,
-        jumlahTamu: data.jumlahTamu,
-        tipeMeja: data.tipeMeja,
-        ...(emailTrimmed ? { email: emailTrimmed } : {}),
-        ...(data.catatan?.trim() ? { catatan: data.catatan.trim() } : {}),
-        [RESERVATION_HONEYPOT_FIELD]: "",
-      };
-      const res = await apiRequest("POST", "/api/reservations", payload);
-      return res.json();
+      const waTab = openPendingWhatsAppTab();
+      try {
+        const emailTrimmed = data.email?.trim() ?? "";
+        const payload = {
+          namaLengkap: data.namaLengkap.trim(),
+          noWhatsApp: normalizeWhatsAppInput(data.noWhatsApp),
+          outlet: data.outlet,
+          tanggalReservasi: data.tanggalReservasi,
+          waktuReservasi: data.waktuReservasi,
+          jumlahTamu: data.jumlahTamu,
+          tipeMeja: data.tipeMeja,
+          ...(emailTrimmed ? { email: emailTrimmed } : {}),
+          ...(data.catatan?.trim() ? { catatan: data.catatan.trim() } : {}),
+          [RESERVATION_HONEYPOT_FIELD]: "",
+        };
+        const res = await apiRequest("POST", "/api/reservations", payload);
+        const result = await res.json();
+        if (!result.success || !result.data?.id) {
+          cancelWhatsAppTab(waTab);
+          return result;
+        }
+
+        completeWhatsAppTab(
+          waTab,
+          buildReservationWhatsAppUrl({
+            reservationId: result.data.id,
+            outletId: data.outlet,
+            namaLengkap: data.namaLengkap,
+          }),
+        );
+        return { ...result, outlet: data.outlet, namaLengkap: data.namaLengkap };
+      } catch (err) {
+        cancelWhatsAppTab(waTab);
+        throw err;
+      }
     },
     onSuccess: (result) => {
-      if (result.success) {
-        setSubmittedId(result.data?.id ?? null);
+      if (result.success && result.data?.id) {
+        setSubmittedId(result.data.id);
+        setSubmittedOutlet(result.outlet ?? form.getValues("outlet"));
+        setSubmittedNama(result.namaLengkap ?? "");
         toast({
           title: lang === "ID" ? "Reservasi terkirim" : "Reservation submitted",
-          description: result.message,
+          description:
+            lang === "ID"
+              ? "Data tersimpan. Lanjutkan konfirmasi di WhatsApp."
+              : "Saved. Continue confirmation on WhatsApp.",
         });
         form.reset({
           namaLengkap: "",
@@ -193,7 +219,7 @@ export default function ReservationPage() {
           catatan: "",
         });
         setPrivacyAccepted(false);
-      } else {
+      } else if (!result.skipped) {
         toast({
           title: "Gagal",
           description:
@@ -235,11 +261,13 @@ export default function ReservationPage() {
         <div className="max-w-2xl mx-auto space-y-8">
           <section className="text-center">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-primary mb-4">
-              {t("reservation.title")}
+              {lang === "ID" ? "Reservasi Meja" : "Table Reservation"}
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6" />
-            <p className="whitespace-pre-line text-lg text-muted-foreground leading-relaxed">
-              {t("reservation.subtitle")}
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              {lang === "ID"
+                ? "Pesan meja di cabang Gadang Barubah Cikarang atau Bintaro — meja reguler atau VIP room untuk acara spesial Anda."
+                : "Book your table at Gadang Barubah Cikarang or Bintaro branch — regular table or VIP room for your special occasion."}
             </p>
           </section>
 
@@ -248,28 +276,38 @@ export default function ReservationPage() {
               <CardContent className="p-8 text-center space-y-4">
                 <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto" />
                 <h2 className="text-xl font-semibold">
-                  {t("reservation.success.title")}
+                  {lang === "ID" ? "Permintaan Reservasi Diterima" : "Reservation Request Received"}
                 </h2>
                 <p className="text-muted-foreground">
-                  {renderTemplate(t("reservation.success.message"), {
-                    id: <span className="font-mono text-sm">{submittedId.slice(0, 8)}</span>,
-                  })}
+                  {lang === "ID"
+                    ? "Data tersimpan di sistem. Lanjutkan chat WhatsApp ke admin outlet (tab baru). ID reservasi: "
+                    : "Saved in our system. Continue WhatsApp chat with the outlet admin (new tab). Reservation ID: "}
+                  <span className="font-mono text-sm">{submittedId.slice(0, 8)}</span>
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button asChild>
                     <a
-                      href={`https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(
-                        t("reservation.success.whatsappMessage", { id: submittedId.slice(0, 8) }),
-                      )}`}
+                      href={buildReservationWhatsAppUrl({
+                        reservationId: submittedId,
+                        outletId: submittedOutlet,
+                        namaLengkap: submittedNama,
+                      })}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {t("reservation.success.whatsappButton")}
+                      {lang === "ID"
+                        ? `WhatsApp ${whatsappForOutlet(submittedOutlet).labelID}`
+                        : `WhatsApp ${whatsappForOutlet(submittedOutlet).labelEN}`}
+                    </a>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <a href={`/cek-reservasi/${submittedId}`}>
+                      {lang === "ID" ? "Lihat bukti status" : "View status proof"}
                     </a>
                   </Button>
                   <ReservationStatusPanel reservationId={submittedId} lang={lang} />
                   <Button variant="outline" onClick={() => setSubmittedId(null)}>
-                    {t("reservation.success.newReservation")}
+                    {lang === "ID" ? "Buat Reservasi Lain" : "Create Another Reservation"}
                   </Button>
                 </div>
               </CardContent>
@@ -301,9 +339,9 @@ export default function ReservationPage() {
                       name="namaLengkap"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t("reservation.form.name")}</FormLabel>
+                          <FormLabel>{lang === "ID" ? "Nama Lengkap" : "Full Name"}</FormLabel>
                           <FormControl>
-                            <Input placeholder={t("reservation.form.namePlaceholder")} {...field} />
+                            <Input placeholder={lang === "ID" ? "Contoh: Budi Santoso" : "Example: John Doe"} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -316,7 +354,7 @@ export default function ReservationPage() {
                         name="noWhatsApp"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("reservation.form.whatsapp")}</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Nomor WhatsApp" : "WhatsApp Number"}</FormLabel>
                             <FormControl>
                               <Input placeholder="08xxxxxxxxxx" {...field} />
                             </FormControl>
@@ -329,7 +367,7 @@ export default function ReservationPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("reservation.form.email")}</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Email (opsional)" : "Email (optional)"}</FormLabel>
                             <FormControl>
                               <Input type="email" placeholder="email@example.com" {...field} />
                             </FormControl>
@@ -344,11 +382,11 @@ export default function ReservationPage() {
                       name="outlet"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t("reservation.form.outlet")}</FormLabel>
+                          <FormLabel>{lang === "ID" ? "Outlet" : "Outlet"}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder={t("reservation.form.outletPlaceholder")} />
+                                <SelectValue placeholder={lang === "ID" ? "Pilih outlet" : "Select outlet"} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -370,7 +408,7 @@ export default function ReservationPage() {
                         name="tanggalReservasi"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("reservation.form.date")}</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Tanggal" : "Date"}</FormLabel>
                             <div className="flex gap-2">
                               <FormControl>
                                 <Input type="date" min={minDate} className="flex-1" {...field} />
@@ -381,7 +419,7 @@ export default function ReservationPage() {
                                 className="shrink-0"
                                 onClick={() => form.setValue("tanggalReservasi", minDate)}
                               >
-                                {t("reservation.form.today")}
+                                {lang === "ID" ? "Hari Ini" : "Today"}
                               </Button>
                             </div>
                             <FormMessage />
@@ -393,11 +431,11 @@ export default function ReservationPage() {
                         name="waktuReservasi"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("reservation.form.time")}</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Waktu" : "Time"}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder={t("reservation.form.timePlaceholder")} />
+                                  <SelectValue placeholder={lang === "ID" ? "Pilih waktu" : "Select time"} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -420,7 +458,7 @@ export default function ReservationPage() {
                         name="jumlahTamu"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("reservation.form.guests")}</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Jumlah Tamu" : "Guests"}</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -436,16 +474,16 @@ export default function ReservationPage() {
                         name="tipeMeja"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("reservation.form.tableType")}</FormLabel>
+                            <FormLabel>{lang === "ID" ? "Tipe Meja" : "Table Type"}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder={t("reservation.form.tableTypePlaceholder")} />
+                                  <SelectValue placeholder={lang === "ID" ? "Pilih tipe meja" : "Select table type"} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="reguler">{t("reservation.form.tableRegular")}</SelectItem>
-                                <SelectItem value="vip">{t("reservation.form.tableVip")}</SelectItem>
+                                <SelectItem value="reguler">{lang === "ID" ? "Meja Reguler" : "Regular Table"}</SelectItem>
+                                <SelectItem value="vip">VIP Room</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -459,10 +497,14 @@ export default function ReservationPage() {
                       name="catatan"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t("reservation.form.notes")}</FormLabel>
+                          <FormLabel>{lang === "ID" ? "Catatan (opsional)" : "Notes (optional)"}</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder={t("reservation.form.notesPlaceholder")}
+                              placeholder={
+                                lang === "ID"
+                                  ? "Permintaan khusus, alergi makanan, acara ulang tahun, dll."
+                                  : "Special requests, food allergies, birthday event, etc."
+                              }
                               rows={3}
                               {...field}
                             />
@@ -489,12 +531,12 @@ export default function ReservationPage() {
                       {mutation.isPending ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {t("reservation.form.submitting")}
+                          {lang === "ID" ? "Mengirim..." : "Submitting..."}
                         </>
                       ) : (
                         <>
                           <CalendarDays className="mr-2 h-4 w-4" />
-                          {t("reservation.form.submit")}
+                          {lang === "ID" ? "Kirim Permintaan Reservasi" : "Submit Reservation Request"}
                         </>
                       )}
                     </Button>
@@ -505,7 +547,9 @@ export default function ReservationPage() {
           )}
 
           <p className="text-sm text-center text-muted-foreground">
-            {t("reservation.footerNote")}
+            {lang === "ID"
+              ? "Jam operasional: 11:00 – 22:00 WIB • Reservasi VIP room disarankan H-1"
+              : "Operating hours: 11:00 – 22:00 • VIP room reservation is recommended 1 day in advance"}
           </p>
         </div>
       </div>

@@ -12,6 +12,7 @@ import eventFestivalImg from "@assets/DSC07140_1758564407964.jpg";
 import eventGatheringImg from "@assets/DSC03388_1758567885565.jpg";
 import eventPrivateImg from "@assets/DSC03165_1758566711557.jpg";
 import eventOutdoorImg from "@assets/DSC07168_1758564588951.jpg";
+import { FROZEN_FOOD_LINKTREE } from "@/lib/siteContent";
 
 /** Portofolio acara — placeholder foto; ganti dengan aset event kemitraan nyata nanti */
 export const KEMITRAAN_GALLERY_FEATURED = { id: "corp", image: eventCorporateImg } as const;
@@ -29,7 +30,12 @@ export const KEMITRAAN_SERVICES = [
   { id: "mealbox", cateringType: "saji-gadang" as const, image: mealboxImg },
   { id: "snackbox", cateringType: "snack-box" as const, image: snackboxImg },
   { id: "stall", cateringType: "stall" as const, image: stallImg },
-  { id: "rental-room", cateringType: "rental-room" as const, image: rentalRoomImg },
+  {
+    id: "rental-room",
+    cateringType: "rental-room" as const,
+    image: rentalRoomImg,
+    externalHref: FROZEN_FOOD_LINKTREE,
+  },
   { id: "home-delivery", cateringType: "home-delivery" as const, image: deliveryImg },
 ] as const;
 

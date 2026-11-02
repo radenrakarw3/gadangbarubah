@@ -29,6 +29,7 @@ const FaqPage = lazy(() => import("@/pages/FaqPage"));
 const TermsPage = lazy(() => import("@/pages/TermsPage"));
 const PrivacyPage = lazy(() => import("@/pages/PrivacyPage"));
 const ReservationPage = lazy(() => import("@/pages/ReservationPage"));
+const CheckReservationPage = lazy(() => import("@/pages/CheckReservationPage"));
 const UniPage = lazy(() => import("@/components/UniPage"));
 const KemitraanPage = lazy(() => import("@/pages/KemitraanPage"));
 const OutletPage = lazy(() => import("@/components/services/OutletPage"));
@@ -37,9 +38,14 @@ const CateringPage = lazy(() => import("@/components/services/CateringPage"));
 const AdminCampaigns = lazy(() => import("@/pages/AdminCampaigns"));
 const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
 const AdminEmails = lazy(() => import("@/pages/AdminEmails"));
+const AdminInquiries = lazy(() => import("@/pages/AdminInquiries"));
 const AdminMenu = lazy(() => import("@/pages/AdminMenu"));
 const AdminWhatsOn = lazy(() => import("@/pages/AdminWhatsOn"));
+const AdminMedia = lazy(() => import("@/pages/AdminMedia"));
+const AdminBookings = lazy(() => import("@/pages/AdminBookings"));
 const AdminLoginPage = lazy(() => import("@/pages/AdminLoginPage"));
+const CareerPage = lazy(() => import("@/pages/CareerPage"));
+const CheckInquiryPage = lazy(() => import("@/pages/CheckInquiryPage"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const AdminSiteTexts = lazy(() => import("@/pages/AdminSiteTexts"));
 
@@ -87,9 +93,12 @@ function Router() {
       <Route path="/menu" component={withSuspense(MenuPage)} />
       <Route path="/catering" component={withSuspense(CateringPage)} />
       <Route path="/reservasi" component={withSuspense(ReservationPage)} />
+      <Route path="/cek-reservasi/:id" component={withSuspense(CheckReservationPage)} />
+      <Route path="/cek-inquiry/:id" component={withSuspense(CheckInquiryPage)} />
       <Route path="/whats-on" component={withSuspense(WhatsOnPage)} />
       <Route path="/whats-on/:slug" component={ArticleRoute} />
       <Route path="/faq" component={withSuspense(FaqPage)} />
+      <Route path="/career" component={withSuspense(CareerPage)} />
       <Route path="/terms" component={withSuspense(TermsPage)} />
       <Route path="/privacy" component={withSuspense(PrivacyPage)} />
       <Route path="/kemitraan" component={withSuspense(KemitraanPage)} />
@@ -118,7 +127,7 @@ function Router() {
         <AdminRedirect to="/kelola-reservasi/bintaro" />
       </Route>
       <Route path="/admin/reservations">
-        <AdminRedirect to="/admin" />
+        <AdminRedirect to="/admin/bookings" />
       </Route>
       <Route
         path="/admin/campaigns"
@@ -131,6 +140,18 @@ function Router() {
       <Route
         path="/admin/emails"
         component={() => <MainAdminOnlyPage component={AdminEmails} />}
+      />
+      <Route
+        path="/admin/inquiries"
+        component={() => <MainAdminOnlyPage component={AdminInquiries} />}
+      />
+      <Route
+        path="/admin/bookings"
+        component={() => <MainAdminOnlyPage component={AdminBookings} />}
+      />
+      <Route
+        path="/admin/media"
+        component={() => <MainAdminOnlyPage component={AdminMedia} />}
       />
       <Route
         path="/admin/menu"

@@ -65,9 +65,9 @@ export const pageSEOConfigs = {
   }),
 
   kemitraan: createSEOConfig({
-    title: "Kemitraan Gadang Barubah - Catering Event, Tenant & Corporate B2B",
-    description: "Hub kemitraan operasional Gadang Barubah: catering acara, tenant event, sewa venue, dan layanan corporate. Buffet, mealbox, stall, dan private dining untuk mitra B2B Anda.",
-    keywords: "kemitraan gadang barubah, catering event padang, tenant stall kuliner, kemitraan catering corporate, sewa venue padang, kemitraan b2b restoran",
+    title: "Kemitraan Gadang Barubah - Catering Acara & Corporate B2B",
+    description: "Hub kemitraan Gadang Barubah: buffet acara, mealbox (Saji Gadang), snacks, dan sewa venue untuk kebutuhan acara dan bisnis Anda.",
+    keywords: "kemitraan gadang barubah, catering acara padang, mealbox saji gadang, kemitraan catering corporate, sewa venue padang, kemitraan b2b restoran",
     path: "/kemitraan",
   }),
   
@@ -121,6 +121,13 @@ export const pageSEOConfigs = {
     path: "/reservasi",
   }),
 
+  career: createSEOConfig({
+    title: "Karir - Bergabung dengan Gadang Barubah",
+    description: "Lowongan dan peluang karir di Gadang Barubah Indonesia. Kirim lamaran ke tim Public Relation kami.",
+    keywords: "karir gadang barubah, lowongan kerja restoran padang, career gadang barubah",
+    path: "/career",
+  }),
+
   terms: createSEOConfig({
     title: "Terms and Conditions - Gadang Barubah Indonesia",
     description: "Syarat dan ketentuan penggunaan website dan layanan reservasi Gadang Barubah Indonesia.",
@@ -151,6 +158,7 @@ export function getSEOConfigByPath(path: string) {
   if (normalizedPath === '/catering') return pageSEOConfigs.catering;
   if (normalizedPath === '/kemitraan') return pageSEOConfigs.kemitraan;
   if (normalizedPath === '/reservasi') return pageSEOConfigs.reservation;
+  if (normalizedPath === '/career') return pageSEOConfigs.career;
   if (normalizedPath === '/uni') return pageSEOConfigs.services;
   if (normalizedPath === '/services/outlet') return pageSEOConfigs.outlet;
   if (normalizedPath === '/services/delivery') return pageSEOConfigs.delivery;

@@ -1,4 +1,7 @@
+import { COMPANY } from "@/lib/siteContent";
+
 export function StructuredData() {
+  const phone = `+${COMPANY.whatsapp}`;
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -9,7 +12,7 @@ export function StructuredData() {
         "alternateName": "Gadang Barubah",
         "description": "Restoran Padang di Sumatera Barat yang menyajikan masakan Minang authentic dengan cita rasa tradisional. Spesialis nasi padang, rendang, dan sate padang.",
         "url": "https://gadangbarubahindonesia.id",
-        "telephone": "+62812-3456-7890",
+        "telephone": phone,
         "email": "info@gadangbarubahindonesia.id",
         "priceRange": "$$",
         "currenciesAccepted": "IDR",
@@ -32,7 +35,7 @@ export function StructuredData() {
           {
             "@type": "OpeningHoursSpecification",
             "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-            "opens": "10:00",
+            "opens": "11:00",
             "closes": "22:00"
           }
         ],
@@ -114,7 +117,7 @@ export function StructuredData() {
         "name": "Gadang Barubah Restaurant",
         "description": "Restoran Padang di Sumatera Barat",
         "url": "https://gadangbarubahindonesia.id",
-        "telephone": "+62812-3456-7890",
+        "telephone": phone,
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Jl. Veteran No. 123",
@@ -132,7 +135,7 @@ export function StructuredData() {
           {
             "@type": "OpeningHoursSpecification",
             "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-            "opens": "10:00",
+            "opens": "11:00",
             "closes": "22:00"
           }
         ]

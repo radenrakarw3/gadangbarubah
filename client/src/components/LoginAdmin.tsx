@@ -123,11 +123,11 @@ export default function LoginAdmin({ portal, onSuccess }: LoginAdminProps) {
             <CardDescription className="text-base leading-relaxed">
               {lang === "ID"
                 ? staffPortal
-                  ? "Masuk untuk melihat dan mengelola permintaan reservasi cabang Anda."
-                  : "Masuk untuk mengelola website, reservasi, dan konten."
+                  ? "Login kasir/PIC — maintain database reservasi outlet via website."
+                  : "Masuk untuk mengelola website, database pemesanan, dan konten."
                 : staffPortal
-                  ? "Sign in to view and manage your branch reservations."
-                  : "Sign in to manage the website, reservations, and content."}
+                  ? "Cashier/PIC login — maintain the outlet reservation database."
+                  : "Sign in to manage the website, bookings database, and content."}
             </CardDescription>
           </CardHeader>
           <CardContent>

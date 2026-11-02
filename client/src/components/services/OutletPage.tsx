@@ -4,8 +4,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Clock, Phone, ArrowLeft, Store, ChevronLeft, ChevronRight, Crown } from 'lucide-react';
 import Logo from '../Logo';
 import SEOHead from '../SEOHead';
+import SiteFooter from '../SiteFooter';
+import { contactByKey } from '@/lib/siteContent';
 import { useState, useEffect, useRef } from 'react';
-import { useSiteText } from '@/lib/siteText';
 
 // Import restaurant photos
 import exteriorImage from '@assets/DSC07220_1758567803910.jpg';
@@ -20,37 +21,69 @@ import boothSeating from '@assets/DSC03081_1758567885552.jpg';
 import streetView from '@assets/DSC03078_1758567885565.jpg';
 import buffetArea from '@assets/DSC03388_1758567885565.jpg';
 
-const ATMOSPHERE_IMAGES = [
-  { n: 1, src: exteriorImage },
-  { n: 2, src: interiorMain },
-  { n: 3, src: vipRoom },
-  { n: 4, src: customersEating },
-  { n: 5, src: waiterService },
-  { n: 6, src: menuDisplay },
-  { n: 7, src: familyDining },
-  { n: 8, src: elegantDining },
-  { n: 9, src: boothSeating },
-  { n: 10, src: streetView },
-  { n: 11, src: buffetArea },
-] as const;
-
-const LOCATIONS = [
-  { n: 1, googleMaps: "https://maps.app.goo.gl/jP1JMKQZBU9AXSLz5" },
-  { n: 2, googleMaps: "https://maps.google.com/?q=Jl.+Menteng+Raya+No.28+Blok+FG+Jurang+Mangu+Barat" },
-] as const;
-
 export default function OutletPage() {
   const [, navigate] = useLocation();
-  const { t } = useSiteText();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoSliding, setIsAutoSliding] = useState(true);
   const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const atmosphereImages = ATMOSPHERE_IMAGES.map((image) => ({
-    src: image.src,
-    title: t(`outlet.atmosphere.${image.n}.title`),
-    description: t(`outlet.atmosphere.${image.n}.description`),
-  }));
+  const atmosphereImages = [
+    {
+      src: exteriorImage,
+      title: "Eksterior Modern",
+      description: "Desain bangunan contemporary dengan signage yang ikonik dan landscaping yang memukau"
+    },
+    {
+      src: interiorMain,
+      title: "Interior Berkelas",
+      description: "Suasana interior rumah makan Padang dengan konsep warna hangat dan buffet area nasi padang yang elegan"
+    },
+    {
+      src: vipRoom,
+      title: "VIP Private Room",
+      description: "Ruang VIP eksklusif dengan poster khas Gadang Barubah untuk acara khusus"
+    },
+    {
+      src: customersEating,
+      title: "Suasana Bersantap",
+      description: "Momen kebersamaan keluarga menikmati hidangan dengan suasana yang nyaman"
+    },
+    {
+      src: waiterService,
+      title: "Pelayanan Prima",
+      description: "Staff profesional memberikan pelayanan berkualitas dengan menu signature masakan Minang kami"
+    },
+    {
+      src: menuDisplay,
+      title: "Menu Berkualitas",
+      description: "Menu bergizi dengan presentasi yang menarik di booth seating yang nyaman"
+    },
+    {
+      src: familyDining,
+      title: "Family Dining",
+      description: "Pengalaman makan bersama dengan berbagai pilihan nasi padang dan hidangan khas Minang autentik"
+    },
+    {
+      src: elegantDining,
+      title: "Elegant Atmosphere",
+      description: "Area dining dengan glass partition dan pencahayaan ambient yang hangat"
+    },
+    {
+      src: boothSeating,
+      title: "Booth Seating",
+      description: "Area booth pribadi dengan desain orange yang khas dan table numbering"
+    },
+    {
+      src: streetView,
+      title: "Lokasi Strategis",
+      description: "Terletak di lokasi strategis dengan akses mudah dan view ke jalan raya"
+    },
+    {
+      src: buffetArea,
+      title: "Buffet Counter",
+      description: "Area buffet lengkap dengan berbagai pilihan hidangan fresh daily"
+    }
+  ];
 
   const pauseAndResume = () => {
     setIsAutoSliding(false);
@@ -112,16 +145,28 @@ export default function OutletPage() {
     preloadImages();
   }, [currentSlide, atmosphereImages]);
 
-  const locations = LOCATIONS.map((location) => ({
-    name: t(`outlet.location.${location.n}.name`),
-    address: t(`outlet.location.${location.n}.address`),
-    phone: t(`outlet.location.${location.n}.phone`),
-    hours: t(`outlet.location.${location.n}.hours`),
-    icon: Store,
-    type: t(`outlet.location.${location.n}.type`),
-    description: t(`outlet.location.${location.n}.description`),
-    googleMaps: location.googleMaps,
-  }));
+  const locations = [
+    {
+      name: "Gadang Barubah Pollux Mall Cikarang",
+      address: "Main Gate, Mall Cikarang, Jl. Raya Cikarang - Cibarusah, Pasirsari, Cikarang Sel., Kabupaten Bekasi, Jawa Barat 17530 Pollux, Lantai GF",
+      contact: contactByKey("cikarang"),
+      hours: "11:00 - 22:00",
+      icon: Store,
+      type: "Restoran Unggulan",
+      description: "Outlet flagship kami di Mall Cikarang dengan konsep berkelas dan VIP room eksklusif.",
+      googleMaps: "https://maps.app.goo.gl/jP1JMKQZBU9AXSLz5"
+    },
+    {
+      name: "Gadang Barubah Bintaro",
+      address: "Jl. Menteng Raya No.28 Blok FG, Jurang Mangu Barat, Kec. Pd. Aren, Kota Tangerang Selatan, Banten 15412",
+      contact: contactByKey("bintaro"),
+      hours: "11:00 - 22:00",
+      icon: Store,
+      type: "Cabang Bintaro",
+      description: "Cabang Bintaro kami menghadirkan cita rasa Minang autentik dengan suasana hangat untuk keluarga dan komunitas.",
+      googleMaps: "https://maps.google.com/?q=Jl.+Menteng+Raya+No.28+Blok+FG+Jurang+Mangu+Barat"
+    }
+  ];
 
   return (
     <div className="min-h-[100svh] supports-[height:100dvh]:min-h-[100dvh] bg-background">
@@ -138,7 +183,7 @@ export default function OutletPage() {
             data-testid="button-back"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline ml-1 text-sm">{t("outlet.back")}</span>
+            <span className="hidden sm:inline ml-1 text-sm">Kembali</span>
           </Button>
           
           <div className="flex-1 flex justify-center">
@@ -154,11 +199,11 @@ export default function OutletPage() {
           {/* Title */}
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-serif font-light text-foreground mb-6">
-              {t("outlet.hero.title")}
+              Dua Cabang Gadang Barubah
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
-            <p className="whitespace-pre-line text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
-              {t("outlet.hero.subtitle")}
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
+              Kini hadir di Pollux Mall Cikarang dan Bintaro — nikmati pengalaman bersantap Minang autentik di cabang terdekat Anda
             </p>
           </div>
 
@@ -184,7 +229,7 @@ export default function OutletPage() {
                             {location.name}
                           </h3>
                           <p className="text-sm font-medium text-primary mb-3">{location.type}</p>
-                          <p className="whitespace-pre-line text-base text-muted-foreground leading-relaxed mb-6">
+                          <p className="text-base text-muted-foreground leading-relaxed mb-6">
                             {location.description}
                           </p>
                         </div>
@@ -192,17 +237,19 @@ export default function OutletPage() {
                         <div className="space-y-3 mb-6">
                           <div className="flex items-start space-x-3">
                             <MapPin className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                            <p className="whitespace-pre-line text-sm text-muted-foreground">{location.address}</p>
+                            <p className="text-sm text-muted-foreground">{location.address}</p>
                           </div>
                           
                           <div className="flex items-center space-x-3">
                             <Phone className="h-4 w-4 text-primary flex-shrink-0" />
-                            <p className="text-sm text-muted-foreground">{location.phone}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {location.contact.name} — {location.contact.display}
+                            </p>
                           </div>
                           
                           <div className="flex items-center space-x-3">
                             <Clock className="h-4 w-4 text-primary flex-shrink-0" />
-                            <p className="text-sm text-muted-foreground">{t("outlet.location.hoursLabel")} {location.hours}</p>
+                            <p className="text-sm text-muted-foreground">Buka: {location.hours}</p>
                           </div>
                         </div>
                         
@@ -210,13 +257,13 @@ export default function OutletPage() {
                           <Button 
                             className="bg-primary hover:bg-primary/90 transition-all duration-300 px-6"
                             onClick={() => {
-                              const message = encodeURIComponent(t("outlet.location.reserveMessage"));
-                              const whatsAppUrl = `https://api.whatsapp.com/send?phone=6289509766739&text=${message}`;
+                              const message = encodeURIComponent('Halo, saya tertarik untuk buat reservasi di Gadang Barubah. Mohon informasi lebih lanjut.');
+                              const whatsAppUrl = `https://api.whatsapp.com/send?phone=${location.contact.whatsapp}&text=${message}`;
                               window.open(whatsAppUrl, '_blank', 'noopener,noreferrer');
                             }}
                             data-testid={`button-reservation-${index}`}
                           >
-                            {t("outlet.location.reserveButton")}
+                            Buat Reservasi
                           </Button>
                           <Button 
                             variant="outline"
@@ -225,7 +272,7 @@ export default function OutletPage() {
                             data-testid={`button-maps-${index}`}
                           >
                             <MapPin className="h-4 w-4 mr-2" />
-                            {t("outlet.location.mapsButton")}
+                            Google Maps
                           </Button>
                         </div>
                       </div>
@@ -240,11 +287,11 @@ export default function OutletPage() {
           <div className="mb-16">
             <div className="text-center mb-12">
               <h2 className="text-3xl sm:text-4xl font-serif font-medium text-foreground mb-6">
-                {t("outlet.atmosphere.title")}
+                Suasana & Atmosfer
               </h2>
               <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
-              <p className="whitespace-pre-line text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                {t("outlet.atmosphere.subtitle")}
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Jelajahi berbagai sudut dan suasana outlet unggulan kami yang dirancang untuk kenyamanan Anda
               </p>
             </div>
             
@@ -265,7 +312,7 @@ export default function OutletPage() {
                   <h3 className="text-white text-2xl font-serif font-medium mb-2">
                     {atmosphereImages[currentSlide].title}
                   </h3>
-                  <p className="whitespace-pre-line text-white/90 text-base leading-relaxed">
+                  <p className="text-white/90 text-base leading-relaxed">
                     {atmosphereImages[currentSlide].description}
                   </p>
                 </div>
@@ -320,30 +367,30 @@ export default function OutletPage() {
                 <div className="flex items-center justify-center mb-8">
                   <Crown className="h-8 w-8 text-primary mr-3" />
                   <h2 className="text-3xl font-serif font-medium text-foreground">
-                    {t("outlet.vip.title")}
+                    VIP Private Room
                   </h2>
                 </div>
                 <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8"></div>
                 
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                   <div className="space-y-6">
-                    <p className="whitespace-pre-line text-lg text-muted-foreground leading-relaxed">
-                      {t("outlet.vip.description")}
+                    <p className="text-lg text-muted-foreground leading-relaxed">
+                      Nikmati pengalaman bersantap eksklusif di ruang VIP pribadi kami yang dirancang khusus untuk acara istimewa, pertemuan bisnis, atau momen keluarga yang berkesan.
                     </p>
                     
                     <div className="grid sm:grid-cols-2 gap-6">
                       <div className="space-y-3">
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                            <span className="text-primary font-semibold text-sm">{t("outlet.vip.capacityValue")}</span>
+                            <span className="text-primary font-semibold text-sm">6-12</span>
                           </div>
-                          <span className="text-sm text-muted-foreground">{t("outlet.vip.capacityLabel")}</span>
+                          <span className="text-sm text-muted-foreground">Kapasitas Tamu</span>
                         </div>
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                             <Store className="h-4 w-4 text-primary" />
                           </div>
-                          <span className="text-sm text-muted-foreground">{t("outlet.vip.privateArea")}</span>
+                          <span className="text-sm text-muted-foreground">Area Privat</span>
                         </div>
                       </div>
                       <div className="space-y-3">
@@ -351,13 +398,13 @@ export default function OutletPage() {
                           <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                             <Phone className="h-4 w-4 text-primary" />
                           </div>
-                          <span className="text-sm text-muted-foreground">{t("outlet.vip.personalService")}</span>
+                          <span className="text-sm text-muted-foreground">Personal Service</span>
                         </div>
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                             <Crown className="h-4 w-4 text-primary" />
                           </div>
-                          <span className="text-sm text-muted-foreground">{t("outlet.vip.specialMenu")}</span>
+                          <span className="text-sm text-muted-foreground">Menu Khusus</span>
                         </div>
                       </div>
                     </div>
@@ -366,13 +413,13 @@ export default function OutletPage() {
                       size="lg" 
                       className="bg-primary hover:bg-primary/90 px-8"
                       onClick={() => {
-                        const message = encodeURIComponent(t("outlet.vip.message"));
-                        const whatsAppUrl = `https://api.whatsapp.com/send?phone=6289509766739&text=${message}`;
+                        const message = encodeURIComponent('Halo, saya tertarik untuk reservasi VIP Room di Gadang Barubah. Mohon informasi lebih lanjut.');
+                        const whatsAppUrl = `https://api.whatsapp.com/send?phone=${contactByKey("cikarang").whatsapp}&text=${message}`;
                         window.open(whatsAppUrl, '_blank', 'noopener,noreferrer');
                       }}
                       data-testid="button-vip-reservation"
                     >
-                      {t("outlet.vip.button")}
+                      Reservasi VIP Room
                     </Button>
                   </div>
                   
@@ -391,6 +438,7 @@ export default function OutletPage() {
 
         </div>
       </main>
+      <SiteFooter />
     </div>
   );
 }
