@@ -10,10 +10,20 @@ export type SiteTextVars = Record<string, string | number>;
 export const SITE_TEXTS_QUERY_KEY = ["/api/site-texts"] as const;
 export const ADMIN_SITE_TEXTS_QUERY_KEY = ["/api/admin/site-texts"] as const;
 
+async function fetchSiteTexts(): Promise<{ success: boolean; texts: SiteTextOverrides }> {
+  const res = await fetch("/api/site-texts", { credentials: "include", cache: "no-store" });
+  if (!res.ok) {
+    throw new Error(`Gagal memuat teks website (${res.status})`);
+  }
+  return res.json();
+}
+
 const siteTextsQueryOptions = {
   queryKey: SITE_TEXTS_QUERY_KEY,
+  queryFn: fetchSiteTexts,
   staleTime: 30_000,
   refetchOnMount: true as const,
+  retry: 2,
 };
 
 export function prefetchSiteTexts() {
@@ -49,7 +59,7 @@ export function renderTemplate(text: string, nodes: Record<string, ReactNode>): 
 /** Teks website: override dari admin (DB) atau default di shared/site-texts. */
 export function useSiteText() {
   const { lang } = useSiteLanguage();
-  const { data } = useQuery<{ success: boolean; texts: SiteTextOverrides }>(siteTextsQueryOptions);
+  const { data } = useQuery(siteTextsQueryOptions);
   const overrides = data?.texts;
 
   const t = useCallback(

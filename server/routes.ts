@@ -1167,9 +1167,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ success: true, texts });
     } catch (error) {
-      // Soft-fail ke default registry di client jika tabel belum siap
+      // Jangan soft-fail kosong: client akan meng-cache teks default dan copywriting CMS "hilang"
       console.error("Get site texts error:", error);
-      res.json({ success: true, texts: {} });
+      const code = (error as { code?: string })?.code;
+      if (code === "42P01") {
+        // relation does not exist — tabel belum di-push; fallback aman ke default registry
+        return res.json({ success: true, texts: {} });
+      }
+      res.status(500).json({ success: false, message: "Gagal mengambil teks website" });
     }
   });
 
