@@ -11,6 +11,7 @@ import { seedMenuIfEmpty } from "./menu-seed";
 import { seedWhatsOnIfEmpty } from "./whats-on-seed";
 import { setupVite, serveStatic, log } from "./vite";
 import { isDevelopment, isProduction } from "./env";
+import { ensureMediaTables } from "./db";
 import { strictRateLimit, antiSpamSlowDown, botDetection, geoSecurity, honeypot, requestValidator } from "./security";
 import { securityLoggingMiddleware, costMonitoringMiddleware } from "./monitoring";
 import { getSEOConfigByPath, generateSEOTags } from "../shared/seo";
@@ -34,7 +35,16 @@ const uploadsRoot = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsRoot)) {
   fs.mkdirSync(uploadsRoot, { recursive: true });
 }
-app.use("/uploads", express.static(uploadsRoot));
+app.use(
+  "/uploads",
+  express.static(uploadsRoot, {
+    fallthrough: false,
+    index: false,
+  }),
+  (_req, res) => {
+    res.status(404).type("text/plain").send("File tidak ditemukan");
+  },
+);
 
 // ULTRA PERMISSIVE HEADERS - NO BLOCKING WHATSOEVER
 app.use(helmet({
@@ -213,6 +223,12 @@ app.get("*", async (req, res, next) => {
 });
 
 (async () => {
+  try {
+    await ensureMediaTables();
+  } catch (error) {
+    console.error("ensureMediaTables error:", error);
+  }
+
   const server = await registerRoutes(app);
   await seedMenuIfEmpty();
   await seedWhatsOnIfEmpty();
@@ -225,7 +241,7 @@ app.get("*", async (req, res, next) => {
     if (err instanceof multer.MulterError) {
       const message =
         err.code === "LIMIT_FILE_SIZE"
-          ? "Ukuran file terlalu besar"
+          ? "Ukuran file terlalu besar (maks. 5MB untuk menu/artikel)"
           : `Upload gagal: ${err.message}`;
       return res.status(400).json({ success: false, message });
     }

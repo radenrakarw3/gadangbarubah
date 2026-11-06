@@ -14,6 +14,6 @@ export const articleUpload = multer({
   storage: multer.memoryStorage(),
   fileFilter,
   limits: {
-    fileSize: 3 * 1024 * 1024,
+    fileSize: 5 * 1024 * 1024,
   },
 });

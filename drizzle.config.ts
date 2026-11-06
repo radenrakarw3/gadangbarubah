@@ -24,5 +24,7 @@ export default defineConfig({
     "menu_items",
     "whats_on_articles",
     "site_texts",
+    "uploaded_files",
+    "site_media_assets",
   ],
 });

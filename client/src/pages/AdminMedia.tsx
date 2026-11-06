@@ -1,14 +1,16 @@
 import { useLocation } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ImageIcon, Loader2, Upload } from "lucide-react";
+import { ArrowLeft, Loader2, Upload } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
+import AdminImagePreview from "@/components/admin/AdminImagePreview";
 import { useToast } from "@/hooks/use-toast";
 import { apiFetch } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { siteMediaQueryKey } from "@/lib/site-media";
+import { isEphemeralDiskImagePath } from "@/lib/media-path";
 import { useSiteLanguage } from "@/lib/language";
 import type { SiteMediaKey } from "@shared/site-media";
 
@@ -115,28 +117,24 @@ export default function AdminMedia() {
                     </p>
                   </CardHeader>
                   <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-end">
-                    <div className="aspect-video w-full overflow-hidden rounded-lg border bg-muted sm:max-w-xs">
-                      {row.imagePath ? (
-                        <img
-                          src={row.imagePath}
-                          alt={row.labelID}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-muted-foreground">
-                          <ImageIcon className="h-8 w-8" />
-                        </div>
-                      )}
-                    </div>
+                    <AdminImagePreview
+                      src={row.imagePath}
+                      alt={row.labelID}
+                      className="aspect-video w-full border sm:max-w-xs"
+                    />
                     <div className="flex-1 space-y-2">
                       <p className="text-xs text-muted-foreground">
-                        {row.imagePath
+                        {isEphemeralDiskImagePath(row.imagePath)
                           ? lang === "ID"
-                            ? "Sedang memakai foto upload admin"
-                            : "Using admin-uploaded photo"
-                          : lang === "ID"
-                            ? "Belum diganti — memakai foto default di kode"
-                            : "Not replaced — using default asset"}
+                            ? "Foto lama hilang — upload ulang agar permanen"
+                            : "Old photo lost — re-upload to persist"
+                          : row.imagePath
+                            ? lang === "ID"
+                              ? "Sedang memakai foto upload admin"
+                              : "Using admin-uploaded photo"
+                            : lang === "ID"
+                              ? "Belum diganti — memakai foto default di kode"
+                              : "Not replaced — using default asset"}
                       </p>
                       <input
                         id={`media-${row.key}`}

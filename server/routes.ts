@@ -425,8 +425,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const asset of assets) map[asset.key] = asset.imagePath;
       res.json({ success: true, data: map });
     } catch (error) {
+      // Soft-fail: tabel belum ada / DB sementara gagal — frontend pakai fallback aset bundel
       console.error("Get site media error:", error);
-      res.status(500).json({ success: false, message: "Gagal mengambil aset media" });
+      res.json({ success: true, data: {} });
     }
   });
 
@@ -442,7 +443,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, data });
     } catch (error) {
       console.error("Get admin site media error:", error);
-      res.status(500).json({ success: false, message: "Gagal mengambil aset media" });
+      res.json({
+        success: true,
+        data: SITE_MEDIA_CATALOG.map((item) => ({
+          ...item,
+          imagePath: null,
+          updatedAt: null,
+        })),
+      });
     }
   });
 
@@ -1159,8 +1167,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ success: true, texts });
     } catch (error) {
+      // Soft-fail ke default registry di client jika tabel belum siap
       console.error("Get site texts error:", error);
-      res.status(500).json({ success: false, message: "Gagal mengambil teks website" });
+      res.json({ success: true, texts: {} });
     }
   });
 

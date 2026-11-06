@@ -5,8 +5,8 @@ import { Clock, MapPin, Phone, Crown, Sparkles, Gem, UtensilsCrossed } from "luc
 import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
 import AboutSlideshow from "@/components/AboutSlideshow";
-import { useSiteLanguage } from "@/lib/language";
 import { contactByKey } from "@/lib/siteContent";
+import { useSiteText } from "@/lib/siteText";
 import aboutInterior from "@assets/about-interior_1781246285353.jpg";
 import aboutTitle from "@assets/about-title-gadang-barubah.svg";
 import image1 from "@assets/DSC07140_1758564407964.jpg";
@@ -15,120 +15,52 @@ import image3 from "@assets/DSC02371_1758564588950.jpg";
 import cikarangImg from "@assets/outlet-cikarang-1_1781246285353.jpg";
 import bintaroImg from "@assets/outlet-bintaro-1_1781246285353.jpg";
 
-const storyImages = [
-  {
-    src: image1,
-    alt: "Hidangan nasi padang Gadang Barubah",
-    captionID: "Rasa familiar dari Ranah Minang",
-    captionEN: "Familiar flavors from Minang land",
-  },
-  {
-    src: image2,
-    alt: "Presentasi masakan Padang Gadang Barubah",
-    captionID: "Disajikan dengan rapi",
-    captionEN: "Thoughtfully presented",
-  },
-  {
-    src: image3,
-    alt: "Suasana restoran Gadang Barubah",
-    captionID: "Suasana bersantap yang hangat",
-    captionEN: "A warm dining atmosphere",
-  },
-];
+const PILLAR_ICONS = [Gem, Sparkles, UtensilsCrossed] as const;
 
-const LUXURY_PILLARS = {
-  ID: [
-    {
-      icon: Gem,
-      title: "Rasa yang Asli",
-      description:
-        "Resep turun-temurun—rendang, gulai, sambal lado hijau—tetap kami masak dengan cara yang sama, dari bahan segar pilihan.",
-    },
-    {
-      icon: Sparkles,
-      title: "Sentuhan Kini",
-      description:
-        "Tradisi Minang yang kami hormati, dengan penyajian yang lebih rapi dan suasana yang nyaman untuk bersantap.",
-    },
-    {
-      icon: UtensilsCrossed,
-      title: "Suasana Bersantap",
-      description:
-        "Interior hangat dan pelayanan yang sopan, agar setiap kunjungan terasa istimewa tanpa perlu berlebihan.",
-    },
-  ],
-  EN: [
-    {
-      icon: Gem,
-      title: "Authentic Flavor",
-      description:
-        "Time-honored recipes—rendang, gulai, green chili sambal—cooked the same way, from fresh, carefully chosen ingredients.",
-    },
-    {
-      icon: Sparkles,
-      title: "A Gentle Modern Touch",
-      description:
-        "Minang tradition we respect, with neater presentation and a comfortable setting to dine in.",
-    },
-    {
-      icon: UtensilsCrossed,
-      title: "The Dining Room",
-      description:
-        "Warm interiors and courteous service, so every visit feels special without trying too hard.",
-    },
-  ],
-} as const;
-
-const STORY_SECTIONS = {
-  ID: [
-    {
-      title: "Masakan yang Disukai Banyak Orang",
-      body: "Sudah lama masakan Padang digemari, tidak hanya di Ranah Minang, tetapi juga di hati banyak perantau dan penggemar kuliner tanah air. Cita rasanya kaya, bumbunya berlapis, dan cara hidangnya khas—hal yang membuatnya begitu melekat di ingatan.",
-    },
-    {
-      title: "Dari Obrolan tentang Rasa",
-      body: "Deddy Corbuzier salah satunya—sering bercerita betapa ia menyukai gulai, rendang, dan sambal lado hijau. Dari obrolan santai tentang cita rasa itu, muncul impian sederhana: mendirikan rumah makan Padang yang enak, rapi, dan berkelas.",
-    },
-    {
-      title: "Lahirnya Gadang Barubah",
-      body: "Impian tersebut akhirnya terwujud dalam Gadang Barubah. Bukan sekadar tempat makan, melainkan ruang untuk menikmati masakan Minang dengan lebih nyaman—resep turun-temurun tetap dijaga, dengan sentuhan modern yang halus, namun tetap berpijak pada cita rasa asli.",
-    },
-    {
-      title: "Sajian yang Kami Banggakan",
-      body: "Mulai dari rendang berbumbu kaya, gulai yang harum, hingga hidangan daging pilihan—setiap suapan membawa rasa Ranah Minang yang familiar, dalam penyajian yang lebih tenang dan hangat.",
-    },
-  ],
-  EN: [
-    {
-      title: "A Cuisine Many People Love",
-      body: "For a long time, Padang food has been cherished—not only in Minang land, but also among migrants and food lovers across Indonesia. Its rich taste, layered spices, and distinctive serving style make it hard to forget.",
-    },
-    {
-      title: "From a Conversation About Taste",
-      body: "Deddy Corbuzier is one of them—often sharing how much he enjoys gulai, rendang, and green chili sambal. From those easy conversations about flavor came a simple dream: to open a Padang restaurant that is delicious, well-kept, and refined.",
-    },
-    {
-      title: "The Birth of Gadang Barubah",
-      body: "That dream became Gadang Barubah—not just a place to eat, but a space to enjoy Minang cuisine more comfortably. Time-honored recipes are still guarded, with a gentle modern touch, while staying true to authentic flavor.",
-    },
-    {
-      title: "Dishes We Are Proud Of",
-      body: "From richly spiced rendang and fragrant gulai to selected meat dishes—every bite carries the familiar taste of Minang land, in a calmer, warmer presentation.",
-    },
-  ],
-} as const;
+const STORY_IMAGE_ALTS = [
+  "Hidangan nasi padang Gadang Barubah",
+  "Presentasi masakan Padang Gadang Barubah",
+  "Suasana restoran Gadang Barubah",
+] as const;
 
 export default function AboutPage() {
-  const { lang } = useSiteLanguage();
-  const isID = lang === "ID";
-  const pillars = LUXURY_PILLARS[lang];
-  const storySections = STORY_SECTIONS[lang];
+  const { t, tl } = useSiteText();
+
+  const pillars = [
+    {
+      icon: PILLAR_ICONS[0],
+      title: t("about.philosophy.1.title"),
+      description: t("about.philosophy.1.description"),
+    },
+    {
+      icon: PILLAR_ICONS[1],
+      title: t("about.philosophy.2.title"),
+      description: t("about.philosophy.2.description"),
+    },
+    {
+      icon: PILLAR_ICONS[2],
+      title: t("about.philosophy.3.title"),
+      description: t("about.philosophy.3.description"),
+    },
+  ];
+
+  const storySections = [
+    { title: t("about.story.1.title"), body: t("about.story.1.body") },
+    { title: t("about.story.2.title"), body: t("about.story.2.body") },
+    { title: t("about.story.3.title"), body: t("about.story.3.body") },
+    { title: t("about.story.4.title"), body: t("about.story.4.body") },
+  ];
+
+  const slideshowImages = [
+    { src: image1, alt: STORY_IMAGE_ALTS[0], caption: t("about.table.caption1") },
+    { src: image2, alt: STORY_IMAGE_ALTS[1], caption: t("about.table.caption2") },
+    { src: image3, alt: STORY_IMAGE_ALTS[2], caption: t("about.table.caption3") },
+  ];
 
   return (
     <PublicPageLayout>
       <SEOHead pageKey="about" />
 
-      {/* Hero — restoran kelas dunia */}
       <section className="relative overflow-hidden bg-[#300505]">
         <div className="absolute inset-0 signature-menu-section-bg" aria-hidden />
         <div className="absolute inset-0">
@@ -153,33 +85,17 @@ export default function AboutPage() {
             />
           </h1>
           <div className="section-divider mb-6" />
-          <p className="max-w-md text-balance text-base leading-relaxed text-white/85 sm:max-w-lg sm:text-lg">
-            {isID ? (
-              <>
-                Warisan rasa Minang yang kami jaga,
-                <br />
-                disajikan dengan tenang dan penuh perhatian.
-              </>
-            ) : (
-              <>
-                Minang flavors we hold dear,
-                <br />
-                served with quiet care and attention.
-              </>
-            )}
+          <p className="max-w-md whitespace-pre-line text-balance text-base leading-relaxed text-white/85 sm:max-w-lg sm:text-lg">
+            {t("about.hero.tagline")}
           </p>
         </div>
       </section>
 
       <div className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="max-w-5xl mx-auto space-y-20 sm:space-y-24">
-
-          {/* Tiga pilar kemewahan */}
           <section>
             <div className="text-center mb-10">
-              <h2 className="section-heading text-primary mb-4">
-                {isID ? "Filosofi Kami" : "Our Philosophy"}
-              </h2>
+              <h2 className="section-heading text-primary mb-4">{t("about.philosophy.title")}</h2>
               <div className="section-divider" />
             </div>
             <div className="grid gap-6 sm:grid-cols-3">
@@ -192,10 +108,8 @@ export default function AboutPage() {
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                       <pillar.icon className="h-6 w-6 text-primary" strokeWidth={1.5} />
                     </div>
-                    <h3 className="font-serif text-lg font-medium text-foreground">
-                      {pillar.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
+                    <h3 className="font-serif text-lg font-medium text-foreground">{pillar.title}</h3>
+                    <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
                       {pillar.description}
                     </p>
                   </CardContent>
@@ -204,12 +118,9 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* Narasi cerita — dikembangkan dari teks asli */}
           <section className="space-y-12">
             <div className="text-center">
-              <h2 className="section-heading text-primary mb-4">
-                {isID ? "Cerita Kami" : "Our Story"}
-              </h2>
+              <h2 className="section-heading text-primary mb-4">{t("about.story.title")}</h2>
               <div className="section-divider" />
             </div>
             <div className="space-y-10">
@@ -229,7 +140,7 @@ export default function AboutPage() {
                     </h3>
                   </div>
                   <div className="sm:w-3/5">
-                    <p className="text-figma-body text-justify leading-relaxed text-muted-foreground">
+                    <p className="whitespace-pre-line text-figma-body text-justify leading-relaxed text-muted-foreground">
                       {section.body}
                     </p>
                   </div>
@@ -238,40 +149,20 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* Slideshow visual */}
           <AboutSlideshow
-            images={storyImages.map((img) => ({
-              src: img.src,
-              alt: img.alt,
-              caption: isID ? img.captionID : img.captionEN,
-            }))}
+            images={slideshowImages}
             content={{
-              title: isID ? "Di Meja Kami" : "At Our Table",
-              paragraphs: isID
-                ? [
-                    "Setiap hidangan kami masak dari resep yang sudah lama ada—bahan segar, bumbu yang pas, tanpa mengubah cita rasa aslinya.",
-                    "Dari dapur ke meja tamu, kami ingin Anda merasa nyaman dan dihargai.",
-                  ]
-                : [
-                    "Every dish is cooked from recipes that have been around for a long time—fresh ingredients, balanced spices, without changing the original taste.",
-                    "From kitchen to guest table, we want you to feel comfortable and well looked after.",
-                  ],
+              title: t("about.table.title"),
+              paragraphs: tl("about.table.paragraphs"),
             }}
             interval={5000}
           />
 
-          {/* Outlet */}
           <section id="outlet">
             <div className="text-center mb-8">
-              <h2 className="section-heading text-primary mb-4">
-                {isID ? "Kunjungi Kami" : "Visit Us"}
-              </h2>
+              <h2 className="section-heading text-primary mb-4">{t("about.visit.title")}</h2>
               <div className="section-divider mb-4" />
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                {isID
-                  ? "Kunjungi cabang kami di Cikarang dan Bintaro."
-                  : "Visit our branches in Cikarang and Bintaro."}
-              </p>
+              <p className="text-muted-foreground max-w-xl mx-auto">{t("about.visit.subtitle")}</p>
             </div>
 
             <div className="space-y-6">
@@ -288,16 +179,15 @@ export default function AboutPage() {
                   <div className="flex items-start gap-3 text-muted-foreground">
                     <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-medium text-foreground">Pollux Mall Cikarang</p>
-                      <p className="text-sm leading-relaxed">
-                        Main Gate, Mall Cikarang, Jl. Raya Cikarang - Cibarusah, Pasirsari,
-                        Cikarang Sel., Kabupaten Bekasi, Jawa Barat 17530 — Lantai GF
+                      <p className="font-medium text-foreground">{t("about.visit.cikarang.name")}</p>
+                      <p className="whitespace-pre-line text-sm leading-relaxed">
+                        {t("about.visit.cikarang.address")}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-muted-foreground">
                     <Clock className="h-5 w-5 text-primary shrink-0" />
-                    <span>{isID ? "Buka setiap hari: 11:00 – 22:00 WIB" : "Open daily: 11:00 – 22:00 WIB"}</span>
+                    <span>{t("about.visit.hours")}</span>
                   </div>
                   <div className="flex items-center gap-3 text-muted-foreground">
                     <Phone className="h-5 w-5 text-primary shrink-0" />
@@ -312,11 +202,7 @@ export default function AboutPage() {
                   </div>
                   <div className="flex items-center gap-3 text-muted-foreground">
                     <Crown className="h-5 w-5 text-primary shrink-0" />
-                    <span>
-                      {isID
-                        ? "VIP Private Room tersedia untuk acara spesial"
-                        : "VIP Private Room available for special occasions"}
-                    </span>
+                    <span>{t("about.visit.cikarang.vip")}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -334,16 +220,15 @@ export default function AboutPage() {
                   <div className="flex items-start gap-3 text-muted-foreground">
                     <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-medium text-foreground">Bintaro (Jurang Mangu Barat)</p>
-                      <p className="text-sm leading-relaxed">
-                        Jl. Menteng Raya No.28 Blok FG, Jurang Mangu Barat, Kec. Pd. Aren,
-                        Kota Tangerang Selatan, Banten 15412
+                      <p className="font-medium text-foreground">{t("about.visit.bintaro.name")}</p>
+                      <p className="whitespace-pre-line text-sm leading-relaxed">
+                        {t("about.visit.bintaro.address")}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-muted-foreground">
                     <Clock className="h-5 w-5 text-primary shrink-0" />
-                    <span>{isID ? "Buka setiap hari: 11:00 – 22:00 WIB" : "Open daily: 11:00 – 22:00 WIB"}</span>
+                    <span>{t("about.visit.hours")}</span>
                   </div>
                   <div className="flex items-center gap-3 text-muted-foreground">
                     <Phone className="h-5 w-5 text-primary shrink-0" />
@@ -360,9 +245,7 @@ export default function AboutPage() {
               </Card>
 
               <Link href="/services/outlet">
-                <Button className="mt-2">
-                  {isID ? "Lihat Detail Outlet" : "View Outlet Details"}
-                </Button>
+                <Button className="mt-2">{t("about.visit.detailButton")}</Button>
               </Link>
             </div>
           </section>

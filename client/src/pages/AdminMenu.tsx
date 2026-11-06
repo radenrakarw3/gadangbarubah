@@ -44,7 +44,9 @@ import {
   PowerOff,
 } from "lucide-react";
 import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
+import AdminImagePreview from "@/components/admin/AdminImagePreview";
 import { Helmet } from "react-helmet-async";
+import { isEphemeralDiskImagePath } from "@/lib/media-path";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest, parseApiError } from "@/lib/queryClient";
 import { apiFetch } from "@/lib/api";
@@ -536,19 +538,19 @@ export default function AdminMenu() {
                 {filteredItems.map((item) => (
                   <Card key={item.id} className="overflow-hidden">
                     <div className="aspect-[8/5] bg-muted relative">
-                      <img
+                      <AdminImagePreview
                         src={item.imagePath}
                         alt={item.nameId}
-                        className="w-full h-full object-cover"
+                        className="h-full w-full rounded-none"
                       />
                       {item.isFeatured && (
-                        <Badge className="absolute top-2 left-2 gap-1">
+                        <Badge className="absolute top-2 right-2 gap-1 z-10">
                           <Star className="h-3 w-3" />
                           Unggulan
                         </Badge>
                       )}
                       {!item.isActive && (
-                        <Badge variant="secondary" className="absolute top-2 right-2">
+                        <Badge variant="secondary" className="absolute bottom-2 right-2 z-10">
                           Nonaktif
                         </Badge>
                       )}
@@ -741,7 +743,7 @@ export default function AdminMenu() {
                   ) : (
                     <div className="text-muted-foreground">
                       <ImageIcon className="h-8 w-8 mx-auto mb-2" />
-                      <p className="text-sm">Klik untuk pilih foto (JPEG, PNG, WebP, max 2MB)</p>
+                      <p className="text-sm">Klik untuk pilih foto (JPEG, PNG, WebP, max 5MB)</p>
                     </div>
                   )}
                 </div>
@@ -759,7 +761,17 @@ export default function AdminMenu() {
               <div className="space-y-2">
                 <Label>Ganti Foto</Label>
                 {previewUrl && (
-                  <img src={previewUrl} alt="Preview" className="max-h-32 rounded mb-2" />
+                  <AdminImagePreview
+                    src={previewUrl}
+                    alt="Preview"
+                    className="mb-2 max-h-32 w-full max-w-xs"
+                    imgClassName="max-h-32 object-contain"
+                  />
+                )}
+                {isEphemeralDiskImagePath(previewUrl) && (
+                  <p className="text-xs text-destructive">
+                    Foto lama hilang setelah deploy. Upload ulang agar tampil permanen.
+                  </p>
                 )}
                 <Button
                   variant="outline"

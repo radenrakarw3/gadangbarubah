@@ -8,11 +8,11 @@ import PublicPageLayout from "@/components/PublicPageLayout";
 import SEOHead from "@/components/SEOHead";
 import { useSiteLanguage } from "@/lib/language";
 import { menuListQueryKey, menuPublicQueryOptions } from "@/lib/menu";
+import { isEphemeralDiskImagePath } from "@/lib/media-path";
+import { useSiteText } from "@/lib/siteText";
 import type { MenuCategory, MenuItem } from "@shared/schema";
 import menuPdfCikarang from "@assets/menu-cikarang.pdf";
 import menuPdfBintaro from "@assets/menu-bintaro.pdf";
-
-const MENU_PDF_UPDATED = { ID: "Update November 2026", EN: "Updated November 2026" } as const;
 
 const MENU_PDFS = [
   {
@@ -33,6 +33,7 @@ type PublicMenuCategory = MenuCategory & { items: MenuItem[] };
 
 export default function MenuPage() {
   const { lang } = useSiteLanguage();
+  const { t } = useSiteText();
 
   const { data, isLoading } = useQuery<{
     success: boolean;
@@ -52,13 +53,11 @@ export default function MenuPage() {
         <div className="max-w-5xl mx-auto space-y-12">
           <section className="text-center">
             <h1 className="text-3xl sm:text-4xl font-serif font-medium text-primary mb-4">
-              Menu
+              {t("menu.title")}
             </h1>
             <div className="w-24 h-px bg-primary mx-auto mb-6" />
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              {lang === "ID"
-                ? "Jelajahi koleksi hidangan autentik Padang kami — dari rendang signature hingga paket praktis untuk dibawa pulang."
-                : "Explore our authentic Padang dishes — from signature rendang to practical takeaway packages."}
+            <p className="whitespace-pre-line text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              {t("menu.subtitle")}
             </p>
           </section>
 
@@ -78,11 +77,7 @@ export default function MenuPage() {
           )}
 
           {!isLoading && categories.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">
-              {lang === "ID"
-                ? "Menu sedang disiapkan. Silakan lihat menu digital lengkap di bawah."
-                : "Menu is being prepared. Please see the complete digital menu below."}
-            </p>
+            <p className="text-center text-muted-foreground py-8">{t("menu.empty")}</p>
           )}
 
           {categories.map((category) => (
@@ -100,12 +95,14 @@ export default function MenuPage() {
                       className="border-border/30 hover-elevate transition-shadow overflow-hidden"
                     >
                       <div className="aspect-[8/5] bg-muted">
-                        <img
-                          src={item.imagePath}
-                          alt={name}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
+                        {!isEphemeralDiskImagePath(item.imagePath) ? (
+                          <img
+                            src={item.imagePath}
+                            alt={name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : null}
                       </div>
                       <CardContent className="p-5">
                         <div className="flex items-start justify-between gap-2 mb-2">
@@ -116,9 +113,7 @@ export default function MenuPage() {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {description}
-                        </p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
                       </CardContent>
                     </Card>
                   );
@@ -135,13 +130,9 @@ export default function MenuPage() {
                     <FileText className="w-8 h-8 text-primary" />
                   </div>
                 </div>
-                <h2 className="text-2xl font-serif font-medium mb-4">
-                  {lang === "ID" ? "Menu Digital Lengkap" : "Complete Digital Menu"}
-                </h2>
-                <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-                  {lang === "ID"
-                    ? "Lihat menu digital dengan harga terbaru dan pilihan lengkap masakan Minang tradisional."
-                    : "See our digital menu with latest prices and complete traditional Minang selections."}
+                <h2 className="text-2xl font-serif font-medium mb-4">{t("menu.pdf.title")}</h2>
+                <p className="whitespace-pre-line text-muted-foreground mb-8 max-w-xl mx-auto">
+                  {t("menu.pdf.description")}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   {MENU_PDFS.map((pdf) => (
@@ -153,10 +144,7 @@ export default function MenuPage() {
                     </Button>
                   ))}
                 </div>
-                <p className="text-sm text-muted-foreground/80 mt-4">
-                  {MENU_PDF_UPDATED[lang]} •{" "}
-                  {lang === "ID" ? "Kompatibel semua perangkat" : "Compatible with all devices"}
-                </p>
+                <p className="text-sm text-muted-foreground/80 mt-4">{t("menu.pdf.note")}</p>
               </CardContent>
             </Card>
           </section>

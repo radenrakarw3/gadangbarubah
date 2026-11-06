@@ -6,6 +6,7 @@ import { useSiteLanguage } from "@/lib/language";
 import { useSiteText } from "@/lib/siteText";
 import { cn } from "@/lib/utils";
 import { menuFeaturedQueryKey, menuPublicQueryOptions } from "@/lib/menu";
+import { isEphemeralDiskImagePath } from "@/lib/media-path";
 import type { MenuItem } from "@shared/schema";
 
 /** Ganti ke import asset saat file `attached_assets/signature-menu-bg.webp` sudah siap */
@@ -180,14 +181,16 @@ function SignatureMenuSection() {
                     MENU_CARD_IMAGE_CLASS,
                   )}
                 >
-                  <img
-                    src={item.imagePath}
-                    alt={label}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
-                  />
+                  {!isEphemeralDiskImagePath(item.imagePath) ? (
+                    <img
+                      src={item.imagePath}
+                      alt={label}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                      draggable={false}
+                    />
+                  ) : null}
                 </button>
                 <p className="mt-4 text-center font-heroCta text-base leading-tight text-white sm:mt-4 sm:text-lg xl:mt-3 xl:text-[clamp(0.9375rem,1vw,1.125rem)] xl:leading-snug 2xl:mt-6 2xl:text-[clamp(1rem,1.1vw,1.25rem)]">
                   {label}

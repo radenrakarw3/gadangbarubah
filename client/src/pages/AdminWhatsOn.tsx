@@ -10,12 +10,12 @@ import {
   Pencil,
   Trash2,
   Upload,
-  ImageIcon,
   Power,
   PowerOff,
   ExternalLink,
 } from "lucide-react";
 import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
+import AdminImagePreview from "@/components/admin/AdminImagePreview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -327,17 +327,11 @@ export default function AdminWhatsOn() {
                     </p>
                     <p className="mt-2 text-xs text-muted-foreground">/{article.slug}</p>
                   </div>
-                  {article.imagePath ? (
-                    <img
-                      src={article.imagePath}
-                      alt=""
-                      className="h-20 w-28 rounded-md object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-20 w-28 items-center justify-center rounded-md bg-muted">
-                      <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                    </div>
-                  )}
+                  <AdminImagePreview
+                    src={article.imagePath}
+                    alt=""
+                    className="h-20 w-28 shrink-0"
+                  />
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-2">
                   <Button variant="outline" size="sm" onClick={() => openEdit(article)}>
@@ -559,10 +553,10 @@ export default function AdminWhatsOn() {
                 onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
               />
               {editing?.imagePath && !imageFile ? (
-                <img
+                <AdminImagePreview
                   src={editing.imagePath}
                   alt=""
-                  className="mt-2 h-32 w-full max-w-xs rounded-md object-cover"
+                  className="mt-2 h-32 w-full max-w-xs"
                 />
               ) : null}
             </div>
